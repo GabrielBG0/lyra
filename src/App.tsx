@@ -1,3 +1,1 @@
-export default function App() {
-  return <div>Benten</div>
-}
+// top-level layout (sidebar + editor)

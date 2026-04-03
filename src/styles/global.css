@@ -1,12 +1,1 @@
-@import './tokens.css';
-
-*, *::before, *::after {
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-  background: var(--color-surface);
-  color: var(--color-text-primary);
-  font-family: var(--font-ui);
-}
+/* global styles */
