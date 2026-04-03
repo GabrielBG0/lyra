@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "benzaiten",
+  "productName": "Benzaiten",
   "version": "0.1.0",
   "identifier": "dev.gabrielbg.benzaiten",
   "build": {
@@ -12,9 +12,12 @@
   "app": {
     "windows": [
       {
-        "title": "benzaiten",
-        "width": 800,
-        "height": 600
+        "title": "Benten",
+        "width": 1280,
+        "height": 800,
+        "minWidth": 900,
+        "minHeight": 600,
+        "decorations": true
       }
     ],
     "security": {
@@ -30,6 +33,12 @@
       "icons/128x128@2x.png",
       "icons/icon.icns",
       "icons/icon.ico"
+    ],
+    "fileAssociations": [
+      {
+        "ext": ["lyr"],
+        "mimeType": "application/x-lyr"
+      }
     ]
   }
 }
