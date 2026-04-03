@@ -1,1 +1,24 @@
 /* design tokens (colors, spacing, typography) */
+:root {
+  --color-surface: #0d0d0d;
+  --color-surface-raised: #161616;
+  --color-surface-overlay: #1f1f1f;
+  --color-border: #2a2a2a;
+  --color-accent: #c084fc;
+  --color-accent-muted: #7c3aed33;
+  --color-text-primary: #ebebeb;
+  --color-text-secondary: #a3a3a3;
+  --color-text-muted: #525252;
+  --color-status-idea: #6b7280;
+  --color-status-draft: #3b82f6;
+  --color-status-demo: #f59e0b;
+  --color-status-finished: #22c55e;
+  --color-diff-add: #14532d;
+  --color-diff-add-text: #86efac;
+  --color-diff-remove: #450a0a;
+  --color-diff-remove-text: #fca5a5;
+  --font-ui: "Inter", sans-serif;
+  --font-lyrics: "Lora", serif;
+  --radius-card: 8px;
+  --radius-input: 6px;
+}
