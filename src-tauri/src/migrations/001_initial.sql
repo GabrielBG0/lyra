@@ -1,4 +1,3 @@
--- Initial migration
 CREATE TABLE IF NOT EXISTS "songs" (
     "id"          TEXT PRIMARY KEY,
     "title"       TEXT NOT NULL,
@@ -9,7 +8,7 @@ CREATE TABLE IF NOT EXISTS "songs" (
     "file_path"   TEXT NOT NULL UNIQUE,
     "created_at"  TEXT NOT NULL,
     "updated_at"  TEXT NOT NULL
-);  -- ← semicolon, and removed the trailing comma above
+);
 
 CREATE INDEX IF NOT EXISTS "idx_songs_status" ON "songs" ("status");
 CREATE INDEX IF NOT EXISTS "idx_updated_at" ON "songs" ("updated_at" DESC);

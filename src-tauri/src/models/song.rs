@@ -1,18 +1,17 @@
 //! Data models for song
 #![allow(dead_code)]
 
-use serde::{Deserialize, Serialize};
 use crate::models::comment::Comment;
 use crate::models::section::Section;
 use crate::models::snapshot::SnapshotHeader;
-
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SongMetadata {
-    pub id: String,           // ULID
+    pub id: String, // ULID
     pub title: String,
     pub status: SongStatus,
-    pub created_at: String,   // ISO 8601
+    pub created_at: String, // ISO 8601
     pub updated_at: String,
     pub musical: MusicalInfo,
     pub tags: SongTags,
@@ -42,7 +41,12 @@ pub struct AlbumRef {
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "lowercase")]
-pub enum SongStatus { Idea, Draft, Demo, Finished }
+pub enum SongStatus {
+    Idea,
+    Draft,
+    Demo,
+    Finished,
+}
 
 // What open_song returns to the frontend
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -61,8 +65,9 @@ pub struct SongIndexEntry {
     pub title: String,
     pub status: SongStatus,
     pub bpm: Option<u16>,
-    pub key: Option<String>,
+    pub key_sig: Option<String>,
     pub genre: Vec<String>,
     pub file_path: String,
+    pub created_at: String,
     pub updated_at: String,
 }

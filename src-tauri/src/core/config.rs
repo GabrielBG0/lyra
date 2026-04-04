@@ -5,11 +5,12 @@ use std::path::PathBuf;
 use serde::{Deserialize, Serialize};
 
 use crate::error::{AppError, AppResult};
+use tokio;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AppConfig {
-    vault_path: Option<String>,
-    last_opened_song: Option<String>,
+    pub vault_path: Option<String>,
+    pub last_opened_song: Option<String>,
 }
 
 fn config_path() -> AppResult<PathBuf> {
@@ -37,7 +38,7 @@ fn config_path() -> AppResult<PathBuf> {
     Ok(config_dir.join("config.toml"))
 }
 
-async fn load_config() -> AppResult<AppConfig> {
+pub async fn load_config() -> AppResult<AppConfig> {
     let path = config_path()?;
 
     if !path.exists() {
@@ -51,4 +52,18 @@ async fn load_config() -> AppResult<AppConfig> {
     let config: AppConfig = toml::from_str(&content)?;
 
     Ok(config)
+}
+
+pub async fn save_config(config: &AppConfig) -> AppResult<()> {
+    let path = config_path()?;
+
+    if let Some(parent) = path.parent() {
+        tokio::fs::create_dir_all(parent).await?;
+    }
+
+    let serial = toml::to_string_pretty(config)?;
+
+    tokio::fs::write(&path, serial).await?;
+
+    Ok(())
 }
