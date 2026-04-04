@@ -93,8 +93,16 @@ pub async fn load_snapshot(
 ///
 /// Each [`SnapshotSection`] is converted back to a [`Section`] with
 /// `updated_at` set to now. The restored sections are written via
-/// [`write_lyr_file`] which also preserves metadata, snapshots, and
+/// [`write_lyr_file`], which also preserves metadata, snapshots, and
 /// comments.
+///
+/// # Note
+///
+/// This function reads the file twice: once to load the snapshot, and once
+/// to read the current metadata before writing. For a single-user local
+/// tool this is safe, but a future improvement is to accept `metadata` as
+/// a parameter from the caller (which already holds it in the editor store),
+/// eliminating the second read.
 pub async fn restore_snapshot(
     path: &Path,
     snapshot_id: &str,
@@ -108,7 +116,7 @@ pub async fn restore_snapshot(
         .map(|ss| section_from_snapshot(ss, &now))
         .collect();
 
-    // We need the current metadata to call write_lyr_file.
+    // Read current metadata so write_lyr_file doesn't clobber it.
     let payload = crate::core::song::read_lyr_file(path).await?;
     write_lyr_file(path, &payload.metadata, &sections).await?;
 
@@ -156,9 +164,8 @@ fn snapshot_section_from(section: &Section) -> SnapshotSection {
 
 /// Convert a [`SnapshotSection`] back into a live [`Section`].
 ///
-/// `created_at` is set from the snapshot section's original id (which is
-/// the section's stable identity). Since `SnapshotSection` doesn't carry
-/// timestamps, both `created_at` and `updated_at` are set to `now`.
+/// Since [`SnapshotSection`] carries no timestamps, both `created_at` and
+/// `updated_at` are set to `now` (the time of the restore operation).
 fn section_from_snapshot(ss: &SnapshotSection, now: &str) -> Section {
     Section {
         id: ss.section_id.clone(),
@@ -173,7 +180,7 @@ fn section_from_snapshot(ss: &SnapshotSection, now: &str) -> Section {
 
 /// Copy all existing archive entries and append one new entry.
 ///
-/// This is the "append" strategy for the zip crate which doesn't support
+/// This is the "append" strategy for the zip crate, which doesn't support
 /// true in-place append.
 fn do_append_snapshot(
     tmp_path: &Path,

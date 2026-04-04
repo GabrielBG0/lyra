@@ -63,7 +63,7 @@ struct SnapshotFile {
 /// 1. `meta.json`  — validate format version
 /// 2. `song.toml`  — parse into [`SongMetadata`]
 /// 3. `sections/`  — each `{ulid}.toml` → [`Section`], sorted by `order`
-/// 4. `snapshots/` — each `{ulid}.toml` → [`SnapshotHeader`] (header only)
+/// 4. `snapshots/` — each `{ulid}.json` → [`SnapshotHeader`] (header only)
 /// 5. `comments.toml` → `Vec<Comment>`
 pub async fn read_lyr_file(path: &Path) -> AppResult<SongPayload> {
     // Open the ZIP synchronously — the file I/O is fast for small archives
@@ -120,10 +120,6 @@ pub async fn read_lyr_file(path: &Path) -> AppResult<SongPayload> {
     sections.sort_by_key(|s| s.order);
 
     // ── 4. snapshots/ — header-only parse (JSON files) ───────────────
-    //
-    // Snapshot filenames follow the pattern:
-    //   snapshots/{ISO-8601}_{slug}.json
-    //   e.g. snapshots/2025-03-01T14:22Z_first-draft.json
     let snapshot_names: Vec<String> = (0..archive.len())
         .filter_map(|i| {
             let entry = archive.by_index(i).ok()?;
@@ -144,7 +140,7 @@ pub async fn read_lyr_file(path: &Path) -> AppResult<SongPayload> {
         })?;
 
         // Derive the id from the filename stem:
-        //   "snapshots/2025-03-01T14:22Z_first-draft.json" → "2025-03-01T14:22Z_first-draft"
+        //   "snapshots/01HXKM5P8Q9R2S3T4U5V6W7X8Y.json" → "01HXKM5P8Q9R2S3T4U5V6W7X8Y"
         let id = name
             .strip_prefix("snapshots/")
             .and_then(|s| s.strip_suffix(".json"))
@@ -160,8 +156,7 @@ pub async fn read_lyr_file(path: &Path) -> AppResult<SongPayload> {
         });
     }
 
-    // Sort by id — the ISO 8601 timestamp prefix makes lexicographic
-    // sort equivalent to chronological order.
+    // Sort by id — ULID lexicographic order is chronological.
     snapshot_headers.sort_by(|a, b| a.id.cmp(&b.id));
 
     // ── 5. comments.toml (optional) ─────────────────────────────────
@@ -259,6 +254,9 @@ pub async fn write_section(
 ///    - `snapshots/`  (empty directory)
 ///    - `comments.toml` (empty array)
 /// 4. Return `(file_path, SongPayload)`.
+///
+/// On any write error the partially-written file is deleted before
+/// returning, so no corrupt `.lyr` file is left on disk.
 pub async fn create_lyr_file(
     vault_path: &Path,
     title: &str,
@@ -307,48 +305,15 @@ pub async fn create_lyr_file(
 
     let sections = vec![default_section];
 
-    // ── Write ZIP archive ───────────────────────────────────────────
-    let file = std::fs::File::create(&file_path)?;
-    let mut writer = ZipWriter::new(file);
-    let opts = SimpleFileOptions::default();
+    // ── Write ZIP archive — clean up partial file on error ──────────
+    let write_result = do_create_lyr(&file_path, &metadata, &sections, &now);
 
-    // meta.json
-    let meta = LyrMeta {
-        lyr_format_version: "1.0".to_owned(),
-        created_at: Some(now.clone()),
-        created_by: None,
-    };
-    let meta_json = serde_json::to_string_pretty(&meta)?;
-    writer.start_file("meta.json", opts)?;
-    writer.write_all(meta_json.as_bytes())?;
-
-    // song.toml
-    let song_toml = toml::to_string_pretty(&metadata).map_err(|e| {
-        AppError::Other(format!("song.toml serialization: {e}"))
-    })?;
-    writer.start_file("song.toml", opts)?;
-    writer.write_all(song_toml.as_bytes())?;
-
-    // sections/{id}.toml
-    for section in &sections {
-        let entry_name = format!("sections/{}.toml", section.id);
-        let section_toml = serialize_section(section)?;
-        writer.start_file(entry_name, opts)?;
-        writer.write_all(section_toml.as_bytes())?;
+    if write_result.is_err() {
+        // Best-effort cleanup: remove the partially-written file so it
+        // doesn't appear as a corrupt entry on the next vault scan.
+        let _ = std::fs::remove_file(&file_path);
+        return Err(write_result.unwrap_err());
     }
-
-    // snapshots/ (empty directory)
-    writer.add_directory("snapshots/", opts)?;
-
-    // comments.toml (empty array)
-    let comments_file = CommentsFile { comments: Vec::new() };
-    let comments_toml = toml::to_string_pretty(&comments_file).map_err(|e| {
-        AppError::Other(format!("comments.toml serialization: {e}"))
-    })?;
-    writer.start_file("comments.toml", opts)?;
-    writer.write_all(comments_toml.as_bytes())?;
-
-    writer.finish()?;
 
     // ── Build return payload ────────────────────────────────────────
     let payload = SongPayload {
@@ -451,6 +416,58 @@ fn do_write_section(
     Ok(())
 }
 
+/// Core implementation for [`create_lyr_file`]. Separated so the caller
+/// can handle partial-file cleanup uniformly.
+fn do_create_lyr(
+    file_path: &Path,
+    metadata: &SongMetadata,
+    sections: &[Section],
+    now: &str,
+) -> AppResult<()> {
+    let file = std::fs::File::create(file_path)?;
+    let mut writer = ZipWriter::new(file);
+    let opts = SimpleFileOptions::default();
+
+    // meta.json
+    let meta = LyrMeta {
+        lyr_format_version: "1.0".to_owned(),
+        created_at: Some(now.to_owned()),
+        created_by: None,
+    };
+    let meta_json = serde_json::to_string_pretty(&meta)?;
+    writer.start_file("meta.json", opts)?;
+    writer.write_all(meta_json.as_bytes())?;
+
+    // song.toml
+    let song_toml = toml::to_string_pretty(metadata).map_err(|e| {
+        AppError::Other(format!("song.toml serialization: {e}"))
+    })?;
+    writer.start_file("song.toml", opts)?;
+    writer.write_all(song_toml.as_bytes())?;
+
+    // sections/{id}.toml
+    for section in sections {
+        let entry_name = format!("sections/{}.toml", section.id);
+        let section_toml = serialize_section(section)?;
+        writer.start_file(entry_name, opts)?;
+        writer.write_all(section_toml.as_bytes())?;
+    }
+
+    // snapshots/ (empty directory)
+    writer.add_directory("snapshots/", opts)?;
+
+    // comments.toml (empty array)
+    let comments_file = CommentsFile { comments: Vec::new() };
+    let comments_toml = toml::to_string_pretty(&comments_file).map_err(|e| {
+        AppError::Other(format!("comments.toml serialization: {e}"))
+    })?;
+    writer.start_file("comments.toml", opts)?;
+    writer.write_all(comments_toml.as_bytes())?;
+
+    writer.finish()?;
+    Ok(())
+}
+
 /// Copy every entry from `src` into `dst` **except** those whose names
 /// appear in `skip`.
 fn copy_entries_except(
@@ -467,7 +484,6 @@ fn copy_entries_except(
             continue;
         }
 
-        // Read the raw bytes and copy them into the new archive.
         let mut buf = Vec::with_capacity(entry.size() as usize);
         entry.read_to_end(&mut buf)?;
 
@@ -481,8 +497,10 @@ fn copy_entries_except(
     Ok(())
 }
 
-/// Serialize a [`Section`] to TOML, using a multiline literal string
-/// (`"""..."""`) for the `content` field so the file is human-readable
+/// Serialize a [`Section`] to TOML.
+///
+/// The `toml` crate's pretty printer automatically uses multiline strings
+/// for values containing newlines, keeping section files human-readable
 /// when opened in a text editor.
 fn serialize_section(section: &Section) -> AppResult<String> {
     let toml_str = toml::to_string_pretty(section).map_err(|e| {
