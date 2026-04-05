@@ -73,3 +73,19 @@ pub struct SongIndexEntry {
     pub created_at: String,
     pub updated_at: String,
 }
+
+impl SongIndexEntry {
+    pub fn from_payload(payload: SongPayload, path: String) -> Self {
+        Self {
+            id: payload.metadata.id,
+            title: payload.metadata.title,
+            status: payload.metadata.status,
+            bpm: payload.metadata.musical.bpm,
+            key_sig: payload.metadata.musical.key,
+            genre: payload.metadata.tags.genre,
+            file_path: path,
+            created_at: payload.metadata.created_at,
+            updated_at: payload.metadata.updated_at,
+        }
+    }
+}

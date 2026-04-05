@@ -11,7 +11,7 @@ use crate::{
 };
 
 #[derive(FromRow)]
-struct SongDbRow {
+pub struct SongDbRow {
     id: String,
     title: String,
     status: SongStatus,
@@ -29,9 +29,9 @@ impl From<SongDbRow> for SongIndexEntry {
             id: row.id,
             title: row.title,
             status: row.status,
-            bpm: row.bpm.map(|b| b as u16), // Safely cast to u16
+            bpm: row.bpm.map(|b| b as u16),
             key_sig: row.key_sig,
-            genre: row.genre.0, // The `.0` extracts the Vec out of the Json wrapper
+            genre: row.genre.0,
             file_path: row.file_path,
             updated_at: row.updated_at,
             created_at: row.created_at,

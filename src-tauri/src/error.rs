@@ -28,6 +28,10 @@ pub enum AppError {
     FileExists(String),
     #[error("Migration error: {0}")]
     Migration(#[from] sqlx::migrate::MigrateError),
+    #[error("File watcher error: {0}")]
+    Notify(#[from] notify::Error),
+    #[error("Tauri error: {0}")]
+    Tauri(#[from] tauri::Error),
     #[error("{0}")]
     Other(String),
 }
