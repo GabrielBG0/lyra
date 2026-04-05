@@ -5,6 +5,7 @@ use crate::models::comment::Comment;
 use crate::models::section::Section;
 use crate::models::snapshot::SnapshotHeader;
 use serde::{Deserialize, Serialize};
+use sqlx::{self, prelude::FromRow, Type};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SongMetadata {
@@ -39,8 +40,9 @@ pub struct AlbumRef {
     pub track_number: Option<u32>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Type)]
 #[serde(rename_all = "lowercase")]
+#[sqlx(type_name = "TEXT", rename_all = "lowercase")]
 pub enum SongStatus {
     Idea,
     Draft,
@@ -59,7 +61,7 @@ pub struct SongPayload {
 }
 
 // What list_songs returns (index row, no content)
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, FromRow)]
 pub struct SongIndexEntry {
     pub id: String,
     pub title: String,

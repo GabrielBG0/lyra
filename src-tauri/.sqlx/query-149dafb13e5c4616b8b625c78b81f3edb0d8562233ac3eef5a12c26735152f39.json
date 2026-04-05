@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        DELETE FROM songs WHERE file_path = ?\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": []
+  },
+  "hash": "149dafb13e5c4616b8b625c78b81f3edb0d8562233ac3eef5a12c26735152f39"
+}

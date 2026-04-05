@@ -3,9 +3,41 @@
 
 use std::path::Path;
 
-use sqlx::SqlitePool;
+use sqlx::{types::Json, FromRow, SqlitePool};
 
-use crate::{error::AppResult, models::song::SongIndexEntry};
+use crate::{
+    error::AppResult,
+    models::song::{SongIndexEntry, SongStatus},
+};
+
+#[derive(FromRow)]
+struct SongDbRow {
+    id: String,
+    title: String,
+    status: SongStatus,
+    bpm: Option<i64>, // SQLite uses i64 for integers
+    key_sig: Option<String>,
+    genre: Json<Vec<String>>, // sqlx will automatically parse the JSON string!
+    file_path: String,
+    updated_at: String,
+    created_at: String,
+}
+
+impl From<SongDbRow> for SongIndexEntry {
+    fn from(row: SongDbRow) -> Self {
+        Self {
+            id: row.id,
+            title: row.title,
+            status: row.status,
+            bpm: row.bpm.map(|b| b as u16), // Safely cast to u16
+            key_sig: row.key_sig,
+            genre: row.genre.0, // The `.0` extracts the Vec out of the Json wrapper
+            file_path: row.file_path,
+            updated_at: row.updated_at,
+            created_at: row.created_at,
+        }
+    }
+}
 
 pub async fn init_index(vault_path: &Path) -> AppResult<SqlitePool> {
     let index_path = vault_path.join(".lyrindex");
@@ -30,7 +62,7 @@ pub async fn init_index(vault_path: &Path) -> AppResult<SqlitePool> {
 
 pub async fn upsert_song(pool: &SqlitePool, entry: &SongIndexEntry) -> AppResult<()> {
     let genre_json = serde_json::to_string(&entry.genre)?;
-    let status = format!("{:?}", entry.status).to_lowercase();
+    let bpm_i64 = entry.bpm.map(|b| b as i64);
 
     sqlx::query!(
         r#"
@@ -47,8 +79,8 @@ pub async fn upsert_song(pool: &SqlitePool, entry: &SongIndexEntry) -> AppResult
         "#,
         entry.id,
         entry.title,
-        status,
-        entry.bpm,
+        entry.status, // Assumes SongStatus has #[derive(sqlx::Type)]
+        bpm_i64,
         entry.key_sig,
         genre_json,
         entry.file_path,
@@ -59,4 +91,73 @@ pub async fn upsert_song(pool: &SqlitePool, entry: &SongIndexEntry) -> AppResult
     .await?;
 
     Ok(())
+}
+
+pub async fn remove_song(pool: &SqlitePool, file_path: &str) -> AppResult<()> {
+    sqlx::query!(
+        r#"
+        DELETE FROM songs WHERE file_path = ?
+        "#,
+        file_path
+    )
+    .execute(pool)
+    .await?;
+
+    Ok(())
+}
+
+pub async fn list_songs(pool: &SqlitePool) -> AppResult<Vec<SongIndexEntry>> {
+    let entries = sqlx::query_as!(
+        SongDbRow, // Tell the macro to build this struct
+        r#"
+        SELECT 
+            id as "id!", 
+            title, 
+            status as "status: SongStatus",
+            bpm, 
+            key_sig, 
+            genre as "genre: Json<Vec<String>>", -- Tell the macro about our wrapper
+            file_path, 
+            updated_at, 
+            created_at
+        FROM songs
+        ORDER BY updated_at DESC
+        "#
+    )
+    .fetch_all(pool)
+    .await?
+    .into_iter()
+    .map(Into::into) // This automatically calls the From trait we wrote above!
+    .collect();
+
+    Ok(entries)
+}
+
+pub async fn get_song_by_path(
+    pool: &SqlitePool,
+    file_path: &str,
+) -> AppResult<Option<SongIndexEntry>> {
+    let result = sqlx::query_as!(
+        SongDbRow,
+        r#"
+        SELECT 
+            id as "id!", 
+            title, 
+            status as "status: SongStatus", 
+            bpm, 
+            key_sig, 
+            genre as "genre: Json<Vec<String>>", 
+            file_path, 
+            updated_at, 
+            created_at
+        FROM songs
+        WHERE file_path = ?
+        "#,
+        file_path,
+    )
+    .fetch_optional(pool)
+    .await?;
+
+    // If we got a row, convert it using `.map(Into::into)`
+    Ok(result.map(Into::into))
 }

@@ -1,0 +1,68 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        SELECT \n            id as \"id!\", \n            title, \n            status as \"status: SongStatus\",\n            bpm, \n            key_sig, \n            genre as \"genre: Json<Vec<String>>\", -- Tell the macro about our wrapper\n            file_path, \n            updated_at, \n            created_at\n        FROM songs\n        ORDER BY updated_at DESC\n        ",
+  "describe": {
+    "columns": [
+      {
+        "name": "id!",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "title",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "status: SongStatus",
+        "ordinal": 2,
+        "type_info": "Text"
+      },
+      {
+        "name": "bpm",
+        "ordinal": 3,
+        "type_info": "Int64"
+      },
+      {
+        "name": "key_sig",
+        "ordinal": 4,
+        "type_info": "Text"
+      },
+      {
+        "name": "genre: Json<Vec<String>>",
+        "ordinal": 5,
+        "type_info": "Text"
+      },
+      {
+        "name": "file_path",
+        "ordinal": 6,
+        "type_info": "Text"
+      },
+      {
+        "name": "updated_at",
+        "ordinal": 7,
+        "type_info": "Text"
+      },
+      {
+        "name": "created_at",
+        "ordinal": 8,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      true,
+      false,
+      false,
+      true,
+      true,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "fbda42c356cee0c8c4cc45a337039aa469d93b5da9ef2500f9bada20d74fb39b"
+}
