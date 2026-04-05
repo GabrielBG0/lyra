@@ -17,7 +17,7 @@ use crate::{
 };
 
 use chrono::Utc;
-use notify::{event, Watcher};
+use notify::{event, EventKind, Watcher};
 use sqlx::SqlitePool;
 use tauri::Emitter;
 
@@ -118,19 +118,115 @@ pub fn start_watcher(
 
     let mut watcher = notify::recommended_watcher(tx)?;
 
-    watcher.watch(&vault_path, notify::RecursiveMode::Recursive)?;
+    watcher.watch(&vault_path, notify::RecursiveMode::NonRecursive)?;
 
     std::thread::spawn({
         move || {
             let _watcher = watcher;
+            let mut last_seen = std::collections::HashMap::new();
 
             for raw_event in rx {
                 match raw_event {
-                    Ok(event) => {
-                        println!("saw event {:?}", event);
-                    }
+                    Ok(event) => match event.kind {
+                        EventKind::Create(_) | EventKind::Modify(_) => {
+                            for path in event.paths {
+                                if path.extension().and_then(|s| s.to_str()) == Some("lyr")
+                                    && !path.to_string_lossy().contains(".lyrindex")
+                                {
+                                    let now = std::time::Instant::now();
+                                    if let Some(last) = last_seen.get(&path) {
+                                        if now.duration_since(*last).as_millis() < 300 {
+                                            continue;
+                                        }
+                                    }
+                                    last_seen.insert(path.clone(), now);
+
+                                    let pool_copy = pool.clone();
+                                    let app_clone = app_handle.clone();
+
+                                    tokio::spawn(async move {
+                                        if let Err(e) =
+                                            handle_file_upsert(path, pool_copy, app_clone).await
+                                        {
+                                            eprintln!("Failed to upsert file: {:?}", e);
+                                        }
+                                    });
+                                }
+                            }
+                        }
+                        EventKind::Remove(_) => {
+                            for path in event.paths {
+                                if path.extension().and_then(|s| s.to_str()) == Some("lyr")
+                                    && !path.to_string_lossy().contains(".lyrindex")
+                                {
+                                    let pool_copy = pool.clone();
+                                    let app_clone = app_handle.clone();
+
+                                    tokio::spawn(async move {
+                                        if let Err(e) =
+                                            handle_file_remove(path, pool_copy, app_clone).await
+                                        {
+                                            eprintln!("Failed to remove file: {:?}", e);
+                                        }
+                                    });
+                                }
+                            }
+                        }
+
+                        EventKind::Modify(event::ModifyKind::Name(event::RenameMode::Both)) => {
+                            if event.paths.len() == 2 {
+                                let old_path = &event.paths[0];
+                                let new_path = &event.paths[1];
+
+                                let old_is_lyr =
+                                    old_path.extension().and_then(|s| s.to_str()) == Some(".lyr");
+                                let new_is_lyr =
+                                    new_path.extension().and_then(|s| s.to_str()) == Some("lyr");
+
+                                let old_in_vault =
+                                    !old_path.to_string_lossy().contains(".lyrindex");
+                                let new_in_vault =
+                                    !new_path.to_string_lossy().contains(".lyrindex");
+
+                                let pool_copy = pool.clone();
+                                let app_clone = app_handle.clone();
+                                let new_path = new_path.clone();
+                                let old_path = old_path.clone();
+
+                                tokio::spawn(async move {
+                                    match (old_is_lyr && old_in_vault, new_is_lyr && new_in_vault) {
+                                        (true, true) => {
+                                            let _ = handle_file_remove(
+                                                old_path,
+                                                pool_copy.clone(),
+                                                app_clone.clone(),
+                                            )
+                                            .await;
+                                            let _ =
+                                                handle_file_upsert(new_path, pool_copy, app_clone)
+                                                    .await;
+                                        }
+                                        (true, false) => {
+                                            let _ =
+                                                handle_file_remove(old_path, pool_copy, app_clone)
+                                                    .await;
+                                        }
+
+                                        (false, true) => {
+                                            let _ =
+                                                handle_file_upsert(new_path, pool_copy, app_clone)
+                                                    .await;
+                                        }
+                                        _ => {}
+                                    }
+                                });
+                            }
+                        }
+
+                        _ => {}
+                    },
                     Err(e) => {
-                        println!("err {:?}", e)
+                        eprintln!("err {:?}", e)
                     }
                 }
             }
