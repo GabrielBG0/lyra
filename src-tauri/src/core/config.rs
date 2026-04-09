@@ -23,17 +23,17 @@ fn config_path() -> AppResult<PathBuf> {
         std::env::var("APPDATA")
             .map(PathBuf::from)
             .unwrap_or_else(|_| home_dir.join("AppData").join("Roaming"))
-            .join("benzaiten")
+            .join("lyra")
     };
 
     #[cfg(target_os = "macos")]
     let config_dir = home
         .join("Library")
         .join("Application Support")
-        .join("benzaiten");
+        .join("lyra");
 
     #[cfg(not(any(target_os = "windows", target_os = "macos")))]
-    let config_dir = home.join(".config").join("benzaiten");
+    let config_dir = home.join(".config").join("lyra");
 
     Ok(config_dir.join("config.toml"))
 }

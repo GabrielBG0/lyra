@@ -1,8 +1,8 @@
 
 
-# Benzaiten 弁財天 — Development Roadmap
+# Lyra 弁財天 — Development Roadmap
 
-> A spec-driven roadmap for building Benzaiten, a file-primary lyric versioning tool built with Tauri 2, Rust, React 18, and SQLite.
+> A spec-driven roadmap for building Lyra, a file-primary lyric versioning tool built with Tauri 2, Rust, React 18, and SQLite.
 > 
 > Each step includes a description, motivation, and implementation spec detailed enough to generate a focused development prompt or implement directly.
 
@@ -30,10 +30,10 @@ A ✦ mark indicates a decision point where a choice was made during design — 
 
 **Spec:**
 
-- Run `npm create tauri-app@latest benzaiten -- --template react-ts` to bootstrap
+- Run `npm create tauri-app@latest lyra -- --template react-ts` to bootstrap
 - Confirm Tauri 2.x is used (not v1)
-- Set `productName = "Benzaiten"` in `tauri.conf.json`
-- Set `identifier = "com.gyfu.benzaiten"` in `tauri.conf.json`
+- Set `productName = "Lyra"` in `tauri.conf.json`
+- Set `identifier = "com.gyfu.lyra"` in `tauri.conf.json`
 - Window config: `width: 1280, height: 800, minWidth: 900, minHeight: 600, decorations: true`
 - Register `.lyr` file association in `tauri.conf.json` under `fileAssociations`: extension `lyr`, mime type `application/x-lyr`
 - Ensure `src-tauri/src/` has `main.rs`, `lib.rs`, `error.rs` and empty `commands/`, `core/`, `models/` modules
@@ -566,9 +566,9 @@ pub async fn save_config(config: &AppConfig) -> AppResult<()>
 
 Config file location:
 
-- Linux: `~/.config/benzaiten/config.toml`
-- macOS: `~/Library/Application Support/benzaiten/config.toml`
-- Windows: `%APPDATA%\benzaiten\config.toml`
+- Linux: `~/.config/lyra/config.toml`
+- macOS: `~/Library/Application Support/lyra/config.toml`
+- Windows: `%APPDATA%\lyra\config.toml`
 
 Use `tauri::path::BaseDirectory` or construct manually via `dirs` crate. If the file doesn’t exist, return `AppConfig { vault_path: None, last_opened_song: None }` without error.
 
