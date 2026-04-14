@@ -89,10 +89,18 @@ pub fn diff_snapshots(snapshot_a: &Snapshot, snapshot_b: &Snapshot) -> Vec<Secti
                 });
             }
             (Some(a), Some(b)) => {
-                let (status, hunks) = if a.content == b.content {
+                let content_changed = a.content != b.content;
+                let metadata_changed =
+                    a.name != b.name ||
+                    a.section_type != b.section_type ||
+                    a.order != b.order;
+
+                let (status, hunks) = if !content_changed && !metadata_changed {
                     (DiffStatus::Equal, vec![])
-                } else {
+                } else if content_changed {
                     (DiffStatus::Changed, diff_section(&a.content, &b.content))
+                } else {
+                    (DiffStatus::Changed, vec![])
                 };
 
                 diffs.push(SectionDiff {
