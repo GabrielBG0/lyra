@@ -1,6 +1,6 @@
 
 
-# Lyra 弁財天 — Development Roadmap
+# Lyra — Development Roadmap
 
 > A spec-driven roadmap for building Lyra, a file-primary lyric versioning tool built with Tauri 2, Rust, React 18, and SQLite.
 > 
