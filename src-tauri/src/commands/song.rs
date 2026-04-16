@@ -50,65 +50,31 @@ pub async fn save_song(
 }
 
 #[tauri::command]
-pub async fn create_song(state: State<'_, AppState>, title: String) -> AppResult<SongPayload> {
-    let config_guard = state.config.lock().unwrap();
-
-    let vault_path = PathBuf::from(
+pub async fn create_song(
+    state: tauri::State<'_, AppState>,
+    title: String,
+) -> AppResult<SongPayload> {
+    // 1. Safely extract the vault path
+    let vault_path_str = {
+        let config_guard = state.config.lock().unwrap();
         config_guard
             .vault_path
             .clone()
-            .ok_or(AppError::VaultNotConfigured)?,
-    );
+            .ok_or(AppError::VaultNotConfigured)?
+    }; // Lock drops here automatically when the block ends
 
-    drop(config_guard);
+    let vault_path = PathBuf::from(vault_path_str);
 
-    let id = Ulid::new().to_string();
-    let now = Utc::now().to_rfc3339();
-    let safe_title = sanitize(&title);
-    let file_name = safe_title + ".lyr";
-    let full_path = vault_path.join(file_name);
-    let path_string = full_path.to_string_lossy().into_owned();
+    // 2. Delegate the heavy lifting to your core logic
+    let (file_path, payload) = create_lyr_file(&vault_path, &title).await?;
 
-    if full_path.exists() {
-        return Err(AppError::FileExists(path_string));
-    }
-
-    let new_metadata = SongMetadata {
-        id,
-        title: title,
-        status: SongStatus::Idea,
-        created_at: now.clone(),
-        updated_at: now,
-        musical: MusicalInfo {
-            key: None,
-            bpm: None,
-            capo: None,
-            tuning: None,
-        },
-        tags: SongTags {
-            genre: vec![],
-            mood: vec![],
-            language: vec![],
-        },
-        album: AlbumRef {
-            album_id: None,
-            track_number: None,
-        },
-    };
-
-    let payload = SongPayload {
-        metadata: new_metadata,
-        sections: vec![],
-        snapshot_headers: vec![],
-        comments: vec![],
-        file_path: path_string.clone(),
-    };
-
-    write_lyr_file(&full_path, &payload.metadata, &payload.sections).await?;
-
+    // 3. Map the data for the database index
+    let path_string = file_path.to_string_lossy().into_owned();
     let index_entry = SongIndexEntry::from_metadata(&payload.metadata, path_string);
 
+    // 4. Keep the Vault synchronized
     upsert_song(&state.pool, &index_entry).await?;
 
+    // 5. Send it to React
     Ok(payload)
 }
