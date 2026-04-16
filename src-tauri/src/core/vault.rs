@@ -128,51 +128,6 @@ pub fn start_watcher(
             for raw_event in rx {
                 match raw_event {
                     Ok(event) => match event.kind {
-                        EventKind::Create(_) | EventKind::Modify(_) => {
-                            for path in event.paths {
-                                if path.extension().and_then(|s| s.to_str()) == Some("lyr")
-                                    && !path.to_string_lossy().contains(".lyrindex")
-                                {
-                                    let now = std::time::Instant::now();
-                                    if let Some(last) = last_seen.get(&path) {
-                                        if now.duration_since(*last).as_millis() < 300 {
-                                            continue;
-                                        }
-                                    }
-                                    last_seen.insert(path.clone(), now);
-
-                                    let pool_copy = pool.clone();
-                                    let app_clone = app_handle.clone();
-
-                                    tokio::spawn(async move {
-                                        if let Err(e) =
-                                            handle_file_upsert(path, pool_copy, app_clone).await
-                                        {
-                                            eprintln!("Failed to upsert file: {:?}", e);
-                                        }
-                                    });
-                                }
-                            }
-                        }
-                        EventKind::Remove(_) => {
-                            for path in event.paths {
-                                if path.extension().and_then(|s| s.to_str()) == Some("lyr")
-                                    && !path.to_string_lossy().contains(".lyrindex")
-                                {
-                                    let pool_copy = pool.clone();
-                                    let app_clone = app_handle.clone();
-
-                                    tokio::spawn(async move {
-                                        if let Err(e) =
-                                            handle_file_remove(path, pool_copy, app_clone).await
-                                        {
-                                            eprintln!("Failed to remove file: {:?}", e);
-                                        }
-                                    });
-                                }
-                            }
-                        }
-
                         EventKind::Modify(event::ModifyKind::Name(event::RenameMode::Both)) => {
                             if event.paths.len() == 2 {
                                 let old_path = &event.paths[0];
@@ -220,6 +175,50 @@ pub fn start_watcher(
                                         _ => {}
                                     }
                                 });
+                            }
+                        }
+                        EventKind::Create(_) | EventKind::Modify(_) => {
+                            for path in event.paths {
+                                if path.extension().and_then(|s| s.to_str()) == Some("lyr")
+                                    && !path.to_string_lossy().contains(".lyrindex")
+                                {
+                                    let now = std::time::Instant::now();
+                                    if let Some(last) = last_seen.get(&path) {
+                                        if now.duration_since(*last).as_millis() < 300 {
+                                            continue;
+                                        }
+                                    }
+                                    last_seen.insert(path.clone(), now);
+
+                                    let pool_copy = pool.clone();
+                                    let app_clone = app_handle.clone();
+
+                                    tokio::spawn(async move {
+                                        if let Err(e) =
+                                            handle_file_upsert(path, pool_copy, app_clone).await
+                                        {
+                                            eprintln!("Failed to upsert file: {:?}", e);
+                                        }
+                                    });
+                                }
+                            }
+                        }
+                        EventKind::Remove(_) => {
+                            for path in event.paths {
+                                if path.extension().and_then(|s| s.to_str()) == Some("lyr")
+                                    && !path.to_string_lossy().contains(".lyrindex")
+                                {
+                                    let pool_copy = pool.clone();
+                                    let app_clone = app_handle.clone();
+
+                                    tokio::spawn(async move {
+                                        if let Err(e) =
+                                            handle_file_remove(path, pool_copy, app_clone).await
+                                        {
+                                            eprintln!("Failed to remove file: {:?}", e);
+                                        }
+                                    });
+                                }
                             }
                         }
 
