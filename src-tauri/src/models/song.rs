@@ -88,4 +88,18 @@ impl SongIndexEntry {
             updated_at: payload.metadata.updated_at,
         }
     }
+
+    pub fn from_metadata(metadata: &SongMetadata, path: String) -> Self {
+        Self {
+            id: metadata.id.clone(),
+            title: metadata.title.clone(),
+            status: metadata.status.clone(),
+            bpm: metadata.musical.bpm,
+            key_sig: metadata.musical.key.clone(),
+            genre: metadata.tags.genre.clone(),
+            file_path: path,
+            created_at: metadata.created_at.clone(),
+            updated_at: metadata.updated_at.clone(), 
+        }
+    }
 }
