@@ -3,32 +3,26 @@
 
 use std::path::PathBuf;
 
-use sanitize_filename::sanitize;
 use tauri::State;
-
-use chrono::Utc;
-use ulid::Ulid;
 
 use crate::{
     commands::AppState,
     core::{
-        index::upsert_song,
-        song::{read_lyr_file, write_lyr_file},
+        index::{remove_song, upsert_song},
+        song::{create_lyr_file, read_lyr_file, write_lyr_file},
     },
     error::{AppError, AppResult},
     models::{
         section::Section,
-        song::{
-            AlbumRef, MusicalInfo, SongIndexEntry, SongMetadata, SongPayload, SongStatus, SongTags,
-        },
+        song::{SongIndexEntry, SongMetadata, SongPayload},
     },
 };
 
 #[tauri::command]
-pub async fn open_song(state: State<'_, AppState>, path: String) -> AppResult<SongPayload> {
+pub async fn open_song(_state: State<'_, AppState>, path: String) -> AppResult<SongPayload> {
     let path_buff = PathBuf::from(&path);
 
-    Ok(read_lyr_file(&path_buff).await?)
+    read_lyr_file(&path_buff).await
 }
 
 #[tauri::command]
@@ -38,7 +32,7 @@ pub async fn save_song(
     metadata: SongMetadata,
     sections: Vec<Section>,
 ) -> AppResult<()> {
-    let path_buff = PathBuf::from(path);
+    let path_buff = PathBuf::from(&path);
 
     write_lyr_file(&path_buff, &metadata, &sections).await?;
 
@@ -77,4 +71,18 @@ pub async fn create_song(
 
     // 5. Send it to React
     Ok(payload)
+}
+
+pub async fn delete_song(state: State<'_, AppState>, path: String) -> AppResult<()> {
+    let path_buff = PathBuf::from(&path);
+
+    match std::fs::remove_file(&path_buff) {
+        Ok(_) => {}
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => {}
+        Err(e) => return Err(AppError::Io(e)),
+    }
+
+    remove_song(&state.pool, &path).await?;
+
+    Ok(())
 }
