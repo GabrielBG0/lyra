@@ -14,6 +14,7 @@ export default function CommentPanel({ sectionId }: CommentPanelProps) {
   const [newText, setNewText] = useState('')
   const [pinToSnapshot, setPinToSnapshot] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [showResolved, setShowResolved] = useState(false)
 
   useEffect(() => {
     if (!filePath) return
@@ -26,8 +27,12 @@ export default function CommentPanel({ sectionId }: CommentPanelProps) {
 
   const handleResolve = async (commentId: string) => {
     if (!filePath) return
-    await tauriApi.comment.resolve(filePath, commentId)
-    setComments(prev => prev.map(c => c.id === commentId ? { ...c, resolved: true } : c))
+    try {
+      await tauriApi.comment.resolve(filePath, commentId)
+      setComments(prev => prev.map(c => c.id === commentId ? { ...c, resolved: true } : c))
+    } catch (err) {
+      console.error('Failed to resolve comment:', err)
+    }
   }
 
   const handlePost = async () => {
@@ -45,8 +50,12 @@ export default function CommentPanel({ sectionId }: CommentPanelProps) {
       <div className="flex justify-between items-center mb-2.5 text-faint" style={{ fontSize: 11 }}>
         <span>{open.length} open · {resolved.length} resolved</span>
         {resolved.length > 0 && (
-          <button className="text-faint hover:text-accent border-none bg-transparent cursor-pointer" style={{ fontSize: 11 }}>
-            Show resolved
+          <button
+            className="text-faint hover:text-accent border-none bg-transparent cursor-pointer"
+            style={{ fontSize: 11 }}
+            onClick={() => setShowResolved(v => !v)}
+          >
+            {showResolved ? 'Hide resolved' : 'Show resolved'}
           </button>
         )}
       </div>
@@ -58,9 +67,12 @@ export default function CommentPanel({ sectionId }: CommentPanelProps) {
           {open.map(c => (
             <CommentEntry key={c.id} comment={c} onResolve={handleResolve} />
           ))}
-          {open.length === 0 && !loading && (
+          {open.length === 0 && (
             <div className="text-faint text-xs py-2 text-center">No open comments</div>
           )}
+          {showResolved && resolved.map(c => (
+            <CommentEntry key={c.id} comment={c} onResolve={handleResolve} />
+          ))}
         </>
       )}
 

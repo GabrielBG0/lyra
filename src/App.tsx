@@ -29,9 +29,12 @@ export default function App() {
     return (
       <VaultSetup
         onDone={(path) => {
-          setVaultPath(path)
           tauriApi.config.set({ vault_path: path, last_opened_song: null })
-            .then(() => loadSongs())
+            .then(() => {
+              setVaultPath(path)
+              loadSongs()
+            })
+            .catch((err) => console.error('Failed to save config:', err))
         }}
       />
     )

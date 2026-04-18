@@ -8,6 +8,7 @@ interface CommentEntryProps {
 
 function timeAgo(isoString: string): string {
   const diff = Date.now() - new Date(isoString).getTime()
+  if (diff < 0 || Number.isNaN(diff)) return 'just now'
   const mins = Math.floor(diff / 60000)
   if (mins < 60) return mins <= 1 ? 'just now' : `${mins}m ago`
   const hrs = Math.floor(mins / 60)

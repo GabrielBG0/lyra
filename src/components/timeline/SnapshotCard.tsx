@@ -1,62 +1,78 @@
-import type { SnapshotHeader } from '../../lib/types'
-import LyraLogo from '../ui/LyraLogo'
+import type { SnapshotHeader } from "../../lib/types";
+import LyraLogo from "../ui/LyraLogo";
 
 interface SnapshotCardProps {
-  header: SnapshotHeader
-  index: number
-  isNow?: boolean
+  header: SnapshotHeader;
+  index: number;
+  isNow?: boolean;
 }
 
 function timeAgo(isoString: string): string {
-  const diff = Date.now() - new Date(isoString).getTime()
-  const mins = Math.floor(diff / 60000)
-  if (mins < 60) return mins <= 1 ? 'just now' : `${mins}m ago`
-  const hrs = Math.floor(mins / 60)
-  if (hrs < 24) return `${hrs}h ago`
-  const days = Math.floor(hrs / 24)
-  if (days === 1) return 'yesterday'
-  return `${days}d ago`
+  const diff = Date.now() - new Date(isoString).getTime();
+  if (diff < 0 || Number.isNaN(diff)) return "just now";
+  const mins = Math.floor(diff / 60000);
+  if (mins < 60) return mins <= 1 ? "just now" : `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  const days = Math.floor(hrs / 24);
+  if (days === 1) return "yesterday";
+  return `${days}d ago`;
 }
 
 export function NowCard() {
   return (
     <div
-      className="flex-shrink-0 w-[170px] p-2.5 bg-surface border rounded-lg flex flex-col gap-1.5 relative cursor-pointer"
+      className="shrink-0 w-42.5 p-2.5 bg-surface border rounded-lg flex flex-col gap-1.5 relative cursor-pointer"
       style={{
-        background: 'linear-gradient(155deg, oklch(0.72 0.10 55 / 0.12), transparent 80%), oklch(0.175 0.010 60)',
-        borderColor: 'oklch(0.72 0.10 55 / 0.4)',
+        background:
+          "linear-gradient(155deg, oklch(0.72 0.10 55 / 0.12), transparent 80%), oklch(0.175 0.010 60)",
+        borderColor: "oklch(0.72 0.10 55 / 0.4)",
       }}
     >
       <div
-        className="absolute -left-[6px] top-1/2 -translate-y-1/2 w-[2px] rounded-full bg-accent"
-        style={{ height: '70%', boxShadow: '0 0 8px oklch(0.72 0.10 55)' }}
+        className="absolute -left-1.5 top-1/2 -translate-y-1/2 w-0.5 rounded-full bg-accent"
+        style={{ height: "70%", boxShadow: "0 0 8px oklch(0.72 0.10 55)" }}
       />
       <div className="flex items-center justify-between">
         <LyraLogo size={16} />
-        <span className="text-[13px] font-bold text-accent tracking-wide">Now</span>
+        <span className="text-[13px] font-bold text-accent tracking-wide">
+          Now
+        </span>
       </div>
       <div className="text-[12px] text-primary">Live draft</div>
-      <div className="text-[10px] text-faint uppercase tracking-wide font-medium">unsaved</div>
+      <div className="text-2xs text-faint uppercase tracking-wide font-medium">
+        unsaved
+      </div>
     </div>
-  )
+  );
 }
 
 export default function SnapshotCard({ header, index }: SnapshotCardProps) {
-  const label = `v${index + 1}`
+  const label = `v${index + 1}`;
   return (
-    <div className="flex-shrink-0 w-[170px] p-2.5 bg-surface border border-border-soft rounded-lg flex flex-col gap-1.5 cursor-pointer hover:border-accent hover:bg-elev transition-all">
+    <div className="shrink-0 w-42.5 p-2.5 bg-surface border border-border-soft rounded-lg flex flex-col gap-1.5 cursor-pointer hover:border-accent hover:bg-elev transition-all">
       <div className="flex items-baseline justify-between">
-        <span className="text-[11px] font-bold text-primary font-ui tracking-wide">{label}</span>
-        <span className="text-[10.5px] text-faint">{timeAgo(header.created_at)}</span>
+        <span className="text-[11px] font-bold text-primary font-ui tracking-wide">
+          {label}
+        </span>
+        <span className="text-[10.5px] text-faint">
+          {timeAgo(header.created_at)}
+        </span>
       </div>
-      <div className={`text-[12px] leading-snug min-h-[30px] overflow-hidden ${header.note ? 'text-secondary' : 'text-faint italic'}`}
-        style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}
+      <div
+        className={`text-[12px] leading-snug min-h-7.5 overflow-hidden ${header.note ? "text-secondary" : "text-faint italic"}`}
+        style={{
+          display: "-webkit-box",
+          WebkitLineClamp: 2,
+          WebkitBoxOrient: "vertical",
+          overflow: "hidden",
+        }}
       >
-        {header.note ?? 'Untitled snapshot'}
+        {header.note ?? "Untitled snapshot"}
       </div>
-      <div className="text-[10px] text-faint uppercase tracking-wide font-medium">
-        {header.section_count} section{header.section_count !== 1 ? 's' : ''}
+      <div className="text-2xs text-faint uppercase tracking-wide font-medium">
+        {header.section_count} section{header.section_count !== 1 ? "s" : ""}
       </div>
     </div>
-  )
+  );
 }

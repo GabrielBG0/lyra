@@ -1,31 +1,31 @@
-import { useState } from 'react'
-import { tauriApi } from '../../lib/tauri'
-import LyraLogo from '../ui/LyraLogo'
-import { Icons } from '../ui/Icon'
+import { useState } from "react";
+import { tauriApi } from "../../lib/tauri";
+import LyraLogo from "../ui/LyraLogo";
+import { Icons } from "../ui/Icon";
 
 interface VaultSetupProps {
-  onDone: (path: string) => void
+  onDone: (path: string) => void;
 }
 
 export default function VaultSetup({ onDone }: VaultSetupProps) {
-  const [mode, setMode] = useState<'create' | 'open' | null>(null)
-  const [path, setPath] = useState('')
-  const [error, setError] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
+  const [mode, setMode] = useState<"create" | "open" | null>(null);
+  const [path, setPath] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const handleContinue = async () => {
-    if (!path.trim() || !mode) return
-    setLoading(true)
-    setError(null)
+    if (!path.trim() || !mode) return;
+    setLoading(true);
+    setError(null);
     try {
-      await tauriApi.vault.setVaultPath(path.trim())
-      onDone(path.trim())
+      await tauriApi.vault.setVaultPath(path.trim());
+      onDone(path.trim());
     } catch (e) {
-      setError(String(e))
+      setError(String(e));
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="h-full grid grid-cols-2 items-center px-16 relative overflow-hidden bg-bg">
@@ -34,19 +34,19 @@ export default function VaultSetup({ onDone }: VaultSetupProps) {
         className="absolute inset-0 pointer-events-none"
         style={{
           backgroundImage: [
-            'radial-gradient(1.5px 1.5px at 10% 20%, rgba(255,230,200,0.7) 50%, transparent)',
-            'radial-gradient(1px 1px at 25% 80%, rgba(255,230,200,0.5) 50%, transparent)',
-            'radial-gradient(1px 1px at 45% 40%, rgba(255,230,200,0.4) 50%, transparent)',
-            'radial-gradient(1.5px 1.5px at 60% 70%, rgba(255,230,200,0.6) 50%, transparent)',
-            'radial-gradient(1px 1px at 85% 15%, rgba(255,230,200,0.5) 50%, transparent)',
-            'radial-gradient(1px 1px at 90% 55%, rgba(255,230,200,0.4) 50%, transparent)',
-          ].join(', '),
+            "radial-gradient(1.5px 1.5px at 10% 20%, rgba(255,230,200,0.7) 50%, transparent)",
+            "radial-gradient(1px 1px at 25% 80%, rgba(255,230,200,0.5) 50%, transparent)",
+            "radial-gradient(1px 1px at 45% 40%, rgba(255,230,200,0.4) 50%, transparent)",
+            "radial-gradient(1.5px 1.5px at 60% 70%, rgba(255,230,200,0.6) 50%, transparent)",
+            "radial-gradient(1px 1px at 85% 15%, rgba(255,230,200,0.5) 50%, transparent)",
+            "radial-gradient(1px 1px at 90% 55%, rgba(255,230,200,0.4) 50%, transparent)",
+          ].join(", "),
           opacity: 0.5,
         }}
       />
 
       {/* Card */}
-      <div className="max-w-[440px] py-10 px-10 relative z-10">
+      <div className="max-w-110 py-10 px-10 relative z-10">
         <div className="mb-6">
           <LyraLogo size={56} />
         </div>
@@ -54,48 +54,64 @@ export default function VaultSetup({ onDone }: VaultSetupProps) {
           Welcome to Lyra
         </h1>
         <p className="text-sm text-muted leading-relaxed mb-7">
-          Before you begin, point Lyra at a folder on your disk.{' '}
-          This is your <span className="text-accent font-medium">vault</span> — every song you write
-          lives here as a plain file.
+          Before you begin, point Lyra at a folder on your disk. This is your{" "}
+          <span className="text-accent font-medium">vault</span> — every song
+          you write lives here as a plain file.
         </p>
 
         {/* Options */}
         <div className="flex flex-col gap-2">
           <button
             className={`flex items-center gap-4 px-4 py-3.5 rounded-lg border text-left transition-all font-ui text-sm cursor-pointer ${
-              mode === 'create'
-                ? 'border-accent bg-accent-soft'
-                : 'border-border-soft bg-surface hover:border-border hover:bg-elev'
+              mode === "create"
+                ? "border-accent bg-accent-soft"
+                : "border-border-soft bg-surface hover:border-border hover:bg-elev"
             }`}
-            onClick={() => { setMode('create'); setPath('') }}
+            onClick={() => {
+              setMode("create");
+              setPath("");
+            }}
           >
-            <div className="w-[38px] h-[38px] rounded-lg bg-elev flex items-center justify-center text-accent relative flex-shrink-0">
+            <div className="w-9.5 h-9.5 rounded-lg bg-elev flex items-center justify-center text-accent relative shrink-0">
               <Icons.Folder size={22} />
               <span className="absolute -right-1 -bottom-1 w-3.5 h-3.5 rounded-full bg-accent flex items-center justify-center">
                 <Icons.Plus size={9} strokeWidth={2.5} className="text-bg" />
               </span>
             </div>
             <div>
-              <div className="font-semibold text-primary mb-0.5">Create a new vault</div>
-              <div className="text-xs text-muted">Pick an empty folder — Lyra will make it yours.</div>
+              <div className="font-semibold text-primary mb-0.5">
+                Create a new vault
+              </div>
+              <div className="text-xs text-muted">
+                Pick an empty folder — Lyra will make it yours.
+              </div>
             </div>
           </button>
 
           <button
             className={`flex items-center gap-4 px-4 py-3.5 rounded-lg border text-left transition-all font-ui text-sm cursor-pointer ${
-              mode === 'open'
-                ? 'border-accent bg-accent-soft'
-                : 'border-border-soft bg-surface hover:border-border hover:bg-elev'
+              mode === "open"
+                ? "border-accent bg-accent-soft"
+                : "border-border-soft bg-surface hover:border-border hover:bg-elev"
             }`}
-            onClick={() => { setMode('open'); setPath('') }}
+            onClick={() => {
+              setMode("open");
+              setPath("");
+            }}
           >
-            <div className="w-[38px] h-[38px] rounded-lg bg-elev flex items-center justify-center text-accent flex-shrink-0">
+            <div className="w-9.5 h-9.5 rounded-lg bg-elev flex items-center justify-center text-accent shrink-0">
               <Icons.Folder size={22} />
             </div>
             <div>
-              <div className="font-semibold text-primary mb-0.5">Open an existing vault</div>
+              <div className="font-semibold text-primary mb-0.5">
+                Open an existing vault
+              </div>
               <div className="text-xs text-muted">
-                Point to a folder that already has <code className="bg-elev text-secondary px-1 py-0.5 rounded text-xs">.lyr</code> files.
+                Point to a folder that already has{" "}
+                <code className="bg-elev text-secondary px-1 py-0.5 rounded text-xs">
+                  .lyr
+                </code>{" "}
+                files.
               </div>
             </div>
           </button>
@@ -104,13 +120,19 @@ export default function VaultSetup({ onDone }: VaultSetupProps) {
         {mode && (
           <div className="mt-3.5">
             <div className="flex items-center gap-2 px-2.5 py-2 bg-bg border border-border-soft rounded text-sm text-secondary font-ui">
-              <Icons.Folder size={13} className="text-faint flex-shrink-0" />
+              <Icons.Folder size={13} className="text-faint shrink-0" />
               <input
                 className="flex-1 bg-transparent border-none outline-none text-primary text-xs"
-                placeholder={mode === 'create' ? '~/Documents/New Lyra Vault' : '~/Documents/Songs'}
+                placeholder={
+                  mode === "create"
+                    ? "~/Documents/New Lyra Vault"
+                    : "~/Documents/Songs"
+                }
                 value={path}
-                onChange={e => setPath(e.target.value)}
-                onKeyDown={e => { if (e.key === 'Enter') handleContinue() }}
+                onChange={(e) => setPath(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleContinue();
+                }}
                 autoFocus
               />
             </div>
@@ -124,9 +146,15 @@ export default function VaultSetup({ onDone }: VaultSetupProps) {
             disabled={!mode || !path.trim() || loading}
             onClick={handleContinue}
           >
-            {loading ? 'Opening…' : mode === 'create' ? 'Create vault' : mode === 'open' ? 'Open vault' : 'Continue'}
+            {loading
+              ? "Opening…"
+              : mode === "create"
+                ? "Create vault"
+                : mode === "open"
+                  ? "Open vault"
+                  : "Continue"}
           </button>
-          <p className="text-xs text-faint max-w-[200px] leading-snug">
+          <p className="text-xs text-faint max-w-50 leading-snug">
             Nothing is uploaded. Your lyrics never leave this machine.
           </p>
         </div>
@@ -135,10 +163,10 @@ export default function VaultSetup({ onDone }: VaultSetupProps) {
       {/* Constellation side panel */}
       <div className="flex flex-col items-center gap-5 justify-self-center opacity-85">
         <LyraLogo size={160} dim />
-        <p className="text-xs text-faint tracking-wide text-center max-w-[220px] leading-relaxed italic">
+        <p className="text-xs text-faint tracking-wide text-center max-w-55 leading-relaxed italic">
           Lyra — the lyre constellation. Home of Vega, the harp-star.
         </p>
       </div>
     </div>
-  )
+  );
 }

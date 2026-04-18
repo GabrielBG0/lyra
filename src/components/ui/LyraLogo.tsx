@@ -1,3 +1,5 @@
+import { useId } from 'react'
+
 interface LyraLogoProps {
   size?: number
   dim?: boolean
@@ -5,6 +7,9 @@ interface LyraLogoProps {
 }
 
 export default function LyraLogo({ size = 28, dim = false, glow = true }: LyraLogoProps) {
+  const rawId = useId()
+  const glowFilterId = `lyra-vega-glow-${rawId}`
+
   return (
     <svg
       width={size}
@@ -15,7 +20,7 @@ export default function LyraLogo({ size = 28, dim = false, glow = true }: LyraLo
     >
       <defs>
         {glow && (
-          <filter id="lyra-vega-glow" x="-50%" y="-50%" width="200%" height="200%">
+          <filter id={glowFilterId} x="-50%" y="-50%" width="200%" height="200%">
             <feGaussianBlur stdDeviation="1.2" />
           </filter>
         )}
@@ -35,7 +40,7 @@ export default function LyraLogo({ size = 28, dim = false, glow = true }: LyraLo
       </g>
       {/* Vega — brightest */}
       {glow && (
-        <circle cx="22.83" cy="9.12" r="2.4" fill="#FFBB41" opacity="0.28" filter="url(#lyra-vega-glow)" />
+        <circle cx="22.83" cy="9.12" r="2.4" fill="#FFBB41" opacity="0.28" filter={`url(#${glowFilterId})`} />
       )}
       <circle cx="22.83" cy="9.12" r="1.15" fill="#FCE7C1" />
     </svg>
