@@ -27,13 +27,11 @@ pub async fn get_vault_path(state: tauri::State<'_, AppState>) -> AppResult<Opti
 
 #[tauri::command]
 pub async fn set_vault_path(state: tauri::State<'_, AppState>, path: String) -> AppResult<()> {
-    let mut config_guard = state.config.lock().unwrap();
-
-    config_guard.vault_path = Some(path);
-
-    let new_config = config_guard.clone();
-
-    drop(config_guard);
+    let new_config = {
+        let mut config_guard = state.config.lock().unwrap();
+        config_guard.vault_path = Some(path);
+        config_guard.clone()
+    };
 
     save_config(&new_config).await?;
 

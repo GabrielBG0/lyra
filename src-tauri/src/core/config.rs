@@ -5,7 +5,6 @@ use std::path::PathBuf;
 use serde::{Deserialize, Serialize};
 
 use crate::error::{AppError, AppResult};
-use tokio;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AppConfig {
@@ -27,13 +26,13 @@ fn config_path() -> AppResult<PathBuf> {
     };
 
     #[cfg(target_os = "macos")]
-    let config_dir = home
+    let config_dir = home_dir
         .join("Library")
         .join("Application Support")
         .join("lyra");
 
     #[cfg(not(any(target_os = "windows", target_os = "macos")))]
-    let config_dir = home.join(".config").join("lyra");
+    let config_dir = home_dir.join(".config").join("lyra");
 
     Ok(config_dir.join("config.toml"))
 }
