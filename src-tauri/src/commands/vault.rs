@@ -6,7 +6,7 @@ use std::path::PathBuf;
 
 use tauri::State;
 
-use crate::core::index::{clear_index, upsert_song};
+use crate::core::index::{clear_index, init_index, upsert_song};
 use crate::core::song::read_lyr_file;
 use crate::core::vault::copy_into_vault;
 use crate::error::AppError;
@@ -36,14 +36,23 @@ pub async fn set_vault_path(state: tauri::State<'_, AppState>, path: String) -> 
     save_config(&new_config).await?;
 
     let vault_path = PathBuf::from(new_config.vault_path.unwrap());
-    scan_vault(&vault_path, &state.pool).await?;
+    let new_pool = init_index(&vault_path).await?;
+
+    {
+        let mut pool_guard = state.pool.lock().unwrap();
+        *pool_guard = new_pool;
+    }
+
+    let pool = state.pool.lock().unwrap().clone();
+    scan_vault(&vault_path, &pool).await?;
 
     Ok(())
 }
 
 #[tauri::command]
 pub async fn list_songs(state: tauri::State<'_, AppState>) -> AppResult<Vec<SongIndexEntry>> {
-    index::list_songs(&state.pool).await
+    let pool = state.pool.lock().unwrap().clone();
+    index::list_songs(&pool).await
 }
 
 #[tauri::command]
@@ -58,9 +67,10 @@ pub async fn rebuild_index(state: State<'_, AppState>) -> AppResult<Vec<SongInde
 
     let vault_path = PathBuf::from(vault_path_str);
 
-    clear_index(&state.pool).await?;
+    let pool = state.pool.lock().unwrap().clone();
+    clear_index(&pool).await?;
 
-    scan_vault(vault_path.as_path(), &state.pool).await
+    scan_vault(vault_path.as_path(), &pool).await
 }
 
 #[tauri::command]
@@ -98,7 +108,8 @@ pub async fn import_song(
     let path_string = new_path.to_string_lossy().into_owned();
     let index_entry = SongIndexEntry::from_metadata(&payload.metadata, path_string);
 
-    upsert_song(&state.pool, &index_entry).await?;
+    let pool = state.pool.lock().unwrap().clone();
+    upsert_song(&pool, &index_entry).await?;
 
     Ok(index_entry)
 }

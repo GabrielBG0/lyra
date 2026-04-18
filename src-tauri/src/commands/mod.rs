@@ -15,6 +15,6 @@ pub mod song;
 pub mod vault;
 
 pub struct AppState {
-    pub pool: SqlitePool,
+    pub pool: std::sync::Mutex<SqlitePool>,
     pub config: std::sync::Mutex<AppConfig>,
 }

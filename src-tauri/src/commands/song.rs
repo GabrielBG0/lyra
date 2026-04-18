@@ -37,8 +37,8 @@ pub async fn save_song(
     write_lyr_file(&path_buff, &metadata, &sections).await?;
 
     let song_entry = SongIndexEntry::from_metadata(&metadata, path);
-
-    upsert_song(&state.pool, &song_entry).await?;
+    let pool = state.pool.lock().unwrap().clone();
+    upsert_song(&pool, &song_entry).await?;
 
     Ok(())
 }
@@ -67,7 +67,8 @@ pub async fn create_song(
     let index_entry = SongIndexEntry::from_metadata(&payload.metadata, path_string);
 
     // 4. Keep the Vault synchronized
-    upsert_song(&state.pool, &index_entry).await?;
+    let pool = state.pool.lock().unwrap().clone();
+    upsert_song(&pool, &index_entry).await?;
 
     // 5. Send it to React
     Ok(payload)
@@ -83,7 +84,8 @@ pub async fn delete_song(state: State<'_, AppState>, path: String) -> AppResult<
         Err(e) => return Err(AppError::Io(e)),
     }
 
-    remove_song(&state.pool, &path).await?;
+    let pool = state.pool.lock().unwrap().clone();
+    remove_song(&pool, &path).await?;
 
     Ok(())
 }

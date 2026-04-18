@@ -37,18 +37,30 @@ pub fn run() {
                 let pool = if let Some(ref vault_path) = config.vault_path {
                     match init_index(Path::new(vault_path)).await {
                         Ok(p) => p,
-                        Err(_) => sqlx::SqlitePool::connect("sqlite::memory:")
-                            .await
-                            .expect("failed to open fallback in-memory SQLite pool"),
+                        Err(_) => {
+                            let p = sqlx::SqlitePool::connect("sqlite::memory:")
+                                .await
+                                .expect("failed to open fallback in-memory SQLite pool");
+                            sqlx::migrate!("./migrations")
+                                .run(&p)
+                                .await
+                                .expect("failed to migrate fallback pool");
+                            p
+                        }
                     }
                 } else {
-                    sqlx::SqlitePool::connect("sqlite::memory:")
+                    let p = sqlx::SqlitePool::connect("sqlite::memory:")
                         .await
-                        .expect("failed to open in-memory SQLite pool")
+                        .expect("failed to open in-memory SQLite pool");
+                    sqlx::migrate!("./migrations")
+                        .run(&p)
+                        .await
+                        .expect("failed to migrate in-memory pool");
+                    p
                 };
 
                 handle.manage(AppState {
-                    pool,
+                    pool: Mutex::new(pool),
                     config: Mutex::new(config),
                 });
             });
