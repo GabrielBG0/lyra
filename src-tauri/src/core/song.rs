@@ -10,7 +10,9 @@ use serde::{Deserialize, Serialize};
 use zip::write::SimpleFileOptions;
 use zip::{ZipArchive, ZipWriter};
 
-use crate::core::utils::find_available_path;
+use crate::core::utils::{
+    copy_entries_except, find_available_path, sanitize_title, serialize_section,
+};
 use crate::error::{AppError, AppResult};
 use crate::models::comment::Comment;
 use crate::models::section::{Section, SectionType};
@@ -213,27 +215,6 @@ pub async fn write_lyr_file(
     result
 }
 
-/// Update a single section inside an existing `.lyr` archive atomically.
-///
-/// This avoids re-serializing every section when only one has changed.
-pub async fn write_section(path: &Path, section: &Section) -> AppResult<()> {
-    let tmp_path = path.with_extension("lyr.tmp");
-
-    let mut overwritten: HashSet<String> = HashSet::new();
-    let entry_name = format!("sections/{}.toml", section.id);
-    overwritten.insert(entry_name.clone());
-
-    let result = do_write_section(&tmp_path, path, section, &entry_name, &overwritten);
-
-    if result.is_err() {
-        let _ = std::fs::remove_file(&tmp_path);
-    } else {
-        std::fs::rename(&tmp_path, path)?;
-    }
-
-    result
-}
-
 /// Create a brand-new, empty `.lyr` archive on disk.
 ///
 /// 1. Generate a ULID for the song.
@@ -377,33 +358,6 @@ fn do_write_lyr(
     Ok(())
 }
 
-/// Core implementation for [`write_section`].
-fn do_write_section(
-    tmp_path: &Path,
-    src_path: &Path,
-    section: &Section,
-    entry_name: &str,
-    overwritten: &HashSet<String>,
-) -> AppResult<()> {
-    let src_file = std::fs::File::open(src_path)?;
-    let mut src_archive = ZipArchive::new(src_file)?;
-
-    let tmp_file = std::fs::File::create(tmp_path)?;
-    let mut writer = ZipWriter::new(tmp_file);
-    let opts = SimpleFileOptions::default();
-
-    // ── Copy everything except the section we are replacing ─────────
-    copy_entries_except(&mut src_archive, &mut writer, overwritten, opts)?;
-
-    // ── Write the updated section ───────────────────────────────────
-    let section_toml = serialize_section(section)?;
-    writer.start_file(entry_name, opts)?;
-    writer.write_all(section_toml.as_bytes())?;
-
-    writer.finish()?;
-    Ok(())
-}
-
 /// Core implementation for [`create_lyr_file`]. Separated so the caller
 /// can handle partial-file cleanup uniformly.
 fn do_create_lyr(
@@ -454,81 +408,4 @@ fn do_create_lyr(
 
     writer.finish()?;
     Ok(())
-}
-
-/// Copy every entry from `src` into `dst` **except** those whose names
-/// appear in `skip`.
-fn copy_entries_except(
-    src: &mut ZipArchive<std::fs::File>,
-    dst: &mut ZipWriter<std::fs::File>,
-    skip: &HashSet<String>,
-    opts: SimpleFileOptions,
-) -> AppResult<()> {
-    for i in 0..src.len() {
-        let mut entry = src.by_index(i)?;
-        let name = entry.name().to_owned();
-
-        if skip.contains(&name) {
-            continue;
-        }
-
-        let mut buf = Vec::with_capacity(entry.size() as usize);
-        entry.read_to_end(&mut buf)?;
-
-        if entry.is_dir() {
-            dst.add_directory(&name, opts)?;
-        } else {
-            dst.start_file(&name, opts)?;
-            dst.write_all(&buf)?;
-        }
-    }
-    Ok(())
-}
-
-/// Serialize a [`Section`] to TOML.
-///
-/// The `toml` crate's pretty printer automatically uses multiline strings
-/// for values containing newlines, keeping section files human-readable
-/// when opened in a text editor.
-fn serialize_section(section: &Section) -> AppResult<String> {
-    let toml_str = toml::to_string_pretty(section)
-        .map_err(|e| AppError::Other(format!("sections/{}.toml serialization: {e}", section.id)))?;
-    Ok(toml_str)
-}
-
-/// Sanitize a song title into a safe, lowercase, hyphenated filename stem.
-///
-/// `"Blue Hour"` → `"blue-hour"`
-/// `"Don't Stop (Demo)"` → `"dont-stop-demo"`
-fn sanitize_title(title: &str) -> String {
-    let slug: String = title
-        .to_lowercase()
-        .chars()
-        .map(|c| if c.is_alphanumeric() { c } else { '-' })
-        .collect();
-
-    // Collapse consecutive hyphens and trim leading/trailing ones.
-    let mut result = String::with_capacity(slug.len());
-    let mut prev_hyphen = true; // start true to trim leading hyphens
-    for c in slug.chars() {
-        if c == '-' {
-            if !prev_hyphen {
-                result.push('-');
-            }
-            prev_hyphen = true;
-        } else {
-            result.push(c);
-            prev_hyphen = false;
-        }
-    }
-    // Trim trailing hyphen
-    if result.ends_with('-') {
-        result.pop();
-    }
-
-    if result.is_empty() {
-        "untitled".to_owned()
-    } else {
-        result
-    }
 }
