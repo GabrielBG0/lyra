@@ -184,11 +184,15 @@ export default function MetadataBar() {
         <MetaField
           label="Capo"
           value={(metadata.musical.capo ?? 0).toString()}
-          onCommit={(v) =>
+          onCommit={(v) => {
+            const parsed = Number(v.trim());
             updateMetadata({
-              musical: { ...metadata.musical, capo: v.trim() === '' ? null : Number(v) },
-            })
-          }
+              musical: {
+                ...metadata.musical,
+                capo: Number.isNaN(parsed) ? null : parsed,
+              },
+            });
+          }}
         />
         <MetaField
           label="Tuning"
@@ -293,6 +297,7 @@ function MetaField({
           onBlur={handleBlur}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
+              cancelledRef.current = true;
               onCommit(draft);
               setEditing(false);
             }
@@ -330,11 +335,17 @@ function ChipGroup({
 }) {
   const [adding, setAdding] = useState(false);
   const [draft, setDraft] = useState("");
+  const cancelledRef = useRef(false);
 
   const commit = () => {
     if (draft.trim()) onAdd(draft.trim());
     setDraft("");
     setAdding(false);
+  };
+
+  const handleBlur = () => {
+    if (!cancelledRef.current) commit();
+    cancelledRef.current = false;
   };
 
   return (
@@ -366,16 +377,25 @@ function ChipGroup({
             autoFocus
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
-            onBlur={commit}
+            onBlur={handleBlur}
             onKeyDown={(e) => {
-              if (e.key === "Enter") commit();
-              if (e.key === "Escape") setAdding(false);
+              if (e.key === "Enter") {
+                cancelledRef.current = true;
+                commit();
+              }
+              if (e.key === "Escape") {
+                cancelledRef.current = true;
+                setAdding(false);
+              }
             }}
           />
         ) : (
           <button
             className="flex items-center px-1.5 py-px bg-transparent border border-dashed border-border-soft text-muted hover:text-accent hover:border-accent rounded-full text-[11px] cursor-pointer transition-colors"
-            onClick={() => setAdding(true)}
+            onClick={() => {
+              cancelledRef.current = false;
+              setAdding(true);
+            }}
           >
             <Icons.Plus size={10} />
           </button>
