@@ -4,7 +4,6 @@
 use std::path::PathBuf;
 
 use crate::{
-    commands::AppState,
     core,
     error::AppResult,
     models::{

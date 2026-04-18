@@ -8,11 +8,12 @@ use chrono::Utc;
 use zip::write::SimpleFileOptions;
 use zip::{ZipArchive, ZipWriter};
 
+use crate::core::section::write_section;
 use crate::error::{AppError, AppResult};
 use crate::models::section::{Section, SnapshotSection};
 use crate::models::snapshot::{Snapshot, SnapshotHeader};
 
-use crate::core::song::{write_lyr_file, write_section};
+use crate::core::song::write_lyr_file;
 
 // ══════════════════════════════════════════════════════════════════════
 //  Public API
@@ -67,24 +68,20 @@ pub async fn create_snapshot(
 
 /// Load a full [`Snapshot`] (including all section content) from a `.lyr`
 /// archive.
-pub async fn load_snapshot(
-    path: &Path,
-    snapshot_id: &str,
-) -> AppResult<Snapshot> {
+pub async fn load_snapshot(path: &Path, snapshot_id: &str) -> AppResult<Snapshot> {
     let file = std::fs::File::open(path)?;
     let mut archive = ZipArchive::new(file)?;
 
     let entry_name = format!("snapshots/{snapshot_id}.json");
-    let mut entry = archive.by_name(&entry_name).map_err(|_| {
-        AppError::SnapshotNotFound(snapshot_id.to_owned())
-    })?;
+    let mut entry = archive
+        .by_name(&entry_name)
+        .map_err(|_| AppError::SnapshotNotFound(snapshot_id.to_owned()))?;
 
     let mut buf = String::with_capacity(entry.size() as usize);
     entry.read_to_string(&mut buf)?;
 
-    let snapshot: Snapshot = serde_json::from_str(&buf).map_err(|e| {
-        AppError::Other(format!("{entry_name}: {e}"))
-    })?;
+    let snapshot: Snapshot =
+        serde_json::from_str(&buf).map_err(|e| AppError::Other(format!("{entry_name}: {e}")))?;
 
     Ok(snapshot)
 }
@@ -103,10 +100,7 @@ pub async fn load_snapshot(
 /// tool this is safe, but a future improvement is to accept `metadata` as
 /// a parameter from the caller (which already holds it in the editor store),
 /// eliminating the second read.
-pub async fn restore_snapshot(
-    path: &Path,
-    snapshot_id: &str,
-) -> AppResult<Vec<Section>> {
+pub async fn restore_snapshot(path: &Path, snapshot_id: &str) -> AppResult<Vec<Section>> {
     let snapshot = load_snapshot(path, snapshot_id).await?;
     let now = Utc::now().to_rfc3339();
 
