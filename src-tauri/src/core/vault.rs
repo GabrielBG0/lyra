@@ -11,8 +11,9 @@ use crate::{
     core::{
         index::{get_song_by_path, list_songs, remove_song, upsert_song},
         song::read_lyr_file,
+        utils::find_available_path,
     },
-    error::AppResult,
+    error::{AppError, AppResult},
     models::song::SongIndexEntry,
 };
 
@@ -263,4 +264,18 @@ async fn handle_file_remove(
     app_handle.emit("vault:song-removed", &song_path)?;
 
     Ok(())
+}
+
+pub async fn copy_into_vault(vault_path: &Path, source_path: &Path) -> AppResult<PathBuf> {
+    let file_stem_os = source_path
+        .file_stem()
+        .ok_or(AppError::Other("Invalid file name".to_string()))?;
+
+    let base_stem = file_stem_os.to_string_lossy();
+
+    let safe_new_path = find_available_path(vault_path, &base_stem)?;
+
+    tokio::fs::copy(source_path, &safe_new_path).await?;
+
+    Ok(safe_new_path)
 }

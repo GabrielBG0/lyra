@@ -73,6 +73,7 @@ pub async fn create_song(
     Ok(payload)
 }
 
+#[tauri::command]
 pub async fn delete_song(state: State<'_, AppState>, path: String) -> AppResult<()> {
     let path_buff = PathBuf::from(&path);
 

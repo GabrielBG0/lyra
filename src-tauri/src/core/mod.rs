@@ -7,4 +7,5 @@ pub mod export;
 pub mod index;
 pub mod snapshot;
 pub mod song;
+pub mod utils;
 pub mod vault;

@@ -161,3 +161,8 @@ pub async fn get_song_by_path(
     // If we got a row, convert it using `.map(Into::into)`
     Ok(result.map(Into::into))
 }
+
+pub async fn clear_index(pool: &SqlitePool) -> AppResult<()> {
+    sqlx::query!("DELETE FROM songs").execute(pool).await?;
+    Ok(())
+}

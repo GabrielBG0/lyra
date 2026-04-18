@@ -10,13 +10,12 @@ use serde::{Deserialize, Serialize};
 use zip::write::SimpleFileOptions;
 use zip::{ZipArchive, ZipWriter};
 
+use crate::core::utils::find_available_path;
 use crate::error::{AppError, AppResult};
 use crate::models::comment::Comment;
 use crate::models::section::{Section, SectionType};
 use crate::models::snapshot::SnapshotHeader;
-use crate::models::song::{
-    AlbumRef, MusicalInfo, SongMetadata, SongPayload, SongStatus, SongTags,
-};
+use crate::models::song::{AlbumRef, MusicalInfo, SongMetadata, SongPayload, SongStatus, SongTags};
 
 // ---------- internal helpers ----------
 
@@ -92,9 +91,8 @@ pub async fn read_lyr_file(path: &Path) -> AppResult<SongPayload> {
 
     // ── 2. song.toml — metadata ─────────────────────────────────────
     let song_toml = read_entry_string(&mut archive, "song.toml")?;
-    let metadata: SongMetadata = toml::from_str(&song_toml).map_err(|e| {
-        AppError::Other(format!("song.toml: {e}"))
-    })?;
+    let metadata: SongMetadata =
+        toml::from_str(&song_toml).map_err(|e| AppError::Other(format!("song.toml: {e}")))?;
 
     // ── 3. sections/ — collect entry names first, then parse ────────
     let section_names: Vec<String> = (0..archive.len())
@@ -112,9 +110,8 @@ pub async fn read_lyr_file(path: &Path) -> AppResult<SongPayload> {
     let mut sections: Vec<Section> = Vec::with_capacity(section_names.len());
     for name in &section_names {
         let raw = read_entry_string(&mut archive, name)?;
-        let section: Section = toml::from_str(&raw).map_err(|e| {
-            AppError::Other(format!("{name}: {e}"))
-        })?;
+        let section: Section =
+            toml::from_str(&raw).map_err(|e| AppError::Other(format!("{name}: {e}")))?;
         sections.push(section);
     }
     sections.sort_by_key(|s| s.order);
@@ -135,9 +132,8 @@ pub async fn read_lyr_file(path: &Path) -> AppResult<SongPayload> {
     let mut snapshot_headers: Vec<SnapshotHeader> = Vec::with_capacity(snapshot_names.len());
     for name in &snapshot_names {
         let raw = read_entry_string(&mut archive, name)?;
-        let snap: SnapshotFile = serde_json::from_str(&raw).map_err(|e| {
-            AppError::Other(format!("{name}: {e}"))
-        })?;
+        let snap: SnapshotFile =
+            serde_json::from_str(&raw).map_err(|e| AppError::Other(format!("{name}: {e}")))?;
 
         // Derive the id from the filename stem:
         //   "snapshots/01HXKM5P8Q9R2S3T4U5V6W7X8Y.json" → "01HXKM5P8Q9R2S3T4U5V6W7X8Y"
@@ -162,9 +158,8 @@ pub async fn read_lyr_file(path: &Path) -> AppResult<SongPayload> {
     // ── 5. comments.toml (optional) ─────────────────────────────────
     let comments = match read_entry_string(&mut archive, "comments.toml") {
         Ok(raw) => {
-            let file: CommentsFile = toml::from_str(&raw).map_err(|e| {
-                AppError::Other(format!("comments.toml: {e}"))
-            })?;
+            let file: CommentsFile =
+                toml::from_str(&raw).map_err(|e| AppError::Other(format!("comments.toml: {e}")))?;
             file.comments
         }
         Err(_) => Vec::new(), // missing file → no comments
@@ -221,10 +216,7 @@ pub async fn write_lyr_file(
 /// Update a single section inside an existing `.lyr` archive atomically.
 ///
 /// This avoids re-serializing every section when only one has changed.
-pub async fn write_section(
-    path: &Path,
-    section: &Section,
-) -> AppResult<()> {
+pub async fn write_section(path: &Path, section: &Section) -> AppResult<()> {
     let tmp_path = path.with_extension("lyr.tmp");
 
     let mut overwritten: HashSet<String> = HashSet::new();
@@ -257,10 +249,7 @@ pub async fn write_section(
 ///
 /// On any write error the partially-written file is deleted before
 /// returning, so no corrupt `.lyr` file is left on disk.
-pub async fn create_lyr_file(
-    vault_path: &Path,
-    title: &str,
-) -> AppResult<(PathBuf, SongPayload)> {
+pub async fn create_lyr_file(vault_path: &Path, title: &str) -> AppResult<(PathBuf, SongPayload)> {
     let now = Utc::now().to_rfc3339();
     let song_id = ulid::Ulid::new().to_string();
     let section_id = ulid::Ulid::new().to_string();
@@ -371,9 +360,8 @@ fn do_write_lyr(
     }
 
     // ── Write song.toml ─────────────────────────────────────────────
-    let song_toml = toml::to_string_pretty(metadata).map_err(|e| {
-        AppError::Other(format!("song.toml serialization: {e}"))
-    })?;
+    let song_toml = toml::to_string_pretty(metadata)
+        .map_err(|e| AppError::Other(format!("song.toml serialization: {e}")))?;
     writer.start_file("song.toml", opts)?;
     writer.write_all(song_toml.as_bytes())?;
 
@@ -439,9 +427,8 @@ fn do_create_lyr(
     writer.write_all(meta_json.as_bytes())?;
 
     // song.toml
-    let song_toml = toml::to_string_pretty(metadata).map_err(|e| {
-        AppError::Other(format!("song.toml serialization: {e}"))
-    })?;
+    let song_toml = toml::to_string_pretty(metadata)
+        .map_err(|e| AppError::Other(format!("song.toml serialization: {e}")))?;
     writer.start_file("song.toml", opts)?;
     writer.write_all(song_toml.as_bytes())?;
 
@@ -457,10 +444,11 @@ fn do_create_lyr(
     writer.add_directory("snapshots/", opts)?;
 
     // comments.toml (empty array)
-    let comments_file = CommentsFile { comments: Vec::new() };
-    let comments_toml = toml::to_string_pretty(&comments_file).map_err(|e| {
-        AppError::Other(format!("comments.toml serialization: {e}"))
-    })?;
+    let comments_file = CommentsFile {
+        comments: Vec::new(),
+    };
+    let comments_toml = toml::to_string_pretty(&comments_file)
+        .map_err(|e| AppError::Other(format!("comments.toml serialization: {e}")))?;
     writer.start_file("comments.toml", opts)?;
     writer.write_all(comments_toml.as_bytes())?;
 
@@ -503,9 +491,8 @@ fn copy_entries_except(
 /// for values containing newlines, keeping section files human-readable
 /// when opened in a text editor.
 fn serialize_section(section: &Section) -> AppResult<String> {
-    let toml_str = toml::to_string_pretty(section).map_err(|e| {
-        AppError::Other(format!("sections/{}.toml serialization: {e}", section.id))
-    })?;
+    let toml_str = toml::to_string_pretty(section)
+        .map_err(|e| AppError::Other(format!("sections/{}.toml serialization: {e}", section.id)))?;
     Ok(toml_str)
 }
 
@@ -544,25 +531,4 @@ fn sanitize_title(title: &str) -> String {
     } else {
         result
     }
-}
-
-/// Find the first available `{stem}.lyr` path inside `vault_path`.
-///
-/// Tries `stem.lyr`, then `stem-2.lyr`, `stem-3.lyr`, etc.
-fn find_available_path(vault_path: &Path, stem: &str) -> AppResult<PathBuf> {
-    let first = vault_path.join(format!("{stem}.lyr"));
-    if !first.exists() {
-        return Ok(first);
-    }
-
-    for n in 2..=1000 {
-        let candidate = vault_path.join(format!("{stem}-{n}.lyr"));
-        if !candidate.exists() {
-            return Ok(candidate);
-        }
-    }
-
-    Err(AppError::FileExists(format!(
-        "could not find an available filename for '{stem}.lyr'"
-    )))
 }
