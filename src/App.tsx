@@ -1,7 +1,13 @@
 import { useEffect, useState } from 'react'
+import { listen } from '@tauri-apps/api/event'
+import { getCurrentWindow } from '@tauri-apps/api/window'
+import { ask } from '@tauri-apps/plugin-dialog'
 import { tauriApi } from './lib/tauri'
 import { useVault } from './hooks/useVault'
 import { useAutosave } from './hooks/useAutosave'
+import { useEditorStore } from './stores/editorStore'
+import { useSongStore } from './stores/songStore'
+import { useUIStore } from './stores/uiStore'
 import AppShell from './components/layout/AppShell'
 import VaultSetup from './components/vault/VaultSetup'
 
@@ -10,12 +16,80 @@ export default function App() {
   const { loadSongs } = useVault()
   useAutosave()
 
+  const { toggleSidebar } = useUIStore()
+  const { setSongs } = useSongStore()
+
   useEffect(() => {
     tauriApi.config.get().then(cfg => {
       setVaultPath(cfg.vault_path)
       if (cfg.vault_path) loadSongs()
     }).catch(() => setVaultPath(null))
   }, [])
+
+  useEffect(() => {
+    const unlisteners = [
+      listen('new-song', async () => {
+        const title = window.prompt('Song title:')
+        if (!title?.trim()) return
+        const payload = await tauriApi.song.create(title.trim())
+        useEditorStore.getState().loadSong(payload)
+        useSongStore.getState().selectSong(payload.file_path)
+        const songs = await tauriApi.vault.listSongs()
+        const entry = songs.find(s => s.file_path === payload.file_path)
+        if (entry) useSongStore.getState().upsertSong(entry)
+      }),
+      listen('save', async () => {
+        const { isDirty, filePath, metadata, sections, markClean } = useEditorStore.getState()
+        if (!isDirty || !filePath || !metadata) return
+        await tauriApi.song.save(filePath, metadata, sections)
+        markClean()
+        const songs = await tauriApi.vault.listSongs()
+        const updated = songs.find(s => s.file_path === filePath)
+        if (updated) useSongStore.getState().upsertSong(updated)
+      }),
+      listen('save-version', async () => {
+        const { filePath, sections } = useEditorStore.getState()
+        if (!filePath) return
+        const note = window.prompt('Snapshot note (optional):')
+        const header = await tauriApi.snapshot.create(filePath, sections, note ?? null)
+        useEditorStore.getState().addSnapshotHeader(header)
+      }),
+      listen('toggle-sidebar', () => toggleSidebar()),
+      listen('export-txt', async () => {
+        const { filePath } = useEditorStore.getState()
+        if (filePath) await tauriApi.export.plainText(filePath, false)
+      }),
+      listen('export-pdf', async () => {
+        const { filePath } = useEditorStore.getState()
+        if (filePath) await tauriApi.export.pdf(filePath, false)
+      }),
+      listen('delete-song', async () => {
+        const { filePath } = useEditorStore.getState()
+        if (!filePath) return
+        await tauriApi.song.delete(filePath)
+        useSongStore.getState().removeSong(filePath)
+        useSongStore.getState().selectSong(null)
+      }),
+      listen('rebuild-index', async () => {
+        const songs = await tauriApi.vault.rebuildIndex()
+        setSongs(songs)
+      }),
+      listen('window:close-requested', async () => {
+        const { isDirty } = useEditorStore.getState()
+        if (!isDirty) {
+          await getCurrentWindow().close()
+          return
+        }
+        const confirmed = await ask(
+          'You have unsaved changes. Close without saving?',
+          { title: 'Unsaved changes', kind: 'warning' }
+        )
+        if (confirmed) await getCurrentWindow().close()
+      }),
+    ]
+
+    return () => { unlisteners.forEach(p => p.then(f => f())) }
+  }, [toggleSidebar, setSongs])
 
   if (vaultPath === undefined) {
     return (

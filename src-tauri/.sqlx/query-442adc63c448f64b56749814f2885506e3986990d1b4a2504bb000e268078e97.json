@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n        SELECT \n            id as \"id!\", \n            title, \n            status as \"status: SongStatus\",\n            bpm, \n            key_sig, \n            genre as \"genre: Json<Vec<String>>\", -- Tell the macro about our wrapper\n            file_path, \n            updated_at, \n            created_at\n        FROM songs\n        ORDER BY updated_at DESC\n        ",
+  "query": "\n        SELECT\n            id as \"id!\",\n            title,\n            status as \"status: SongStatus\",\n            bpm,\n            key_sig,\n            genre as \"genre: Json<Vec<String>>\",\n            mood as \"mood: Json<Vec<String>>\",\n            language as \"language: Json<Vec<String>>\",\n            file_path,\n            updated_at,\n            created_at\n        FROM songs\n        ORDER BY updated_at DESC\n        ",
   "describe": {
     "columns": [
       {
@@ -34,18 +34,28 @@
         "type_info": "Text"
       },
       {
-        "name": "file_path",
+        "name": "mood: Json<Vec<String>>",
         "ordinal": 6,
         "type_info": "Text"
       },
       {
-        "name": "updated_at",
+        "name": "language: Json<Vec<String>>",
         "ordinal": 7,
         "type_info": "Text"
       },
       {
-        "name": "created_at",
+        "name": "file_path",
         "ordinal": 8,
+        "type_info": "Text"
+      },
+      {
+        "name": "updated_at",
+        "ordinal": 9,
+        "type_info": "Text"
+      },
+      {
+        "name": "created_at",
+        "ordinal": 10,
         "type_info": "Text"
       }
     ],
@@ -61,8 +71,10 @@
       false,
       false,
       false,
+      false,
+      false,
       false
     ]
   },
-  "hash": "fbda42c356cee0c8c4cc45a337039aa469d93b5da9ef2500f9bada20d74fb39b"
+  "hash": "442adc63c448f64b56749814f2885506e3986990d1b4a2504bb000e268078e97"
 }

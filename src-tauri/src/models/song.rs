@@ -69,6 +69,8 @@ pub struct SongIndexEntry {
     pub bpm: Option<u16>,
     pub key_sig: Option<String>,
     pub genre: Vec<String>,
+    pub mood: Vec<String>,
+    pub language: Vec<String>,
     pub file_path: String,
     pub created_at: String,
     pub updated_at: String,
@@ -83,6 +85,8 @@ impl SongIndexEntry {
             bpm: payload.metadata.musical.bpm,
             key_sig: payload.metadata.musical.key,
             genre: payload.metadata.tags.genre,
+            mood: payload.metadata.tags.mood,
+            language: payload.metadata.tags.language,
             file_path: path,
             created_at: payload.metadata.created_at,
             updated_at: payload.metadata.updated_at,
@@ -97,9 +101,11 @@ impl SongIndexEntry {
             bpm: metadata.musical.bpm,
             key_sig: metadata.musical.key.clone(),
             genre: metadata.tags.genre.clone(),
+            mood: metadata.tags.mood.clone(),
+            language: metadata.tags.language.clone(),
             file_path: path,
             created_at: metadata.created_at.clone(),
-            updated_at: metadata.updated_at.clone(), 
+            updated_at: metadata.updated_at.clone(),
         }
     }
 }

@@ -38,7 +38,9 @@ export default function SongList({ vaultPath, onCreateSong }: SongListProps) {
       ? songs.filter(
           (s) =>
             s.title.toLowerCase().includes(q) ||
-            s.genre.some((g) => g.toLowerCase().includes(q)),
+            s.genre.some((g) => g.toLowerCase().includes(q)) ||
+            s.mood.some((m) => m.toLowerCase().includes(q)) ||
+            s.language.some((l) => l.toLowerCase().includes(q)),
         )
       : songs;
     return sortSongs(list, sort);

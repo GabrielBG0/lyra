@@ -40,4 +40,6 @@ export const Icons = {
   MoreHorizontal: (p: IconProps) => <Icon {...p} circles={[{cx:12,cy:12,r:1},{cx:19,cy:12,r:1},{cx:5,cy:12,r:1}]} />,
   Search: (p: IconProps) => <Icon {...p} circles={[{cx:11,cy:11,r:8}]} paths={['m21 21-4.3-4.3']} />,
   Check: (p: IconProps) => <Icon {...p} paths={['M20 6 9 17l-5-5']} />,
+  Eye: (p: IconProps) => <Icon {...p} paths={['M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z']} circles={[{cx:12,cy:12,r:3}]} />,
+  Loader: (p: IconProps) => <Icon {...p} paths={['M12 2v4','M12 18v4','M4.93 4.93l2.83 2.83','M16.24 16.24l2.83 2.83','M2 12h4','M18 12h4','M4.93 19.07l2.83-2.83','M16.24 7.76l2.83-2.83']} />,
 }

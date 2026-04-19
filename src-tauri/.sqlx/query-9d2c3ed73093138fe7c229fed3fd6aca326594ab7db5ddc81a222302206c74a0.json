@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        INSERT INTO songs (id, title, status, bpm, key_sig, genre, mood, language, file_path, updated_at, created_at)\n        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)\n        ON CONFLICT(file_path) DO UPDATE SET\n            id = excluded.id,\n            title = excluded.title,\n            status = excluded.status,\n            bpm = excluded.bpm,\n            key_sig = excluded.key_sig,\n            genre = excluded.genre,\n            mood = excluded.mood,\n            language = excluded.language,\n            updated_at = excluded.updated_at\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 11
+    },
+    "nullable": []
+  },
+  "hash": "9d2c3ed73093138fe7c229fed3fd6aca326594ab7db5ddc81a222302206c74a0"
+}

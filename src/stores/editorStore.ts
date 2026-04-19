@@ -21,6 +21,7 @@ interface EditorStore {
   diffResult: SectionDiff[] | null
   diffTargetA: string | null // snapshot id or 'now'
   diffTargetB: string | null
+  previewSnapshotId: string | null
 
   // Actions
   loadSong: (payload: SongPayload) => void
@@ -34,6 +35,8 @@ interface EditorStore {
   cacheSnapshot: (id: string, snapshot: Snapshot) => void
   setDiff: (result: SectionDiff[], a: string, b: string) => void
   clearDiff: () => void
+  enterPreview: (snapshotId: string) => void
+  exitPreview: () => void
 }
 
 export const useEditorStore = create<EditorStore>((set) => ({
@@ -46,6 +49,7 @@ export const useEditorStore = create<EditorStore>((set) => ({
   diffResult: null,
   diffTargetA: null,
   diffTargetB: null,
+  previewSnapshotId: null,
 
   loadSong: (payload) =>
     set({
@@ -58,6 +62,7 @@ export const useEditorStore = create<EditorStore>((set) => ({
       diffResult: null,
       diffTargetA: null,
       diffTargetB: null,
+      previewSnapshotId: null,
     }),
 
   updateSection: (id, content) =>
@@ -113,4 +118,7 @@ export const useEditorStore = create<EditorStore>((set) => ({
 
   clearDiff: () =>
     set({ diffResult: null, diffTargetA: null, diffTargetB: null }),
+
+  enterPreview: (snapshotId) => set({ previewSnapshotId: snapshotId }),
+  exitPreview: () => set({ previewSnapshotId: null }),
 }))

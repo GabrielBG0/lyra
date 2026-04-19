@@ -4,6 +4,10 @@ import SectionEditor from "../editor/SectionEditor";
 import VersionTimeline from "../timeline/VersionTimeline";
 import LyraLogo from "../ui/LyraLogo";
 import { Icons } from "../ui/Icon";
+import EditorErrorBoundary from "./EditorErrorBoundary";
+import DiffBanner from "../diff/DiffBanner";
+import DiffSection from "../diff/DiffSection";
+import SnapshotPreviewBanner from "../timeline/SnapshotPreviewBanner";
 
 interface EditorPanelProps {
   lyricFont: string;
@@ -14,7 +18,7 @@ export default function EditorPanel({
   lyricFont,
   onNewSong,
 }: EditorPanelProps) {
-  const { metadata } = useEditorStore();
+  const { metadata, previewSnapshotId, loadedSnapshots, diffResult } = useEditorStore();
 
   if (!metadata) {
     return (
@@ -37,12 +41,32 @@ export default function EditorPanel({
     );
   }
 
+  const previewSnapshot = previewSnapshotId ? loadedSnapshots[previewSnapshotId] : null;
+
   return (
     <div className="flex-1 flex flex-col min-h-0 bg-bg">
       <MetadataBar />
-      <div className="flex-1 overflow-y-auto">
-        <SectionEditor lyricFont={lyricFont} />
-      </div>
+      {diffResult !== null && <DiffBanner />}
+      {previewSnapshotId && !diffResult && (
+        <SnapshotPreviewBanner snapshotId={previewSnapshotId} />
+      )}
+      <EditorErrorBoundary>
+        <div className="flex-1 overflow-y-auto">
+          {diffResult !== null ? (
+            <div className="max-w-190 mx-auto px-14 py-3.5 pb-16">
+              {diffResult.map((d) => (
+                <DiffSection key={d.section_id} diff={d} />
+              ))}
+            </div>
+          ) : (
+            <SectionEditor
+              lyricFont={lyricFont}
+              readOnly={previewSnapshotId !== null}
+              previewSections={previewSnapshot?.sections ?? null}
+            />
+          )}
+        </div>
+      </EditorErrorBoundary>
       <VersionTimeline />
     </div>
   );
