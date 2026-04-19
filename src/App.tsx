@@ -16,7 +16,7 @@ export default function App() {
   const { loadSongs } = useVault()
   useAutosave()
 
-  const { toggleSidebar } = useUIStore()
+  const { toggleSidebar, openNewSongModal } = useUIStore()
   const { setSongs } = useSongStore()
 
   useEffect(() => {
@@ -28,16 +28,7 @@ export default function App() {
 
   useEffect(() => {
     const unlisteners = [
-      listen('new-song', async () => {
-        const title = window.prompt('Song title:')
-        if (!title?.trim()) return
-        const payload = await tauriApi.song.create(title.trim())
-        useEditorStore.getState().loadSong(payload)
-        useSongStore.getState().selectSong(payload.file_path)
-        const songs = await tauriApi.vault.listSongs()
-        const entry = songs.find(s => s.file_path === payload.file_path)
-        if (entry) useSongStore.getState().upsertSong(entry)
-      }),
+      listen('new-song', () => openNewSongModal()),
       listen('save', async () => {
         const { isDirty, filePath, metadata, sections, markClean } = useEditorStore.getState()
         if (!isDirty || !filePath || !metadata) return
@@ -77,14 +68,14 @@ export default function App() {
       listen('window:close-requested', async () => {
         const { isDirty } = useEditorStore.getState()
         if (!isDirty) {
-          await getCurrentWindow().close()
+          await getCurrentWindow().destroy()
           return
         }
         const confirmed = await ask(
           'You have unsaved changes. Close without saving?',
           { title: 'Unsaved changes', kind: 'warning' }
         )
-        if (confirmed) await getCurrentWindow().close()
+        if (confirmed) await getCurrentWindow().destroy()
       }),
     ]
 

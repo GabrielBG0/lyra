@@ -6,23 +6,26 @@ import { useSong } from "../../hooks/useSong";
 import SidebarErrorBoundary from "./SidebarErrorBoundary";
 import { useUIStore } from "../../stores/uiStore";
 import { useState } from "react";
+import MenuBar from "../shell/MenuBar";
+import NewSongModal from "../ui/NewSongModal";
 
 interface AppShellProps {
   vaultPath: string;
 }
 
 export default function AppShell({ vaultPath }: AppShellProps) {
-  const { sidebarCollapsed, setSidebarCollapsed } = useUIStore();
+  const { sidebarCollapsed, setSidebarCollapsed, newSongModalOpen, openNewSongModal, closeNewSongModal } = useUIStore();
   const [lyricFont] = useState<string>("Newsreader, Georgia, serif");
   const { createSong } = useSong();
 
-  const handleNewSong = async () => {
-    const title = window.prompt("Song title:");
-    if (title?.trim()) await createSong(title.trim());
-  };
+  const handleNewSong = () => openNewSongModal();
 
   return (
     <div className="h-full flex flex-col bg-bg text-primary font-ui overflow-hidden">
+      <MenuBar
+        onToggleSidebar={() => setSidebarCollapsed(!sidebarCollapsed)}
+        onNewSong={handleNewSong}
+      />
       <div className="flex flex-1 min-h-0">
         {/* Collapsed sidebar strip */}
         {sidebarCollapsed ? (
@@ -46,7 +49,7 @@ export default function AppShell({ vaultPath }: AppShellProps) {
             </button>
           </aside>
         ) : (
-          <div className="relative shrink-0">
+          <div className="relative shrink-0 h-full">
             <SidebarErrorBoundary>
               <SongList vaultPath={vaultPath} onCreateSong={handleNewSong} />
             </SidebarErrorBoundary>
@@ -62,6 +65,12 @@ export default function AppShell({ vaultPath }: AppShellProps) {
 
         <EditorPanel lyricFont={lyricFont} onNewSong={handleNewSong} />
       </div>
+
+      <NewSongModal
+        open={newSongModalOpen}
+        onClose={closeNewSongModal}
+        onCreate={createSong}
+      />
     </div>
   );
 }

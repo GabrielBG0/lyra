@@ -51,7 +51,7 @@ export default function SongList({ vaultPath, onCreateSong }: SongListProps) {
   };
 
   return (
-    <aside className="w-65 shrink-0 bg-panel border-r border-border-soft flex flex-col min-h-0">
+    <aside className="w-65 shrink-0 bg-panel border-r border-border-soft flex flex-col h-full">
       {/* Header */}
       <div className="flex items-center justify-between px-3.5 pt-3.5 pb-2.5">
         <div className="flex items-center gap-2">
