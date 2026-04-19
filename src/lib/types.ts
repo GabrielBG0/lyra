@@ -42,6 +42,8 @@ export interface SongIndexEntry {
   bpm: number | null
   key: string | null
   genre: string[]
+  mood: string[]
+  language: string[]
   file_path: string
   updated_at: string
 }

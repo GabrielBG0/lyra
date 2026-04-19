@@ -7,7 +7,8 @@ pub mod models;
 use std::path::Path;
 use std::sync::Mutex;
 
-use tauri::Manager;
+use tauri::{Emitter, Manager, WindowEvent};
+use tauri::menu::{MenuBuilder, MenuItemBuilder, SubmenuBuilder};
 
 use commands::AppState;
 use core::config::{load_config, AppConfig};
@@ -22,6 +23,7 @@ fn greet(name: &str) -> String {
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())
+        .plugin(tauri_plugin_dialog::init())
         .setup(|app| {
             let handle = app.handle().clone();
 
@@ -64,6 +66,51 @@ pub fn run() {
                     config: Mutex::new(config),
                 });
             });
+
+            // Build native OS menu.
+            let menu = MenuBuilder::new(app)
+                .item(&SubmenuBuilder::new(app, "File")
+                    .item(&MenuItemBuilder::with_id("new-song", "New Song").accelerator("CmdOrCtrl+N").build(app)?)
+                    .separator()
+                    .item(&MenuItemBuilder::with_id("save", "Save").accelerator("CmdOrCtrl+S").build(app)?)
+                    .item(&MenuItemBuilder::with_id("save-version", "Save Version").accelerator("CmdOrCtrl+Shift+S").build(app)?)
+                    .separator()
+                    .text("export-txt", "Export Plain Text…")
+                    .text("export-pdf", "Export PDF…")
+                    .separator()
+                    .text("close-vault", "Close Vault")
+                    .build()?)
+                .item(&SubmenuBuilder::new(app, "Edit")
+                    .item(&MenuItemBuilder::with_id("undo", "Undo").enabled(false).build(app)?)
+                    .item(&MenuItemBuilder::with_id("redo", "Redo").enabled(false).build(app)?)
+                    .build()?)
+                .item(&SubmenuBuilder::new(app, "Song")
+                    .text("delete-song", "Delete Song")
+                    .separator()
+                    .text("rebuild-index", "Rebuild Index")
+                    .build()?)
+                .item(&SubmenuBuilder::new(app, "View")
+                    .text("toggle-sidebar", "Toggle Sidebar")
+                    .text("toggle-timeline", "Toggle Timeline")
+                    .build()?)
+                .build()?;
+
+            app.set_menu(menu)?;
+
+            app.on_menu_event(|app, event| {
+                let _ = app.emit(event.id().as_ref(), ());
+            });
+
+            // Intercept window close to allow dirty-state check in the frontend.
+            if let Some(window) = app.get_webview_window("main") {
+                let window_clone = window.clone();
+                window.on_window_event(move |event| {
+                    if let WindowEvent::CloseRequested { api, .. } = event {
+                        api.prevent_close();
+                        let _ = window_clone.emit("window:close-requested", ());
+                    }
+                });
+            }
 
             Ok(())
         })

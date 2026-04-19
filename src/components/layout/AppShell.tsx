@@ -1,17 +1,18 @@
-import { useState } from "react";
 import SongList from "../sidebar/SongList";
 import EditorPanel from "./EditorPanel";
-import MenuBar from "../shell/MenuBar";
 import LyraLogo from "../ui/LyraLogo";
 import { Icons } from "../ui/Icon";
 import { useSong } from "../../hooks/useSong";
+import SidebarErrorBoundary from "./SidebarErrorBoundary";
+import { useUIStore } from "../../stores/uiStore";
+import { useState } from "react";
 
 interface AppShellProps {
   vaultPath: string;
 }
 
 export default function AppShell({ vaultPath }: AppShellProps) {
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const { sidebarCollapsed, setSidebarCollapsed } = useUIStore();
   const [lyricFont] = useState<string>("Newsreader, Georgia, serif");
   const { createSong } = useSong();
 
@@ -22,11 +23,6 @@ export default function AppShell({ vaultPath }: AppShellProps) {
 
   return (
     <div className="h-full flex flex-col bg-bg text-primary font-ui overflow-hidden">
-      <MenuBar
-        onToggleSidebar={() => setSidebarCollapsed((c) => !c)}
-        onNewSong={handleNewSong}
-      />
-
       <div className="flex flex-1 min-h-0">
         {/* Collapsed sidebar strip */}
         {sidebarCollapsed ? (
@@ -51,7 +47,9 @@ export default function AppShell({ vaultPath }: AppShellProps) {
           </aside>
         ) : (
           <div className="relative shrink-0">
-            <SongList vaultPath={vaultPath} onCreateSong={handleNewSong} />
+            <SidebarErrorBoundary>
+              <SongList vaultPath={vaultPath} onCreateSong={handleNewSong} />
+            </SidebarErrorBoundary>
             <button
               className="absolute top-3.5 right-3.5 w-7 h-7 flex items-center justify-center rounded text-secondary hover:bg-elev hover:text-primary transition-colors border-none bg-transparent cursor-pointer"
               title="Collapse sidebar"

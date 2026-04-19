@@ -1,15 +1,48 @@
 import { useState } from "react";
 import { useEditorStore } from "../../stores/editorStore";
 import { useSnapshot } from "../../hooks/useSnapshot";
+import { useDiff } from "../../hooks/useDiff";
 import { Icons } from "../ui/Icon";
 import SnapshotCard, { NowCard } from "./SnapshotCard";
 
 export default function VersionTimeline() {
   const [expanded, setExpanded] = useState(false);
-  const { snapshotHeaders } = useEditorStore();
+  const [shiftSelectedId, setShiftSelectedId] = useState<string | null>(null);
+  const { snapshotHeaders, previewSnapshotId, exitPreview } = useEditorStore();
 
-  const { createSnapshot } = useSnapshot();
+  const { createSnapshot, loadSnapshot } = useSnapshot();
+  const { diffTwoSnapshots, diffWorkingVsSnapshot } = useDiff();
   const latestSnap = snapshotHeaders[0];
+
+  const handlePreviewClick = async (headerId: string) => {
+    await loadSnapshot(headerId);
+    useEditorStore.getState().enterPreview(headerId);
+  };
+
+  const handleCardClick = async (headerId: string, shiftHeld: boolean) => {
+    if (shiftHeld && shiftSelectedId) {
+      await diffTwoSnapshots(shiftSelectedId, headerId);
+      setShiftSelectedId(null);
+      return;
+    }
+    if (shiftHeld) {
+      setShiftSelectedId(headerId);
+      return;
+    }
+    setShiftSelectedId(null);
+    await handlePreviewClick(headerId);
+  };
+
+  const handleNowCardClick = async () => {
+    if (shiftSelectedId) {
+      await diffWorkingVsSnapshot(shiftSelectedId);
+      setShiftSelectedId(null);
+      return;
+    }
+    if (previewSnapshotId !== null) {
+      exitPreview();
+    }
+  };
 
   return (
     <div
@@ -86,12 +119,15 @@ export default function VersionTimeline() {
       {/* Expanded strip */}
       {expanded && (
         <div className="flex gap-2.5 px-4 pb-3.5 overflow-x-auto">
-          <NowCard />
+          <NowCard onClick={handleNowCardClick} />
           {snapshotHeaders.map((header, i) => (
             <SnapshotCard
               key={header.id}
               header={header}
               index={snapshotHeaders.length - 1 - i}
+              isPreview={previewSnapshotId === header.id}
+              isShiftSelected={shiftSelectedId === header.id}
+              onClick={handleCardClick}
             />
           ))}
           {snapshotHeaders.length === 0 && (
