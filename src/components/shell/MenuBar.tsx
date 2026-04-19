@@ -3,6 +3,7 @@ import LyraLogo from "../ui/LyraLogo";
 import { useEditorStore } from "../../stores/editorStore";
 import { useSong } from "../../hooks/useSong";
 import { useSnapshot } from "../../hooks/useSnapshot";
+import { useUIStore } from "../../stores/uiStore";
 
 const MENUS = {
   File: [
@@ -45,6 +46,7 @@ export default function MenuBar({ onToggleSidebar, onNewSong }: MenuBarProps) {
   const { metadata, isDirty } = useEditorStore();
   const { saveSong } = useSong();
   const { createSnapshot } = useSnapshot();
+  const { openSnapshotModal } = useUIStore();
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -65,8 +67,7 @@ export default function MenuBar({ onToggleSidebar, onNewSong }: MenuBarProps) {
     else if (label === "Toggle Sidebar") onToggleSidebar();
     else if (label === "Save") saveSong();
     else if (label === "Save Version…") {
-      const note = window.prompt("Snapshot note (optional):");
-      createSnapshot(note || null);
+      openSnapshotModal((note) => createSnapshot(note));
     } else {
       console.warn(`Menu action "${label}" not yet implemented`);
     }

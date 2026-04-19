@@ -3,6 +3,7 @@ import type { SongStatus } from "../../lib/types";
 import { useEditorStore } from "../../stores/editorStore";
 import { useSong } from "../../hooks/useSong";
 import { useSnapshot } from "../../hooks/useSnapshot";
+import { useUIStore } from "../../stores/uiStore";
 import { Icons } from "../ui/Icon";
 
 const STATUS_DOT: Record<SongStatus, string> = {
@@ -18,6 +19,7 @@ export default function MetadataBar() {
   const { metadata, isDirty, updateMetadata } = useEditorStore();
   const { saveSong } = useSong();
   const { createSnapshot } = useSnapshot();
+  const { openSnapshotModal } = useUIStore();
   const [editingTitle, setEditingTitle] = useState(false);
   const [titleDraft, setTitleDraft] = useState("");
   const [savedBlink, setSavedBlink] = useState(false);
@@ -57,10 +59,7 @@ export default function MetadataBar() {
     setTimeout(() => setSavedBlink(false), 1500);
   };
 
-  const handleSnapshot = async () => {
-    const note = window.prompt("Snapshot note (optional):");
-    await createSnapshot(note ?? null);
-  };
+  const handleSnapshot = () => openSnapshotModal((note) => createSnapshot(note));
 
   return (
     <div

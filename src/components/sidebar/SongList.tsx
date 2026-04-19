@@ -53,28 +53,16 @@ export default function SongList({ vaultPath, onCreateSong }: SongListProps) {
   return (
     <aside className="w-65 shrink-0 bg-panel border-r border-border-soft flex flex-col h-full">
       {/* Header */}
-      <div className="flex items-center justify-between px-3.5 pt-3.5 pb-2.5">
-        <div className="flex items-center gap-2">
-          <LyraLogo size={22} />
-          <div>
-            <div className="font-semibold text-primary text-[13px] tracking-wide leading-tight">
-              Lyra
-            </div>
-            <div
-              className="text-faint leading-tight font-ui"
-              style={{ fontSize: 10.5 }}
-            >
-              {vaultPath.replace(/\\/g, "/").split("/").slice(-2).join("/")}
-            </div>
-          </div>
+      <div className="flex flex-col px-3.5 pt-3.5 pb-2.5 pr-11">
+        <div className="font-semibold text-primary text-[13px] tracking-wide leading-tight mb-1">
+          My Songs
         </div>
-        <button
-          className="w-7 h-7 rounded flex items-center justify-center text-secondary hover:bg-elev hover:text-primary transition-colors border-none bg-transparent cursor-pointer"
-          title="New song (⌘N)"
-          onClick={onCreateSong}
+        <div
+          className="text-faint leading-tight font-ui"
+          style={{ fontSize: 10.5 }}
         >
-          <Icons.Plus size={16} />
-        </button>
+          {vaultPath.replace(/\\/g, "/").split("/").slice(-2).join("/")}
+        </div>
       </div>
 
       {/* Controls */}

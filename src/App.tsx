@@ -16,7 +16,7 @@ export default function App() {
   const { loadSongs } = useVault()
   useAutosave()
 
-  const { toggleSidebar, openNewSongModal } = useUIStore()
+  const { toggleSidebar, openNewSongModal, openSnapshotModal } = useUIStore()
   const { setSongs } = useSongStore()
 
   useEffect(() => {
@@ -38,12 +38,13 @@ export default function App() {
         const updated = songs.find(s => s.file_path === filePath)
         if (updated) useSongStore.getState().upsertSong(updated)
       }),
-      listen('save-version', async () => {
+      listen('save-version', () => {
         const { filePath, sections } = useEditorStore.getState()
         if (!filePath) return
-        const note = window.prompt('Snapshot note (optional):')
-        const header = await tauriApi.snapshot.create(filePath, sections, note ?? null)
-        useEditorStore.getState().addSnapshotHeader(header)
+        openSnapshotModal(async (note) => {
+          const header = await tauriApi.snapshot.create(filePath, sections, note)
+          useEditorStore.getState().addSnapshotHeader(header)
+        })
       }),
       listen('toggle-sidebar', () => toggleSidebar()),
       listen('export-txt', async () => {
@@ -80,7 +81,7 @@ export default function App() {
     ]
 
     return () => { unlisteners.forEach(p => p.then(f => f())) }
-  }, [toggleSidebar, setSongs])
+  }, [toggleSidebar, setSongs, openSnapshotModal])
 
   if (vaultPath === undefined) {
     return (

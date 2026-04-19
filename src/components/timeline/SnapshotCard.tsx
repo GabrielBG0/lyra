@@ -83,7 +83,7 @@ export default function SnapshotCard({ header, index, isPreview, isShiftSelected
       danger: true,
       onClick: () => {
         // TODO: implement delete_snapshot Rust command
-        window.alert("Not yet implemented");
+        console.warn("Delete snapshot not yet implemented");
       },
     },
   ];

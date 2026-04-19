@@ -7,6 +7,10 @@ interface UIStore {
   newSongModalOpen: boolean
   openNewSongModal: () => void
   closeNewSongModal: () => void
+  snapshotModalOpen: boolean
+  snapshotModalOnSubmit: ((note: string | null) => void) | null
+  openSnapshotModal: (onSubmit: (note: string | null) => void) => void
+  closeSnapshotModal: () => void
 }
 
 export const useUIStore = create<UIStore>((set) => ({
@@ -16,4 +20,8 @@ export const useUIStore = create<UIStore>((set) => ({
   newSongModalOpen: false,
   openNewSongModal: () => set({ newSongModalOpen: true }),
   closeNewSongModal: () => set({ newSongModalOpen: false }),
+  snapshotModalOpen: false,
+  snapshotModalOnSubmit: null,
+  openSnapshotModal: (onSubmit) => set({ snapshotModalOpen: true, snapshotModalOnSubmit: onSubmit }),
+  closeSnapshotModal: () => set({ snapshotModalOpen: false, snapshotModalOnSubmit: null }),
 }))

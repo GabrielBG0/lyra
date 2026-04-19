@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useEditorStore } from "../../stores/editorStore";
 import { useSnapshot } from "../../hooks/useSnapshot";
 import { useDiff } from "../../hooks/useDiff";
+import { useUIStore } from "../../stores/uiStore";
 import { Icons } from "../ui/Icon";
 import SnapshotCard, { NowCard } from "./SnapshotCard";
 
@@ -12,6 +13,7 @@ export default function VersionTimeline() {
 
   const { createSnapshot, loadSnapshot } = useSnapshot();
   const { diffTwoSnapshots, diffWorkingVsSnapshot } = useDiff();
+  const { openSnapshotModal } = useUIStore();
   const latestSnap = snapshotHeaders[0];
 
   const handlePreviewClick = async (headerId: string) => {
@@ -104,10 +106,7 @@ export default function VersionTimeline() {
             <button
               className="flex items-center gap-1 px-2 py-1 bg-transparent border border-border-soft rounded text-secondary hover:bg-elev transition-colors font-ui cursor-pointer"
               style={{ fontSize: 11 }}
-              onClick={() => {
-                const note = window.prompt("Snapshot note (optional):");
-                createSnapshot(note ?? null);
-              }}
+              onClick={() => openSnapshotModal((note) => createSnapshot(note))}
             >
               <Icons.Camera size={12} />
               Snapshot

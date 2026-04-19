@@ -8,13 +8,23 @@ import { useUIStore } from "../../stores/uiStore";
 import { useState } from "react";
 import MenuBar from "../shell/MenuBar";
 import NewSongModal from "../ui/NewSongModal";
+import SnapshotModal from "../ui/SnapshotModal";
 
 interface AppShellProps {
   vaultPath: string;
 }
 
 export default function AppShell({ vaultPath }: AppShellProps) {
-  const { sidebarCollapsed, setSidebarCollapsed, newSongModalOpen, openNewSongModal, closeNewSongModal } = useUIStore();
+  const {
+    sidebarCollapsed,
+    setSidebarCollapsed,
+    newSongModalOpen,
+    openNewSongModal,
+    closeNewSongModal,
+    snapshotModalOpen,
+    snapshotModalOnSubmit,
+    closeSnapshotModal,
+  } = useUIStore();
   const [lyricFont] = useState<string>("Newsreader, Georgia, serif");
   const { createSong } = useSong();
 
@@ -30,8 +40,11 @@ export default function AppShell({ vaultPath }: AppShellProps) {
         {/* Collapsed sidebar strip */}
         {sidebarCollapsed ? (
           <aside className="w-12 shrink-0 bg-panel border-r border-border-soft flex flex-col items-center py-2.5 gap-2">
-            <div className="mb-1">
-              <LyraLogo size={22} />
+            <div
+              className="mb-1 text-accent text-xl leading-none select-none"
+              title="Lyra"
+            >
+              𝄞
             </div>
             <button
               className="w-7 h-7 flex items-center justify-center rounded text-secondary hover:bg-elev hover:text-primary transition-colors border-none bg-transparent cursor-pointer"
@@ -45,7 +58,7 @@ export default function AppShell({ vaultPath }: AppShellProps) {
               title="Expand sidebar"
               onClick={() => setSidebarCollapsed(false)}
             >
-              <Icons.ChevronRight size={16} />
+              <Icons.PanelLeftOpen size={16} />
             </button>
           </aside>
         ) : (
@@ -58,7 +71,7 @@ export default function AppShell({ vaultPath }: AppShellProps) {
               title="Collapse sidebar"
               onClick={() => setSidebarCollapsed(true)}
             >
-              <Icons.PanelLeft size={15} />
+              <Icons.PanelLeftClose size={15} />
             </button>
           </div>
         )}
@@ -70,6 +83,11 @@ export default function AppShell({ vaultPath }: AppShellProps) {
         open={newSongModalOpen}
         onClose={closeNewSongModal}
         onCreate={createSong}
+      />
+      <SnapshotModal
+        open={snapshotModalOpen}
+        onClose={closeSnapshotModal}
+        onSubmit={snapshotModalOnSubmit ?? (() => {})}
       />
     </div>
   );

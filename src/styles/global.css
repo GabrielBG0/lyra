@@ -2,42 +2,42 @@
 
 @theme {
   /* ── Backgrounds — Editorial Ink palette */
-  --color-bg:           oklch(0.145 0.008 60);
-  --color-surface:      oklch(0.175 0.010 60);
-  --color-panel:        oklch(0.205 0.012 60);
-  --color-elev:         oklch(0.245 0.014 60);
+  --color-bg: oklch(0.145 0.008 60);
+  --color-surface: oklch(0.175 0.01 60);
+  --color-panel: oklch(0.205 0.012 60);
+  --color-elev: oklch(0.245 0.014 60);
 
   /* ── Borders */
-  --color-border:       oklch(0.32 0.012 60 / 0.5);
-  --color-border-soft:  oklch(0.32 0.012 60 / 0.22);
+  --color-border: oklch(0.32 0.012 60 / 0.5);
+  --color-border-soft: oklch(0.32 0.012 60 / 0.22);
 
   /* ── Text */
-  --color-primary:      oklch(0.95 0.013 85);
-  --color-secondary:    oklch(0.78 0.013 80);
-  --color-muted:        oklch(0.55 0.010 75);
-  --color-faint:        oklch(0.40 0.008 70);
+  --color-primary: oklch(0.95 0.013 85);
+  --color-secondary: oklch(0.78 0.013 80);
+  --color-muted: oklch(0.55 0.01 75);
+  --color-faint: oklch(0.4 0.008 70);
 
   /* ── Accent (muted amber) */
-  --color-accent:       oklch(0.72 0.10 55);
-  --color-accent-soft:  oklch(0.72 0.10 55 / 0.12);
+  --color-accent: oklch(0.72 0.1 55);
+  --color-accent-soft: oklch(0.72 0.1 55 / 0.12);
 
   /* ── Rose (bridge / secondary) */
-  --color-brand-rose:   oklch(0.66 0.10 22);
+  --color-brand-rose: oklch(0.66 0.1 22);
 
   /* ── Status */
-  --color-status-idea:     oklch(0.75 0.08 230);
-  --color-status-draft:    oklch(0.78 0.10 65);
-  --color-status-demo:     oklch(0.68 0.12 15);
-  --color-status-finished: oklch(0.80 0.10 115);
+  --color-status-idea: oklch(0.75 0.08 230);
+  --color-status-draft: oklch(0.78 0.1 65);
+  --color-status-demo: oklch(0.68 0.12 15);
+  --color-status-finished: oklch(0.8 0.1 115);
 
   /* ── Diff */
-  --color-diff-add:      #14532d;
+  --color-diff-add: #14532d;
   --color-diff-add-text: #86efac;
-  --color-diff-remove:   #450a0a;
+  --color-diff-remove: #450a0a;
   --color-diff-remove-text: #fca5a5;
 
   /* ── Typography */
-  --font-ui:     "Satoshi", -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+  --font-ui: "Satoshi", -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
   --font-lyrics: "Newsreader", Georgia, "Times New Roman", serif;
 
   /* ── Extra text sizes not in Tailwind's default scale */
@@ -46,7 +46,9 @@
 }
 
 @layer base {
-  html, body, #root {
+  html,
+  body,
+  #root {
     height: 100%;
     margin: 0;
   }
@@ -54,7 +56,12 @@
   body {
     background-color: oklch(0.145 0.008 60);
     color: oklch(0.95 0.013 85);
-    font-family: "Satoshi", -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+    font-family:
+      "Satoshi",
+      -apple-system,
+      BlinkMacSystemFont,
+      "Helvetica Neue",
+      sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -68,9 +75,17 @@
     scrollbar-width: thin;
     scrollbar-color: oklch(0.32 0.012 60 / 0.5) transparent;
   }
-  *::-webkit-scrollbar { width: 6px; height: 6px; }
-  *::-webkit-scrollbar-thumb { background: oklch(0.32 0.012 60 / 0.5); border-radius: 3px; }
-  *::-webkit-scrollbar-track { background: transparent; }
+  *::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  *::-webkit-scrollbar-thumb {
+    background: oklch(0.32 0.012 60 / 0.5);
+    border-radius: 3px;
+  }
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
 }
 
 @layer components {
@@ -94,13 +109,13 @@
 
   /* Selected song accent bar */
   .song-entry-selected::before {
-    content: '';
+    content: "";
     position: absolute;
     left: 0;
     top: 7px;
     bottom: 7px;
     width: 2px;
-    background: oklch(0.72 0.10 55);
+    background: oklch(0.72 0.1 55);
     border-radius: 0 2px 2px 0;
   }
 }
