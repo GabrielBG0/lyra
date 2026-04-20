@@ -11,6 +11,9 @@ interface UIStore {
   snapshotModalOnSubmit: ((note: string | null) => void) | null
   openSnapshotModal: (onSubmit: (note: string | null) => void) => void
   closeSnapshotModal: () => void
+  shortcutsModalOpen: boolean
+  openShortcutsModal: () => void
+  closeShortcutsModal: () => void
 }
 
 export const useUIStore = create<UIStore>((set) => ({
@@ -24,4 +27,7 @@ export const useUIStore = create<UIStore>((set) => ({
   snapshotModalOnSubmit: null,
   openSnapshotModal: (onSubmit) => set({ snapshotModalOpen: true, snapshotModalOnSubmit: onSubmit }),
   closeSnapshotModal: () => set({ snapshotModalOpen: false, snapshotModalOnSubmit: null }),
+  shortcutsModalOpen: false,
+  openShortcutsModal: () => set({ shortcutsModalOpen: true }),
+  closeShortcutsModal: () => set({ shortcutsModalOpen: false }),
 }))

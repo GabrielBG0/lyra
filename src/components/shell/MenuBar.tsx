@@ -39,9 +39,10 @@ const MENUS = {
 interface MenuBarProps {
   onToggleSidebar: () => void;
   onNewSong: () => void;
+  onShowShortcuts: () => void;
 }
 
-export default function MenuBar({ onToggleSidebar, onNewSong }: MenuBarProps) {
+export default function MenuBar({ onToggleSidebar, onNewSong, onShowShortcuts }: MenuBarProps) {
   const [open, setOpen] = useState<string | null>(null);
   const { metadata, isDirty } = useEditorStore();
   const { saveSong } = useSong();
@@ -68,9 +69,8 @@ export default function MenuBar({ onToggleSidebar, onNewSong }: MenuBarProps) {
     else if (label === "Save") saveSong();
     else if (label === "Save Version…") {
       openSnapshotModal((note) => createSnapshot(note));
-    } else {
-      console.warn(`Menu action "${label}" not yet implemented`);
-    }
+    } else if (label === "Keyboard Shortcuts…") onShowShortcuts();
+    else console.warn(`Menu action "${label}" not yet implemented`)
   };
 
   return (

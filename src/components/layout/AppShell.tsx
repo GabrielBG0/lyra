@@ -9,6 +9,7 @@ import { useState } from "react";
 import MenuBar from "../shell/MenuBar";
 import NewSongModal from "../ui/NewSongModal";
 import SnapshotModal from "../ui/SnapshotModal";
+import KeyboardShortcutsModal from "../ui/KeyboardShortcutsModal";
 
 interface AppShellProps {
   vaultPath: string;
@@ -24,6 +25,9 @@ export default function AppShell({ vaultPath }: AppShellProps) {
     snapshotModalOpen,
     snapshotModalOnSubmit,
     closeSnapshotModal,
+    shortcutsModalOpen,
+    openShortcutsModal,
+    closeShortcutsModal,
   } = useUIStore();
   const [lyricFont] = useState<string>("Newsreader, Georgia, serif");
   const { createSong } = useSong();
@@ -35,6 +39,7 @@ export default function AppShell({ vaultPath }: AppShellProps) {
       <MenuBar
         onToggleSidebar={() => setSidebarCollapsed(!sidebarCollapsed)}
         onNewSong={handleNewSong}
+        onShowShortcuts={openShortcutsModal}
       />
       <div className="flex flex-1 min-h-0">
         {/* Collapsed sidebar strip */}
@@ -88,6 +93,10 @@ export default function AppShell({ vaultPath }: AppShellProps) {
         open={snapshotModalOpen}
         onClose={closeSnapshotModal}
         onSubmit={snapshotModalOnSubmit ?? (() => {})}
+      />
+      <KeyboardShortcutsModal
+        open={shortcutsModalOpen}
+        onClose={closeShortcutsModal}
       />
     </div>
   );

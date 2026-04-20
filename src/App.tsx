@@ -5,6 +5,7 @@ import { ask } from '@tauri-apps/plugin-dialog'
 import { tauriApi } from './lib/tauri'
 import { useVault } from './hooks/useVault'
 import { useAutosave } from './hooks/useAutosave'
+import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts'
 import { useEditorStore } from './stores/editorStore'
 import { useSongStore } from './stores/songStore'
 import { useUIStore } from './stores/uiStore'
@@ -18,6 +19,31 @@ export default function App() {
 
   const { toggleSidebar, openNewSongModal, openSnapshotModal } = useUIStore()
   const { setSongs } = useSongStore()
+
+  useKeyboardShortcuts({
+    'save': async () => {
+      const { isDirty, filePath, metadata, sections, markClean } = useEditorStore.getState()
+      if (!isDirty || !filePath || !metadata) return
+      await tauriApi.song.save(filePath, metadata, sections)
+      markClean()
+      const songs = await tauriApi.vault.listSongs()
+      const updated = songs.find(s => s.file_path === filePath)
+      if (updated) useSongStore.getState().upsertSong(updated)
+    },
+    'save-version': () => {
+      const { filePath, sections } = useEditorStore.getState()
+      if (!filePath) return
+      openSnapshotModal(async (note) => {
+        const header = await tauriApi.snapshot.create(filePath, sections, note)
+        useEditorStore.getState().addSnapshotHeader(header)
+      })
+    },
+    'new-song': () => openNewSongModal(),
+    'toggle-sidebar': () => toggleSidebar(),
+    'close-song': () => {
+      useSongStore.getState().selectSong(null)
+    },
+  })
 
   useEffect(() => {
     tauriApi.config.get().then(cfg => {
