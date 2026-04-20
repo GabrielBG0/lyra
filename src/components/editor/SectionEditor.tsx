@@ -22,7 +22,7 @@ export default function SectionEditor({ lyricFont, readOnly, previewSections }: 
     const order = afterIndex + 2
     try {
       const section = await tauriApi.section.add(filePath, type, name, order)
-      addSection(section)
+      addSection(section, afterIndex + 1)
     } catch (error) {
       console.error('Failed to add section:', error)
     }
@@ -73,7 +73,7 @@ export default function SectionEditor({ lyricFont, readOnly, previewSections }: 
       )
     }
     return (
-      <div className="max-w-4xl mx-auto px-14 py-3.5 pb-16">
+      <div className="w-[85%] mx-auto px-14 py-3.5 pb-16">
         {previewSections.map((section, i) => (
           <SectionBlock
             key={section.section_id}
@@ -111,7 +111,7 @@ export default function SectionEditor({ lyricFont, readOnly, previewSections }: 
   return (
     <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
       <SortableContext items={sections.map(s => s.id)} strategy={verticalListSortingStrategy}>
-        <div className="max-w-4xl mx-auto px-14 py-3.5 pb-16">
+        <div className="w-[85%] mx-auto px-14 py-3.5 pb-16">
           {sections.map((section, i) => (
             <SectionBlock
               key={section.id}

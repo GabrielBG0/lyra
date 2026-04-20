@@ -7,6 +7,7 @@ import { Icons } from "../ui/Icon";
 import { useSongStore } from "../../stores/songStore";
 import { useEditorStore } from "../../stores/editorStore";
 import { useSong } from "../../hooks/useSong";
+import { useUIStore } from "../../stores/uiStore";
 
 type SortKey = "updated" | "az" | "za" | "status";
 
@@ -28,6 +29,7 @@ export default function SongList({ vaultPath, onCreateSong }: SongListProps) {
   const { songs, selectedSongPath } = useSongStore();
   const { isDirty, filePath: openPath } = useEditorStore();
   const { openSong } = useSong();
+  const { openDeleteSongModal } = useUIStore();
 
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState<SortKey>("updated");
@@ -99,6 +101,7 @@ export default function SongList({ vaultPath, onCreateSong }: SongListProps) {
             selected={song.file_path === selectedSongPath}
             isDirty={isDirty && song.file_path === openPath}
             onClick={() => handleSelect(song.file_path)}
+            onDelete={() => openDeleteSongModal(song.file_path, song.title)}
           />
         ))}
         {filtered.length === 0 && (

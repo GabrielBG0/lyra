@@ -41,6 +41,7 @@ export default function App() {
     'new-song': () => openNewSongModal(),
     'toggle-sidebar': () => toggleSidebar(),
     'close-song': () => {
+      useEditorStore.getState().closeSong()
       useSongStore.getState().selectSong(null)
     },
   })

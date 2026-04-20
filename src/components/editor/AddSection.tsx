@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import type { SectionType } from "../../lib/types";
 import { Icons } from "../ui/Icon";
 
@@ -22,7 +23,8 @@ export default function AddSection({ onAdd, inline = false }: AddSectionProps) {
   const [selectedType, setSelectedType] = useState<SectionType>("verse");
   const [name, setName] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
-  const popoverRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const [popoverPos, setPopoverPos] = useState({ top: 0, left: 0 });
 
   useEffect(() => {
     if (open) {
@@ -32,20 +34,6 @@ export default function AddSection({ onAdd, inline = false }: AddSectionProps) {
       setName(defaultName);
     }
   }, [open, selectedType]);
-
-  useEffect(() => {
-    if (!open) return;
-    const handler = (e: MouseEvent) => {
-      if (
-        popoverRef.current &&
-        !popoverRef.current.contains(e.target as Node)
-      ) {
-        setOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, [open]);
 
   const handleAdd = () => {
     const finalName =
@@ -57,33 +45,46 @@ export default function AddSection({ onAdd, inline = false }: AddSectionProps) {
   };
 
   if (inline) {
+    const handleOpen = () => {
+      if (buttonRef.current) {
+        const rect = buttonRef.current.getBoundingClientRect();
+        setPopoverPos({ top: rect.bottom + 4, left: rect.left + rect.width / 2 });
+      }
+      setOpen(true);
+    };
+
     return (
       <div className="relative flex items-center justify-center">
         <button
+          ref={buttonRef}
           className="w-5.5 h-5.5 rounded-full bg-surface border border-border text-muted hover:text-accent hover:border-accent flex items-center justify-center transition-all cursor-pointer"
-          onClick={() => setOpen(true)}
+          onClick={handleOpen}
           title="Insert section here"
         >
           <Icons.Plus size={11} />
         </button>
-        {open && (
-          <div
-            ref={popoverRef}
-            className="absolute top-full mt-1 left-1/2 -translate-x-1/2 z-20 bg-elev border border-border rounded-lg p-3 shadow-2xl min-w-55"
-          >
-            <TypeAndNamePicker
-              selectedType={selectedType}
-              name={name}
-              onTypeChange={(t) => {
-                setSelectedType(t);
-                setName(SECTION_TYPES.find((s) => s.type === t)?.label ?? "");
-              }}
-              onNameChange={setName}
-              onSubmit={handleAdd}
-              inputRef={inputRef}
-              onCancel={() => setOpen(false)}
-            />
-          </div>
+        {open && createPortal(
+          <>
+            <div className="fixed inset-0 z-40" onMouseDown={() => setOpen(false)} />
+            <div
+              style={{ position: "fixed", top: popoverPos.top, left: popoverPos.left, transform: "translateX(-50%)" }}
+              className="z-50 bg-elev border border-border rounded-lg p-3 shadow-2xl min-w-55"
+            >
+              <TypeAndNamePicker
+                selectedType={selectedType}
+                name={name}
+                onTypeChange={(t) => {
+                  setSelectedType(t);
+                  setName(SECTION_TYPES.find((s) => s.type === t)?.label ?? "");
+                }}
+                onNameChange={setName}
+                onSubmit={handleAdd}
+                inputRef={inputRef}
+                onCancel={() => setOpen(false)}
+              />
+            </div>
+          </>,
+          document.body
         )}
       </div>
     );
@@ -100,10 +101,7 @@ export default function AddSection({ onAdd, inline = false }: AddSectionProps) {
           Add section
         </button>
       ) : (
-        <div
-          ref={popoverRef}
-          className="bg-elev border border-border rounded-lg p-3 shadow-xl min-w-60"
-        >
+        <div className="bg-elev border border-border rounded-lg p-3 shadow-xl min-w-60">
           <TypeAndNamePicker
             selectedType={selectedType}
             name={name}

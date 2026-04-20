@@ -67,6 +67,7 @@ pub struct SongIndexEntry {
     pub title: String,
     pub status: SongStatus,
     pub bpm: Option<u16>,
+    #[serde(rename = "key")]
     pub key_sig: Option<String>,
     pub genre: Vec<String>,
     pub mood: Vec<String>,

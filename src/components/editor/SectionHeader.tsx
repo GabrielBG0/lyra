@@ -98,13 +98,15 @@ export default function SectionHeader({
             >
               <Icons.MoreHorizontal size={13} />
             </button>
-            <div className="absolute right-0 top-full mt-0.5 hidden group-hover/more:block bg-elev border border-border rounded-lg p-1 min-w-30 z-10 shadow-xl">
-              <button
-                className="w-full text-left px-2.5 py-1.5 text-[12px] text-brand-rose hover:bg-accent-soft/20 rounded cursor-pointer border-none bg-transparent transition-colors"
-                onClick={onDelete}
-              >
-                Delete section
-              </button>
+            <div className="absolute right-0 top-full hidden group-hover/more:block pt-1 z-10">
+              <div className="bg-elev border border-border rounded-lg p-1 min-w-32 shadow-xl">
+                <button
+                  className="w-full text-left px-2.5 py-1.5 text-[12px] text-brand-rose hover:bg-accent-soft/20 rounded cursor-pointer border-none bg-transparent transition-colors"
+                  onClick={onDelete}
+                >
+                  Delete section
+                </button>
+              </div>
             </div>
           </div>
         </div>

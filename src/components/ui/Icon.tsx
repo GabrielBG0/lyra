@@ -16,6 +16,7 @@ import {
   Check,
   Eye,
   Loader,
+  Trash2,
 } from 'lucide-react'
 
 export const Icons = {
@@ -36,4 +37,5 @@ export const Icons = {
   Check,
   Eye,
   Loader,
+  Trash: Trash2,
 }

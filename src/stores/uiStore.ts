@@ -14,6 +14,9 @@ interface UIStore {
   shortcutsModalOpen: boolean
   openShortcutsModal: () => void
   closeShortcutsModal: () => void
+  deleteSongModal: { path: string; title: string } | null
+  openDeleteSongModal: (path: string, title: string) => void
+  closeDeleteSongModal: () => void
 }
 
 export const useUIStore = create<UIStore>((set) => ({
@@ -30,4 +33,7 @@ export const useUIStore = create<UIStore>((set) => ({
   shortcutsModalOpen: false,
   openShortcutsModal: () => set({ shortcutsModalOpen: true }),
   closeShortcutsModal: () => set({ shortcutsModalOpen: false }),
+  deleteSongModal: null,
+  openDeleteSongModal: (path, title) => set({ deleteSongModal: { path, title } }),
+  closeDeleteSongModal: () => set({ deleteSongModal: null }),
 }))

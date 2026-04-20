@@ -46,6 +46,11 @@
 }
 
 @layer base {
+  ::selection {
+    background-color: oklch(0.72 0.1 55 / 0.35);
+    color: oklch(0.95 0.013 85);
+  }
+
   html,
   body,
   #root {

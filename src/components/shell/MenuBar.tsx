@@ -1,54 +1,98 @@
 import { useState, useEffect, useRef } from "react";
+import { open as openDialog } from "@tauri-apps/plugin-dialog";
+import { getCurrentWindow } from "@tauri-apps/api/window";
 import LyraLogo from "../ui/LyraLogo";
 import { useEditorStore } from "../../stores/editorStore";
 import { useSong } from "../../hooks/useSong";
 import { useSnapshot } from "../../hooks/useSnapshot";
 import { useUIStore } from "../../stores/uiStore";
+import { tauriApi } from "../../lib/tauri";
+
+const isMac = navigator.platform.startsWith("Mac") || navigator.userAgent.includes("Mac");
+const mod = isMac ? "⌘" : "Ctrl+";
+const shift = isMac ? "⇧" : "Shift+";
 
 const MENUS = {
   File: [
-    "New Song\t⌘N",
-    "Open Vault…\t⌘O",
+    `New Song\t${mod}N`,
+    `Open Vault…\t${mod}O`,
     "—",
     "Export as Plain Text…",
-    "Export as PDF…\t⌘P",
+    `Export as PDF…\t${mod}P`,
     "—",
-    "Close Song\t⌘W",
+    `Close Song\t${mod}W`,
   ],
   Edit: [
-    "Undo\t⌘Z",
-    "Redo\t⇧⌘Z",
+    // TODO: Undo/Redo require an undo history stack (not yet implemented)
+    `Undo\t${mod}Z`,
+    `Redo\t${shift}${mod}Z`,
     "—",
-    "Cut\t⌘X",
-    "Copy\t⌘C",
-    "Paste\t⌘V",
+    // TODO: Cut/Copy/Paste menu items (native shortcuts still work in text fields)
+    `Cut\t${mod}X`,
+    `Copy\t${mod}C`,
+    `Paste\t${mod}V`,
     "—",
-    "Find…\t⌘F",
+    // TODO: In-editor find/replace
+    `Find…\t${mod}F`,
   ],
   Song: [
-    "Save\t⌘S",
-    "Save Version…\t⇧⌘S",
+    `Save\t${mod}S`,
+    `Save Version…\t${shift}${mod}S`,
     "—",
-    "Show History\t⌘H",
-    "Diff with Snapshot…\t⌘D",
+    // TODO: Snapshot history timeline panel
+    `Show History\t${mod}H`,
+    // TODO: Diff view between working copy and a snapshot
+    `Diff with Snapshot…\t${mod}D`,
   ],
-  View: ["Toggle Sidebar\t⌘\\", "Zoom In\t⌘+", "Zoom Out\t⌘-"],
-  Help: ["Keyboard Shortcuts…\t⌘?", "About Lyra"],
-} as const;
+  View: [
+    `Toggle Sidebar\t${mod}\\`,
+    // TODO: Font size zoom
+    `Zoom In\t${mod}+`,
+    `Zoom Out\t${mod}-`,
+  ],
+  Help: [
+    `Keyboard Shortcuts…\t${mod}?`,
+    // TODO: About dialog
+    "About Lyra",
+  ],
+};
+
+// Labels that are wired to an actual implementation.
+const IMPLEMENTED = new Set([
+  "New Song",
+  "Open Vault…",
+  "Export as Plain Text…",
+  "Export as PDF…",
+  "Close Song",
+  "Save",
+  "Save Version…",
+  "Toggle Sidebar",
+  "Keyboard Shortcuts…",
+]);
 
 interface MenuBarProps {
   onToggleSidebar: () => void;
   onNewSong: () => void;
   onShowShortcuts: () => void;
+  onCloseSong: () => void;
 }
 
-export default function MenuBar({ onToggleSidebar, onNewSong, onShowShortcuts }: MenuBarProps) {
+export default function MenuBar({ onToggleSidebar, onNewSong, onShowShortcuts, onCloseSong }: MenuBarProps) {
   const [open, setOpen] = useState<string | null>(null);
-  const { metadata, isDirty } = useEditorStore();
+  const [maximized, setMaximized] = useState(false);
+  const { metadata, isDirty, filePath } = useEditorStore();
   const { saveSong } = useSong();
   const { createSnapshot } = useSnapshot();
   const { openSnapshotModal } = useUIStore();
   const menuRef = useRef<HTMLDivElement>(null);
+  const win = getCurrentWindow();
+
+  useEffect(() => {
+    win.isMaximized().then(setMaximized);
+    let unlisten: (() => void) | undefined;
+    win.onResized(() => win.isMaximized().then(setMaximized)).then((fn) => { unlisten = fn; });
+    return () => unlisten?.();
+  }, []);
 
   useEffect(() => {
     if (!open) return;
@@ -61,21 +105,44 @@ export default function MenuBar({ onToggleSidebar, onNewSong, onShowShortcuts }:
     return () => document.removeEventListener("mousedown", handler);
   }, [open]);
 
+  const handleOpenVault = async () => {
+    const selected = await openDialog({ directory: true, multiple: false });
+    if (!selected || Array.isArray(selected)) return;
+    await tauriApi.vault.setVaultPath(selected);
+    await tauriApi.config.set({ vault_path: selected, last_opened_song: null });
+    window.location.reload();
+  };
+
+  const handleExportText = async () => {
+    if (!filePath) return;
+    await tauriApi.export.plainText(filePath, false);
+  };
+
+  const handleExportPdf = async () => {
+    if (!filePath) return;
+    await tauriApi.export.pdf(filePath, false);
+  };
+
   const handleItem = (_menu: string, item: string) => {
     const label = item.split("\t")[0];
+    if (!IMPLEMENTED.has(label)) return;
     setOpen(null);
     if (label === "New Song") onNewSong();
+    else if (label === "Open Vault…") handleOpenVault();
+    else if (label === "Export as Plain Text…") handleExportText();
+    else if (label === "Export as PDF…") handleExportPdf();
+    else if (label === "Close Song") onCloseSong();
     else if (label === "Toggle Sidebar") onToggleSidebar();
     else if (label === "Save") saveSong();
     else if (label === "Save Version…") {
       openSnapshotModal((note) => createSnapshot(note));
     } else if (label === "Keyboard Shortcuts…") onShowShortcuts();
-    else console.warn(`Menu action "${label}" not yet implemented`)
   };
 
   return (
     <div
       ref={menuRef}
+      data-tauri-drag-region
       className="h-7 flex items-center gap-0 px-2.5 bg-panel border-b border-border-soft text-secondary relative z-50 shrink-0"
       style={{ fontSize: 12.5 }}
     >
@@ -108,16 +175,29 @@ export default function MenuBar({ onToggleSidebar, onNewSong, onShowShortcuts }:
                   );
                 }
                 const [label, kbd] = item.split("\t");
+                const implemented = IMPLEMENTED.has(label);
                 return (
                   <button
                     key={i}
-                    className="flex items-center justify-between w-full px-2.5 py-1.5 rounded text-[12.5px] text-primary hover:bg-accent-soft hover:text-accent cursor-pointer transition-colors"
+                    disabled={!implemented}
+                    className={`flex items-center justify-between w-full px-2.5 py-1.5 rounded text-[12.5px] transition-colors ${
+                      implemented
+                        ? "text-primary hover:bg-accent-soft hover:text-accent cursor-pointer"
+                        : "text-muted cursor-not-allowed opacity-50"
+                    }`}
                     onClick={() => handleItem(menu, item)}
                   >
                     <span>{label}</span>
-                    {kbd && (
-                      <span className="text-faint text-[11px] ml-4">{kbd}</span>
-                    )}
+                    <span className="flex items-center gap-1.5 ml-4">
+                      {!implemented && (
+                        <span className="text-[9px] font-mono uppercase tracking-widest text-faint border border-border rounded px-1 py-px">
+                          TODO
+                        </span>
+                      )}
+                      {kbd && (
+                        <span className="text-muted text-[11px]">{kbd}</span>
+                      )}
+                    </span>
                   </button>
                 );
               })}
@@ -129,7 +209,7 @@ export default function MenuBar({ onToggleSidebar, onNewSong, onShowShortcuts }:
       <div className="flex-1" />
 
       {metadata && (
-        <div className="flex items-center gap-1.5 pr-1 text-faint text-[11px]">
+        <div className="flex items-center gap-1.5 text-faint text-[11px]">
           <span
             className="w-1.5 h-1.5 rounded-full bg-accent inline-block"
             style={{
@@ -140,6 +220,45 @@ export default function MenuBar({ onToggleSidebar, onNewSong, onShowShortcuts }:
           {isDirty ? " · unsaved" : ""}
         </div>
       )}
+
+      {/* Window controls */}
+      <div className="flex items-center ml-2">
+        <button
+          onClick={() => win.minimize()}
+          className="w-8 h-7 flex items-center justify-center text-muted hover:text-primary hover:bg-elev transition-colors"
+          title="Minimize"
+        >
+          <svg width="10" height="1" viewBox="0 0 10 1" fill="currentColor">
+            <rect width="10" height="1" />
+          </svg>
+        </button>
+        <button
+          onClick={() => win.toggleMaximize()}
+          className="w-8 h-7 flex items-center justify-center text-muted hover:text-primary hover:bg-elev transition-colors"
+          title={maximized ? "Restore" : "Maximize"}
+        >
+          {maximized ? (
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="1">
+              <rect x="2" y="0" width="8" height="8" />
+              <polyline points="0,2 0,10 8,10" />
+            </svg>
+          ) : (
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="1">
+              <rect x="0" y="0" width="10" height="10" />
+            </svg>
+          )}
+        </button>
+        <button
+          onClick={() => win.close()}
+          className="w-8 h-7 flex items-center justify-center text-muted hover:text-white hover:bg-red-600 transition-colors"
+          title="Close"
+        >
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="1.2">
+            <line x1="0" y1="0" x2="10" y2="10" />
+            <line x1="10" y1="0" x2="0" y2="10" />
+          </svg>
+        </button>
+      </div>
     </div>
   );
 }

@@ -1,8 +1,9 @@
 import SongList from "../sidebar/SongList";
 import EditorPanel from "./EditorPanel";
-import LyraLogo from "../ui/LyraLogo";
 import { Icons } from "../ui/Icon";
 import { useSong } from "../../hooks/useSong";
+import { useEditorStore } from "../../stores/editorStore";
+import { useSongStore } from "../../stores/songStore";
 import SidebarErrorBoundary from "./SidebarErrorBoundary";
 import { useUIStore } from "../../stores/uiStore";
 import { useState } from "react";
@@ -10,6 +11,8 @@ import MenuBar from "../shell/MenuBar";
 import NewSongModal from "../ui/NewSongModal";
 import SnapshotModal from "../ui/SnapshotModal";
 import KeyboardShortcutsModal from "../ui/KeyboardShortcutsModal";
+import DeleteSongModal from "../ui/DeleteSongModal";
+import { useCloseGuard } from "../../hooks/useCloseGuard";
 
 interface AppShellProps {
   vaultPath: string;
@@ -28,9 +31,19 @@ export default function AppShell({ vaultPath }: AppShellProps) {
     shortcutsModalOpen,
     openShortcutsModal,
     closeShortcutsModal,
+    deleteSongModal,
+    closeDeleteSongModal,
   } = useUIStore();
   const [lyricFont] = useState<string>("Newsreader, Georgia, serif");
-  const { createSong } = useSong();
+  const { createSong, deleteSong } = useSong();
+  const { selectSong } = useSongStore();
+  const { closeSong } = useEditorStore();
+
+  const handleCloseSong = () => {
+    closeSong();
+    selectSong(null);
+  };
+  useCloseGuard();
 
   const handleNewSong = () => openNewSongModal();
 
@@ -40,6 +53,7 @@ export default function AppShell({ vaultPath }: AppShellProps) {
         onToggleSidebar={() => setSidebarCollapsed(!sidebarCollapsed)}
         onNewSong={handleNewSong}
         onShowShortcuts={openShortcutsModal}
+        onCloseSong={handleCloseSong}
       />
       <div className="flex flex-1 min-h-0">
         {/* Collapsed sidebar strip */}
@@ -97,6 +111,17 @@ export default function AppShell({ vaultPath }: AppShellProps) {
       <KeyboardShortcutsModal
         open={shortcutsModalOpen}
         onClose={closeShortcutsModal}
+      />
+      <DeleteSongModal
+        open={deleteSongModal !== null}
+        songTitle={deleteSongModal?.title ?? ''}
+        onClose={closeDeleteSongModal}
+        onConfirm={async () => {
+          if (deleteSongModal) {
+            await deleteSong(deleteSongModal.path)
+            closeDeleteSongModal()
+          }
+        }}
       />
     </div>
   );

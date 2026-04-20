@@ -6,10 +6,16 @@ import { useEditorStore } from '../stores/editorStore'
 import { useSongStore } from '../stores/songStore'
 
 export function useSong() {
-  const { loadSong, markClean, filePath, metadata, sections } = useEditorStore()
+  const { loadSong, closeSong, markClean, filePath, metadata, sections } = useEditorStore()
   const { upsertSong, removeSong, selectSong } = useSongStore()
 
   const openSong = async (path: string) => {
+    const state = useEditorStore.getState()
+    if (state.isDirty && state.filePath && state.metadata) {
+      await tauriApi.song.save(state.filePath, state.metadata, state.sections)
+      state.markClean()
+    }
+
     const payload = await tauriApi.song.open(path)
     loadSong(payload)
     selectSong(path)
@@ -53,12 +59,7 @@ export function useSong() {
 
     // Clear the editor if the deleted song was open.
     if (filePath === path) {
-      useEditorStore.getState().loadSong({
-        metadata: useEditorStore.getState().metadata!,
-        sections: [],
-        snapshot_headers: [],
-        file_path: '',
-      })
+      closeSong()
       selectSong(null)
     }
   }

@@ -53,7 +53,7 @@ export default function EditorPanel({
       <EditorErrorBoundary>
         <div className="flex-1 overflow-y-auto">
           {diffResult !== null ? (
-            <div className="max-w-4xl mx-auto px-14 py-3.5 pb-16">
+            <div className="w-[85%] mx-auto px-14 py-3.5 pb-16">
               {diffResult.map((d) => (
                 <DiffSection key={d.section_id} diff={d} />
               ))}

@@ -25,10 +25,11 @@ interface EditorStore {
 
   // Actions
   loadSong: (payload: SongPayload) => void
+  closeSong: () => void
   updateSection: (id: string, content: string) => void
   updateMetadata: (partial: Partial<SongMetadata>) => void
   reorderSections: (orderedIds: string[]) => void
-  addSection: (section: Section) => void
+  addSection: (section: Section, insertAt?: number) => void
   removeSection: (id: string) => void
   markClean: () => void
   addSnapshotHeader: (header: SnapshotHeader) => void
@@ -65,6 +66,20 @@ export const useEditorStore = create<EditorStore>((set) => ({
       previewSnapshotId: null,
     }),
 
+  closeSong: () =>
+    set({
+      filePath: null,
+      metadata: null,
+      sections: [],
+      isDirty: false,
+      snapshotHeaders: [],
+      loadedSnapshots: {},
+      diffResult: null,
+      diffTargetA: null,
+      diffTargetB: null,
+      previewSnapshotId: null,
+    }),
+
   updateSection: (id, content) =>
     set((state) => ({
       sections: state.sections.map((s) => (s.id === id ? { ...s, content } : s)),
@@ -89,11 +104,13 @@ export const useEditorStore = create<EditorStore>((set) => ({
       return { sections: reordered }
     }),
 
-  addSection: (section) =>
-    set((state) => ({
-      sections: [...state.sections, section],
-      isDirty: true,
-    })),
+  addSection: (section, insertAt) =>
+    set((state) => {
+      const arr = [...state.sections];
+      const idx = insertAt !== undefined ? insertAt : arr.length;
+      arr.splice(idx, 0, section);
+      return { sections: arr, isDirty: true };
+    }),
 
   removeSection: (id) =>
     set((state) => ({
