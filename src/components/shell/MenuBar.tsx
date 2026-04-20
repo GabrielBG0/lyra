@@ -143,8 +143,8 @@ export default function MenuBar({ onToggleSidebar, onNewSong, onShowShortcuts, o
     <div
       ref={menuRef}
       data-tauri-drag-region
-      className="h-7 flex items-center gap-0 px-2.5 bg-panel border-b border-border-soft text-secondary relative z-50 shrink-0"
-      style={{ fontSize: 12.5 }}
+      className="h-8 flex items-center gap-0 bg-panel border-b border-border-soft text-secondary relative z-50 shrink-0"
+      style={{ fontSize: 12.5, paddingLeft: isMac ? 76 : 10 }}
     >
       {/* Brand */}
       <div className="flex items-center gap-1.5 px-2.5 font-semibold text-primary text-xs tracking-wide mr-1">
@@ -221,11 +221,11 @@ export default function MenuBar({ onToggleSidebar, onNewSong, onShowShortcuts, o
         </div>
       )}
 
-      {/* Window controls */}
-      <div className="flex items-center ml-2">
+      {/* Window controls — hidden on macOS (traffic lights handle this) */}
+      {!isMac && <div className="flex items-center ml-2">
         <button
           onClick={() => win.minimize()}
-          className="w-8 h-7 flex items-center justify-center text-muted hover:text-primary hover:bg-elev transition-colors"
+          className="w-8 h-8 flex items-center justify-center text-muted hover:text-primary hover:bg-elev transition-colors"
           title="Minimize"
         >
           <svg width="10" height="1" viewBox="0 0 10 1" fill="currentColor">
@@ -234,23 +234,23 @@ export default function MenuBar({ onToggleSidebar, onNewSong, onShowShortcuts, o
         </button>
         <button
           onClick={() => win.toggleMaximize()}
-          className="w-8 h-7 flex items-center justify-center text-muted hover:text-primary hover:bg-elev transition-colors"
+          className="w-8 h-8 flex items-center justify-center text-muted hover:text-primary hover:bg-elev transition-colors"
           title={maximized ? "Restore" : "Maximize"}
         >
           {maximized ? (
             <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="1">
-              <rect x="2" y="0" width="8" height="8" />
-              <polyline points="0,2 0,10 8,10" />
+              <rect x="2.5" y="0.5" width="7" height="7" />
+              <polyline points="0.5,2.5 0.5,9.5 7.5,9.5" />
             </svg>
           ) : (
             <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="1">
-              <rect x="0" y="0" width="10" height="10" />
+              <rect x="0.5" y="0.5" width="9" height="9" />
             </svg>
           )}
         </button>
         <button
           onClick={() => win.close()}
-          className="w-8 h-7 flex items-center justify-center text-muted hover:text-white hover:bg-red-600 transition-colors"
+          className="w-8 h-8 flex items-center justify-center text-muted hover:text-white hover:bg-red-600 transition-colors"
           title="Close"
         >
           <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="1.2">
@@ -258,7 +258,7 @@ export default function MenuBar({ onToggleSidebar, onNewSong, onShowShortcuts, o
             <line x1="10" y1="0" x2="0" y2="10" />
           </svg>
         </button>
-      </div>
+      </div>}
     </div>
   );
 }
