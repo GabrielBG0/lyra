@@ -152,11 +152,11 @@ Two families. No third family is ever permitted.
 ```
 Neo-grotesque. Weights 400/500/600/700 loaded from Fontshare. Handles everything that is not a lyric: titles, buttons, menus, metadata, labels, status pills, modals.
 
-### 4.2 Lyrics — **Newsreader** (`--font-lyrics`, `font-lyrics`)
+### 4.2 Lyrics — **Noto Serif** (`--font-lyrics`, `font-lyrics`)
 ```
-"Newsreader", Georgia, "Times New Roman", serif
+"Noto Serif", "Noto Serif JP", "Noto Serif KR", Georgia, "Times New Roman", serif
 ```
-A contemporary serif with a wide optical-size range (`opsz 6..72`). Loaded in weights 400/500 plus italic 400. **Used only in**:
+A pan-Unicode serif with broad language support. Loaded in weights 400/500 plus italic 400 (Latin). Noto Serif JP and Noto Serif KR are listed as fallbacks and activate automatically for Japanese/Korean text without any per-song configuration. **Used only in**:
 - The lyric textarea (`.lyric-textarea` in `global.css:98`)
 - Diff content (`DiffSection.tsx` — `font-lyrics text-primary leading-[1.85]`)
 - Snapshot preview section bodies

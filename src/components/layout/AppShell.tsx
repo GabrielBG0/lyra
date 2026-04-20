@@ -34,7 +34,7 @@ export default function AppShell({ vaultPath }: AppShellProps) {
     deleteSongModal,
     closeDeleteSongModal,
   } = useUIStore();
-  const [lyricFont] = useState<string>("Newsreader, Georgia, serif");
+  const [lyricFont] = useState<string>('"Noto Serif", "Noto Serif JP", "Noto Serif KR", Georgia, serif');
   const { createSong, deleteSong } = useSong();
   const { selectSong } = useSongStore();
   const { closeSong } = useEditorStore();

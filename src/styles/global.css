@@ -38,7 +38,7 @@
 
   /* ── Typography */
   --font-ui: "Satoshi", -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
-  --font-lyrics: "Newsreader", Georgia, "Times New Roman", serif;
+  --font-lyrics: "Noto Serif", "Noto Serif JP", "Noto Serif KR", Georgia, "Times New Roman", serif;
 
   /* ── Extra text sizes not in Tailwind's default scale */
   --text-2xs: 10px;
