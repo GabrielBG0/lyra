@@ -17,6 +17,9 @@ interface UIStore {
   deleteSongModal: { path: string; title: string } | null
   openDeleteSongModal: (path: string, title: string) => void
   closeDeleteSongModal: () => void
+  aboutModalOpen: boolean
+  openAboutModal: () => void
+  closeAboutModal: () => void
 }
 
 export const useUIStore = create<UIStore>((set) => ({
@@ -36,4 +39,7 @@ export const useUIStore = create<UIStore>((set) => ({
   deleteSongModal: null,
   openDeleteSongModal: (path, title) => set({ deleteSongModal: { path, title } }),
   closeDeleteSongModal: () => set({ deleteSongModal: null }),
+  aboutModalOpen: false,
+  openAboutModal: () => set({ aboutModalOpen: true }),
+  closeAboutModal: () => set({ aboutModalOpen: false }),
 }))

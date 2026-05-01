@@ -57,11 +57,11 @@ export default function AddSection({ onAdd, inline = false }: AddSectionProps) {
       <div className="relative flex items-center justify-center">
         <button
           ref={buttonRef}
-          className="w-5.5 h-5.5 rounded-full bg-surface border border-border text-muted hover:text-accent hover:border-accent flex items-center justify-center transition-all cursor-pointer"
+          className="w-6 h-6 rounded-full bg-surface border border-border text-muted hover:text-accent hover:border-accent flex items-center justify-center transition-all cursor-pointer"
           onClick={handleOpen}
           title="Insert section here"
         >
-          <Icons.Plus size={11} />
+          <span className="text-[17px] leading-[0] select-none">+</span>
         </button>
         {open && createPortal(
           <>

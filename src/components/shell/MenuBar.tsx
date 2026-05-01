@@ -52,7 +52,6 @@ const MENUS = {
   ],
   Help: [
     `Keyboard Shortcuts…\t${mod}?`,
-    // TODO: About dialog
     "About Lyra",
   ],
 };
@@ -68,6 +67,7 @@ const IMPLEMENTED = new Set([
   "Save Version…",
   "Toggle Sidebar",
   "Keyboard Shortcuts…",
+  "About Lyra",
 ]);
 
 interface MenuBarProps {
@@ -75,9 +75,10 @@ interface MenuBarProps {
   onNewSong: () => void;
   onShowShortcuts: () => void;
   onCloseSong: () => void;
+  onShowAbout: () => void;
 }
 
-export default function MenuBar({ onToggleSidebar, onNewSong, onShowShortcuts, onCloseSong }: MenuBarProps) {
+export default function MenuBar({ onToggleSidebar, onNewSong, onShowShortcuts, onCloseSong, onShowAbout }: MenuBarProps) {
   const [open, setOpen] = useState<string | null>(null);
   const [maximized, setMaximized] = useState(false);
   const { metadata, isDirty, filePath } = useEditorStore();
@@ -137,6 +138,7 @@ export default function MenuBar({ onToggleSidebar, onNewSong, onShowShortcuts, o
     else if (label === "Save Version…") {
       openSnapshotModal((note) => createSnapshot(note));
     } else if (label === "Keyboard Shortcuts…") onShowShortcuts();
+    else if (label === "About Lyra") onShowAbout();
   };
 
   return (
