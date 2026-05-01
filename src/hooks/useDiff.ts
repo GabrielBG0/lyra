@@ -29,6 +29,7 @@ export function useDiff() {
   const diffWorkingVsSnapshot = async (snapshotId: string) => {
     if (!filePath) return
 
+    await ensureLoaded(snapshotId)
     const result = await tauriApi.diff.diffWorkingVsSnapshot(filePath, snapshotId, sections)
     setDiff(result, 'now', snapshotId)
     return result

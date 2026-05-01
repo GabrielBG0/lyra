@@ -9,7 +9,7 @@ export default function DiffHunk({ hunk }: DiffHunkProps) {
     return <span>{hunk.text}</span>
   }
   if (hunk.kind === 'insert') {
-    return <mark className="bg-diff-add text-diff-add-text rounded-sm">{hunk.text}</mark>
+    return <mark className="bg-diff-add text-diff-add-text rounded-[2px]">{hunk.text}</mark>
   }
-  return <del className="bg-diff-remove text-diff-remove-text rounded-sm line-through">{hunk.text}</del>
+  return <del className="bg-diff-remove text-diff-remove-text rounded-[2px] line-through">{hunk.text}</del>
 }

@@ -9,17 +9,12 @@ import SnapshotCard, { NowCard } from "./SnapshotCard";
 export default function VersionTimeline() {
   const [expanded, setExpanded] = useState(false);
   const [shiftSelectedId, setShiftSelectedId] = useState<string | null>(null);
-  const { snapshotHeaders, previewSnapshotId, exitPreview } = useEditorStore();
+  const { snapshotHeaders, previewSnapshotId, exitPreview, diffTargetB } = useEditorStore();
 
-  const { createSnapshot, loadSnapshot } = useSnapshot();
-  const { diffTwoSnapshots, diffWorkingVsSnapshot } = useDiff();
+  const { createSnapshot } = useSnapshot();
+  const { diffTwoSnapshots, diffWorkingVsSnapshot, clearDiff } = useDiff();
   const { openSnapshotModal } = useUIStore();
   const latestSnap = snapshotHeaders[0];
-
-  const handlePreviewClick = async (headerId: string) => {
-    await loadSnapshot(headerId);
-    useEditorStore.getState().enterPreview(headerId);
-  };
 
   const handleCardClick = async (headerId: string, shiftHeld: boolean) => {
     if (shiftHeld && shiftSelectedId) {
@@ -32,7 +27,7 @@ export default function VersionTimeline() {
       return;
     }
     setShiftSelectedId(null);
-    await handlePreviewClick(headerId);
+    await diffWorkingVsSnapshot(headerId);
   };
 
   const handleNowCardClick = async () => {
@@ -41,9 +36,8 @@ export default function VersionTimeline() {
       setShiftSelectedId(null);
       return;
     }
-    if (previewSnapshotId !== null) {
-      exitPreview();
-    }
+    exitPreview();
+    clearDiff();
   };
 
   return (
@@ -124,7 +118,7 @@ export default function VersionTimeline() {
               key={header.id}
               header={header}
               index={snapshotHeaders.length - 1 - i}
-              isPreview={previewSnapshotId === header.id}
+              isPreview={previewSnapshotId === header.id || diffTargetB === header.id}
               isShiftSelected={shiftSelectedId === header.id}
               onClick={handleCardClick}
             />

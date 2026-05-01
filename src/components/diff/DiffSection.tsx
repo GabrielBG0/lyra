@@ -36,7 +36,13 @@ export default function DiffSection({ diff }: DiffSectionProps) {
     <div className="mb-6">
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
-          <span className="text-2xs font-semibold tracking-[0.14em] uppercase text-muted font-ui">
+          <span className={`text-2xs font-semibold tracking-[0.14em] uppercase font-ui ${
+            diff.status === 'added'
+              ? 'text-status-finished'
+              : diff.status === 'removed'
+              ? 'text-rose-400 line-through'
+              : 'text-muted'
+          }`}>
             {diff.name}
           </span>
           <DiffStatusBadge status={diff.status} />

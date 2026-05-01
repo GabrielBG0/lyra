@@ -79,10 +79,10 @@
   --color-status-finished: oklch(0.8 0.1 115);
 
   /* ── Diff */
-  --color-diff-add: #14532d;
-  --color-diff-add-text: #86efac;
-  --color-diff-remove: #450a0a;
-  --color-diff-remove-text: #fca5a5;
+  --color-diff-add: #00220b;
+  --color-diff-add-text: #48aa79;
+  --color-diff-remove: #310c10;
+  --color-diff-remove-text: #e68478;
 
   /* ── Typography */
   --font-ui: "Satoshi", -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
