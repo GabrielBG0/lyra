@@ -32,6 +32,12 @@ export const SHORTCUT_CATEGORIES: ShortcutCategory[] = [
       { label: 'Toggle History Bar', action: 'toggle-history',  keys: ['mod', 'H'] },
     ],
   },
+  {
+    title: 'General',
+    shortcuts: [
+      { label: 'Preferences', action: 'preferences', keys: ['mod', ','] },
+    ],
+  },
 ]
 
 export function matchesShortcut(def: ShortcutDef, e: KeyboardEvent): boolean {

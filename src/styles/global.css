@@ -72,6 +72,9 @@
   /* ── Rose (bridge / secondary) */
   --color-brand-rose: oklch(0.66 0.1 22);
 
+  /* ── Danger (destructive actions) */
+  --color-danger: oklch(0.55 0.18 25);
+
   /* ── Status */
   --color-status-idea: oklch(0.75 0.08 230);
   --color-status-draft: oklch(0.78 0.1 65);
@@ -141,7 +144,57 @@
   }
 }
 
+@keyframes menu-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
 @layer components {
+  /* Dropdown / context menu popover shell */
+  .menu-popover {
+    background: oklch(0.205 0.012 60);
+    border: 1px solid oklch(0.32 0.012 60 / 0.5);
+    border-radius: 0.5rem;
+    box-shadow: 0 12px 32px oklch(0.06 0.005 60 / 0.65), 0 0 0 1px oklch(0.32 0.012 60 / 0.35);
+    padding: 0.25rem;
+    position: relative;
+    animation: menu-in 90ms ease-out both;
+    overflow: hidden;
+  }
+  .menu-popover::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, oklch(0.72 0.10 55 / 0.45), transparent);
+    pointer-events: none;
+  }
+
+  /* Menu item with left accent bar on hover */
+  .menu-item,
+  .menu-item-danger {
+    position: relative;
+    transition: background-color 100ms, color 100ms;
+  }
+  .menu-item::before,
+  .menu-item-danger::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 4px;
+    bottom: 4px;
+    width: 2px;
+    border-radius: 0 2px 2px 0;
+    opacity: 0;
+    transition: opacity 100ms;
+  }
+  .menu-item::before { background: oklch(0.72 0.1 55); }
+  .menu-item-danger::before { background: oklch(0.66 0.1 22); }
+  .menu-item:hover::before,
+  .menu-item-danger:hover::before { opacity: 1; }
+
   /* Auto-resizing textarea — no visible chrome */
   .lyric-textarea {
     width: 100%;

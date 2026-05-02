@@ -114,4 +114,6 @@ export interface Comment {
 export interface AppConfig {
   vault_path: string | null
   last_opened_song: string | null
+  debug_mode: boolean
+  nudge_dismissed: boolean
 }

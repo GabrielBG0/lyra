@@ -10,7 +10,7 @@ use std::sync::Mutex;
 use tauri::{Emitter, Manager, WindowEvent};
 
 use commands::AppState;
-use core::config::{load_config, AppConfig};
+use core::config::load_config;
 use core::index::init_index;
 
 #[tauri::command]
@@ -28,10 +28,7 @@ pub fn run() {
             let handle = app.handle().clone();
 
             tauri::async_runtime::block_on(async move {
-                let config = load_config().await.unwrap_or(AppConfig {
-                    vault_path: None,
-                    last_opened_song: None,
-                });
+                let config = load_config().await.unwrap_or_default();
 
                 // Initialise the SQLite index if a vault path is already set;
                 // fall back to an in-memory pool so the app starts cleanly on
@@ -115,6 +112,8 @@ pub fn run() {
             commands::vault::list_songs,
             commands::vault::rebuild_index,
             commands::vault::import_song,
+            // debug
+            commands::debug::nuke_vault,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

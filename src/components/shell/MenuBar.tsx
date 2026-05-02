@@ -63,6 +63,7 @@ const MENUS = {
 const IMPLEMENTED = new Set([
   "New Song",
   "Open Vault…",
+  "Preferences…",
   "Vault Options…",
   "Export as Plain Text…",
   "Export as PDF…",
@@ -99,7 +100,7 @@ export default function MenuBar({
   const { metadata, isDirty, filePath } = useEditorStore();
   const { saveSong } = useSong();
   const { createSnapshot } = useSnapshot();
-  const { openSnapshotModal } = useUIStore();
+  const { openSnapshotModal, openPreferencesModal } = useUIStore();
   const menuRef = useRef<HTMLDivElement>(null);
   const win = getCurrentWindow();
 
@@ -129,7 +130,8 @@ export default function MenuBar({
     const selected = await openDialog({ directory: true, multiple: false });
     if (!selected || Array.isArray(selected)) return;
     await tauriApi.vault.setVaultPath(selected);
-    await tauriApi.config.set({ vault_path: selected, last_opened_song: null });
+    const current = await tauriApi.config.get();
+    await tauriApi.config.set({ ...current, vault_path: selected, last_opened_song: null });
     window.location.reload();
   };
 
@@ -147,7 +149,8 @@ export default function MenuBar({
     const label = item.split("\t")[0];
     if (!IMPLEMENTED.has(label)) return;
     setOpen(null);
-    if (label === "New Song") onNewSong();
+    if (label === "Preferences…") openPreferencesModal();
+    else if (label === "New Song") onNewSong();
     else if (label === "Open Vault…") handleOpenVault();
     else if (label === "Vault Options…") onShowVaultOptions();
     else if (label === "Export as Plain Text…") handleExportText();
@@ -191,7 +194,7 @@ export default function MenuBar({
             )}
           </button>
           {open === menu && (
-            <div className="absolute top-full left-0 mt-0.5 min-w-55 bg-elev border border-border rounded-lg p-1 shadow-2xl z-50">
+            <div className="absolute top-full left-0 mt-0.5 min-w-55 z-50 menu-popover">
               {MENUS[menu as keyof typeof MENUS].map((item, i) => {
                 if (item === "—") {
                   return (
@@ -204,9 +207,9 @@ export default function MenuBar({
                   <button
                     key={i}
                     disabled={!implemented}
-                    className={`flex items-center justify-between w-full px-2.5 py-1.5 rounded text-[12.5px] transition-colors ${
+                    className={`flex items-center justify-between w-full px-2.5 py-1.5 rounded text-[12.5px] ${
                       implemented
-                        ? "text-primary hover:bg-accent-soft hover:text-accent cursor-pointer"
+                        ? "menu-item text-secondary hover:text-primary hover:bg-panel cursor-pointer"
                         : "text-muted cursor-not-allowed opacity-50"
                     }`}
                     onClick={() => handleItem(menu, item)}

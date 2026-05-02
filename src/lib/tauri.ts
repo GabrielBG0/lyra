@@ -111,4 +111,9 @@ export const tauriApi = {
     pdf: (path: string, includeHistory: boolean) =>
       invoke<void>('export_pdf', { path, includeHistory }),
   },
+
+  debug: {
+    nukeVault: () =>
+      invoke<void>('nuke_vault'),
+  },
 }

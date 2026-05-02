@@ -6,6 +6,8 @@ interface UIStore {
   setSidebarCollapsed: (v: boolean) => void
   historyBarExpanded: boolean
   toggleHistoryBar: () => void
+  nudgeDismissed: boolean
+  setNudgeDismissed: (v: boolean) => void
   newSongModalOpen: boolean
   openNewSongModal: () => void
   closeNewSongModal: () => void
@@ -25,6 +27,9 @@ interface UIStore {
   vaultOptionsModalOpen: boolean
   openVaultOptionsModal: () => void
   closeVaultOptionsModal: () => void
+  preferencesModalOpen: boolean
+  openPreferencesModal: () => void
+  closePreferencesModal: () => void
 }
 
 export const useUIStore = create<UIStore>((set) => ({
@@ -33,6 +38,8 @@ export const useUIStore = create<UIStore>((set) => ({
   setSidebarCollapsed: (v) => set({ sidebarCollapsed: v }),
   historyBarExpanded: false,
   toggleHistoryBar: () => set((s) => ({ historyBarExpanded: !s.historyBarExpanded })),
+  nudgeDismissed: false,
+  setNudgeDismissed: (v) => set({ nudgeDismissed: v }),
   newSongModalOpen: false,
   openNewSongModal: () => set({ newSongModalOpen: true }),
   closeNewSongModal: () => set({ newSongModalOpen: false }),
@@ -52,4 +59,7 @@ export const useUIStore = create<UIStore>((set) => ({
   vaultOptionsModalOpen: false,
   openVaultOptionsModal: () => set({ vaultOptionsModalOpen: true }),
   closeVaultOptionsModal: () => set({ vaultOptionsModalOpen: false }),
+  preferencesModalOpen: false,
+  openPreferencesModal: () => set({ preferencesModalOpen: true }),
+  closePreferencesModal: () => set({ preferencesModalOpen: false }),
 }))

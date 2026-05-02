@@ -106,11 +106,11 @@ export default function MetadataBar() {
               <Icons.ChevronDown size={11} />
             </button>
             {statusOpen && (
-              <div className="absolute top-full left-0 mt-1 bg-elev border border-border rounded-lg p-1 z-10 shadow-xl min-w-30">
+              <div className="absolute top-full left-0 mt-1 z-10 min-w-30 menu-popover">
                 {STATUS_LABELS.map((s) => (
                   <button
                     key={s}
-                    className="flex items-center gap-2 w-full px-2.5 py-1.5 text-left text-primary hover:bg-accent-soft rounded text-xs cursor-pointer border-none bg-transparent transition-colors"
+                    className="menu-item flex items-center gap-2 w-full px-2.5 py-1.5 text-left text-secondary hover:text-primary hover:bg-panel rounded text-xs cursor-pointer border-none bg-transparent"
                     onClick={() => {
                       updateMetadata({ status: s });
                       setStatusOpen(false);

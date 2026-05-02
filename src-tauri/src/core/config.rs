@@ -6,10 +6,14 @@ use serde::{Deserialize, Serialize};
 
 use crate::error::{AppError, AppResult};
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct AppConfig {
     pub vault_path: Option<String>,
     pub last_opened_song: Option<String>,
+    #[serde(default)]
+    pub debug_mode: bool,
+    #[serde(default)]
+    pub nudge_dismissed: bool,
 }
 
 fn config_path() -> AppResult<PathBuf> {
@@ -41,10 +45,7 @@ pub async fn load_config() -> AppResult<AppConfig> {
     let path = config_path()?;
 
     if !path.exists() {
-        return Ok(AppConfig {
-            vault_path: None,
-            last_opened_song: None,
-        });
+        return Ok(AppConfig::default());
     }
 
     let content = tokio::fs::read_to_string(&path).await?;

@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { open as openDialog } from "@tauri-apps/plugin-dialog";
 import { tauriApi } from "../../lib/tauri";
+import { useEditorStore } from "../../stores/editorStore";
+import { useSongStore } from "../../stores/songStore";
 import { Icons } from "./Icon";
 
 interface VaultOptionsModalProps {
@@ -15,6 +17,9 @@ export default function VaultOptionsModal({
   const [currentPath, setCurrentPath] = useState<string | null>(null);
   const [newPath, setNewPath] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [debugMode, setDebugMode] = useState(false);
+  const [nukeConfirming, setNukeConfirming] = useState(false);
+  const [nuking, setNuking] = useState(false);
 
   useEffect(() => {
     if (!open) return;
@@ -28,7 +33,9 @@ export default function VaultOptionsModal({
   useEffect(() => {
     if (open) {
       tauriApi.vault.getVaultPath().then(setCurrentPath);
+      tauriApi.config.get().then(cfg => setDebugMode(cfg.debug_mode));
       setNewPath(null);
+      setNukeConfirming(false);
     }
   }, [open]);
 
@@ -43,10 +50,25 @@ export default function VaultOptionsModal({
     setLoading(true);
     try {
       await tauriApi.vault.setVaultPath(newPath);
-      await tauriApi.config.set({ vault_path: newPath, last_opened_song: null });
+      const current = await tauriApi.config.get();
+      await tauriApi.config.set({ ...current, vault_path: newPath, last_opened_song: null });
       window.location.reload();
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleNuke = async () => {
+    setNuking(true);
+    try {
+      await tauriApi.debug.nukeVault();
+      useSongStore.getState().setSongs([]);
+      useSongStore.getState().selectSong(null);
+      useEditorStore.getState().closeSong();
+      onClose();
+    } finally {
+      setNuking(false);
+      setNukeConfirming(false);
     }
   };
 
@@ -133,6 +155,65 @@ export default function VaultOptionsModal({
               </button>
             </div>
           </div>
+
+          {debugMode && (
+            <div
+              className="mt-5 rounded-lg border px-3 py-3"
+              style={{
+                background: 'oklch(0.55 0.18 25 / 0.06)',
+                borderColor: 'oklch(0.55 0.18 25 / 0.25)',
+              }}
+            >
+              <div
+                className="font-semibold uppercase tracking-wide mb-2.5"
+                style={{ fontSize: 10.5, color: 'oklch(0.65 0.18 25)' }}
+              >
+                Danger Zone
+              </div>
+
+              {!nukeConfirming ? (
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <div className="text-secondary" style={{ fontSize: 13 }}>Nuke Vault</div>
+                    <div className="text-muted mt-0.5 leading-snug" style={{ fontSize: 11.5 }}>
+                      Delete all songs and reset the vault index
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setNukeConfirming(true)}
+                    className="shrink-0 px-3 py-1.5 rounded-lg font-semibold border-none cursor-pointer transition-all hover:brightness-110"
+                    style={{ fontSize: 12.5, background: 'var(--color-danger)', color: 'oklch(0.96 0.01 60)' }}
+                  >
+                    Nuke Vault
+                  </button>
+                </div>
+              ) : (
+                <div>
+                  <p className="text-secondary leading-snug mb-3" style={{ fontSize: 12.5 }}>
+                    This will permanently delete all songs and reset the vault index. This cannot be undone.
+                  </p>
+                  <div className="flex items-center justify-end gap-2">
+                    <button
+                      onClick={() => setNukeConfirming(false)}
+                      disabled={nuking}
+                      className="px-3 py-1.5 rounded-lg text-secondary hover:text-primary hover:bg-elev transition-colors border border-border-soft bg-transparent cursor-pointer disabled:opacity-40"
+                      style={{ fontSize: 12.5 }}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleNuke}
+                      disabled={nuking}
+                      className="px-3 py-1.5 rounded-lg font-semibold border-none cursor-pointer transition-all hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed"
+                      style={{ fontSize: 12.5, background: 'var(--color-danger)', color: 'oklch(0.96 0.01 60)' }}
+                    >
+                      {nuking ? 'Deleting…' : 'Delete everything'}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
 
           <div className="flex items-center justify-end gap-2 mt-5">
             <button

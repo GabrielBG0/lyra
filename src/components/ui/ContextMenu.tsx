@@ -38,15 +38,13 @@ export default function ContextMenu({ position, items, onClose }: ContextMenuPro
   return (
     <div
       ref={ref}
-      className="fixed bg-elev border border-border rounded-lg shadow-2xl p-1 z-50 min-w-44"
+      className="fixed z-50 min-w-44 menu-popover"
       style={{ left: position.x, top: position.y }}
     >
       {items.map((item, i) => (
         <button
           key={i}
-          className={`w-full text-left text-sm px-3 py-1.5 rounded hover:bg-panel border-none bg-transparent cursor-pointer ${
-            item.danger ? "text-rose-400" : "text-secondary hover:text-primary"
-          }`}
+          className={`${item.danger ? "menu-item-danger text-brand-rose" : "menu-item text-secondary hover:text-primary"} w-full text-left text-sm px-3 py-1.5 rounded hover:bg-panel border-none bg-transparent cursor-pointer`}
           onClick={() => {
             item.onClick();
             onClose();

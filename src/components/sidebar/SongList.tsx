@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useRef, useEffect } from "react";
 import type { SongIndexEntry } from "../../lib/types";
 import SongEntry from "./SongEntry";
 import SongSearch from "./SongSearch";
@@ -10,6 +10,13 @@ import { useSong } from "../../hooks/useSong";
 import { useUIStore } from "../../stores/uiStore";
 
 type SortKey = "updated" | "az" | "za" | "status";
+
+const SORT_LABELS: Record<SortKey, string> = {
+  updated: "Newest updated",
+  az: "Title A–Z",
+  za: "Title Z–A",
+  status: "By status",
+};
 
 function sortSongs(songs: SongIndexEntry[], sort: SortKey): SongIndexEntry[] {
   return [...songs].sort((a, b) => {
@@ -33,6 +40,18 @@ export default function SongList({ vaultPath, onCreateSong }: SongListProps) {
 
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState<SortKey>("updated");
+  const [sortOpen, setSortOpen] = useState(false);
+  const sortRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!sortOpen) return;
+    const handler = (e: MouseEvent) => {
+      if (sortRef.current && !sortRef.current.contains(e.target as Node))
+        setSortOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [sortOpen]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -71,16 +90,28 @@ export default function SongList({ vaultPath, onCreateSong }: SongListProps) {
       <div className="flex flex-col gap-2 px-3 pb-2.5">
         <SongSearch value={query} onChange={setQuery} />
         <div className="flex items-center gap-1.5">
-          <select
-            className="flex-1 bg-bg border border-border-soft text-secondary px-2 py-1.5 rounded text-[11.5px] font-ui outline-none cursor-pointer appearance-none"
-            value={sort}
-            onChange={(e) => setSort(e.target.value as SortKey)}
-          >
-            <option value="updated">Newest updated</option>
-            <option value="az">Title A–Z</option>
-            <option value="za">Title Z–A</option>
-            <option value="status">By status</option>
-          </select>
+          <div ref={sortRef} className="relative flex-1">
+            <button
+              className="flex items-center justify-between w-full bg-bg border border-border-soft text-secondary px-2 py-1.5 rounded text-[11.5px] font-ui cursor-pointer hover:border-border hover:text-primary transition-colors"
+              onClick={() => setSortOpen((o) => !o)}
+            >
+              <span>{SORT_LABELS[sort]}</span>
+              <Icons.ChevronDown size={11} className="text-faint shrink-0 ml-1" />
+            </button>
+            {sortOpen && (
+              <div className="absolute top-full left-0 right-0 mt-1 z-20 menu-popover">
+                {(Object.keys(SORT_LABELS) as SortKey[]).map((key) => (
+                  <button
+                    key={key}
+                    className="menu-item w-full text-left px-2.5 py-1.5 rounded text-[11.5px] cursor-pointer border-none bg-transparent hover:bg-panel text-secondary hover:text-primary"
+                    onClick={() => { setSort(key); setSortOpen(false); }}
+                  >
+                    {SORT_LABELS[key]}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
           <button
             className="flex items-center gap-1 px-2 py-1.5 bg-transparent border border-border-soft rounded text-secondary hover:bg-elev transition-colors font-ui text-[12px] cursor-pointer"
             title="New song (⌘N)"

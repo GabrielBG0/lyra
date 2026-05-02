@@ -17,7 +17,7 @@ export default function App() {
   const { loadSongs } = useVault()
   useAutosave()
 
-  const { toggleSidebar, toggleHistoryBar, openNewSongModal, openSnapshotModal } = useUIStore()
+  const { toggleSidebar, toggleHistoryBar, openNewSongModal, openSnapshotModal, openPreferencesModal, setNudgeDismissed } = useUIStore()
   const { setSongs } = useSongStore()
 
   useKeyboardShortcuts({
@@ -45,11 +45,13 @@ export default function App() {
       useEditorStore.getState().closeSong()
       useSongStore.getState().selectSong(null)
     },
+    'preferences': () => openPreferencesModal(),
   })
 
   useEffect(() => {
     tauriApi.config.get().then(cfg => {
       setVaultPath(cfg.vault_path)
+      setNudgeDismissed(cfg.nudge_dismissed)
       if (cfg.vault_path) loadSongs()
     }).catch(() => setVaultPath(null))
   }, [])
@@ -109,7 +111,7 @@ export default function App() {
     ]
 
     return () => { unlisteners.forEach(p => p.then(f => f())) }
-  }, [toggleSidebar, setSongs, openSnapshotModal])
+  }, [toggleSidebar, setSongs, openSnapshotModal, openPreferencesModal])
 
   if (vaultPath === undefined) {
     return (
@@ -122,13 +124,15 @@ export default function App() {
   if (!vaultPath) {
     return (
       <VaultSetup
-        onDone={(path) => {
-          tauriApi.config.set({ vault_path: path, last_opened_song: null })
-            .then(() => {
-              setVaultPath(path)
-              loadSongs()
-            })
-            .catch((err) => console.error('Failed to save config:', err))
+        onDone={async (path) => {
+          try {
+            const current = await tauriApi.config.get()
+            await tauriApi.config.set({ ...current, vault_path: path, last_opened_song: null })
+            setVaultPath(path)
+            loadSongs()
+          } catch (err) {
+            console.error('Failed to save config:', err)
+          }
         }}
       />
     )

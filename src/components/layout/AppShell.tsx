@@ -14,6 +14,7 @@ import KeyboardShortcutsModal from "../ui/KeyboardShortcutsModal";
 import AboutModal from "../ui/AboutModal";
 import DeleteSongModal from "../ui/DeleteSongModal";
 import VaultOptionsModal from "../ui/VaultOptionsModal";
+import PreferencesModal from "../ui/PreferencesModal";
 import { useCloseGuard } from "../../hooks/useCloseGuard";
 
 interface AppShellProps {
@@ -41,6 +42,8 @@ export default function AppShell({ vaultPath }: AppShellProps) {
     vaultOptionsModalOpen,
     openVaultOptionsModal,
     closeVaultOptionsModal,
+    preferencesModalOpen,
+    closePreferencesModal,
     toggleHistoryBar,
   } = useUIStore();
   const [lyricFont] = useState<string>('"Noto Serif", "Noto Serif JP", "Noto Serif KR", Georgia, serif');
@@ -142,6 +145,10 @@ export default function AppShell({ vaultPath }: AppShellProps) {
             closeDeleteSongModal()
           }
         }}
+      />
+      <PreferencesModal
+        open={preferencesModalOpen}
+        onClose={closePreferencesModal}
       />
     </div>
   );

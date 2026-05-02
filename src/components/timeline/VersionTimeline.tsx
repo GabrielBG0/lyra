@@ -20,9 +20,7 @@ export default function VersionTimeline() {
   const { openSnapshotModal } = useUIStore();
   const latestSnap = snapshotHeaders[0];
 
-  // TODO: persist nudge_dismissed to AppConfig and expose as a toggle
-  // in the settings menu when settings are implemented
-  const [nudgeDismissed, setNudgeDismissed] = useState(false);
+  const { nudgeDismissed, setNudgeDismissed } = useUIStore();
   const [showNudge, setShowNudge] = useState(false);
   const changeCount = useRef(0);
   const songOpenTime = useRef<number>(Date.now());

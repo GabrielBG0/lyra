@@ -7,6 +7,7 @@ use crate::core::config::AppConfig;
 
 pub mod comment;
 pub mod config;
+pub mod debug;
 pub mod diff;
 pub mod export;
 pub mod section;
