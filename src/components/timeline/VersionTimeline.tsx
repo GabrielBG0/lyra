@@ -55,7 +55,7 @@ export default function VersionTimeline() {
           <Icons.History size={13} />
           <span>History</span>
           <span className="text-faint text-[10.5px] ml-0.5 px-1.5 py-px bg-elev rounded-full">
-            {snapshotHeaders.length} snapshot
+            {snapshotHeaders.length} take
             {snapshotHeaders.length !== 1 ? "s" : ""}
           </span>
           {expanded ? (
@@ -75,7 +75,7 @@ export default function VersionTimeline() {
               style={{ boxShadow: "0 0 8px oklch(0.72 0.10 55)" }}
             />
             <span>
-              Latest: {latestSnap.note ?? "snapshot"} ·{" "}
+              Latest: {latestSnap.note ?? "take"} ·{" "}
               {new Date(latestSnap.created_at).toLocaleDateString()}
             </span>
             <div className="ml-auto flex gap-1 pr-1.5">
@@ -91,7 +91,7 @@ export default function VersionTimeline() {
 
         {!expanded && !latestSnap && (
           <div className="flex-1 text-faint text-xs">
-            No snapshots yet — save a version to track changes.
+            No takes yet, save a version to track changes.
           </div>
         )}
 
@@ -103,7 +103,7 @@ export default function VersionTimeline() {
               onClick={() => openSnapshotModal((note) => createSnapshot(note))}
             >
               <Icons.Camera size={12} />
-              Snapshot
+              Take
             </button>
           </div>
         )}
@@ -125,7 +125,7 @@ export default function VersionTimeline() {
           ))}
           {snapshotHeaders.length === 0 && (
             <div className="flex items-center text-faint text-xs pl-2">
-              No snapshots yet
+              No takes yet
             </div>
           )}
         </div>

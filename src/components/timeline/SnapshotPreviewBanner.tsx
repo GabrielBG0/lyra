@@ -24,7 +24,7 @@ export default function SnapshotPreviewBanner({ snapshotId }: SnapshotPreviewBan
   return (
     <div className="flex items-center gap-3 px-4 py-2 bg-panel border-b border-border-soft border-t border-t-status-demo/40 text-sm text-primary">
       <Icons.Eye size={14} className="text-muted shrink-0" />
-      <span className="text-secondary">Viewing snapshot —</span>
+      <span className="text-secondary">Viewing take</span>
       {snapshot ? (
         <>
           <span className="font-medium text-primary">{snapshot.note ?? 'Untitled'}</span>

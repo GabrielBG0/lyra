@@ -42,7 +42,7 @@ const MENUS = {
     // TODO: Snapshot history timeline panel
     `Show History\t${mod}H`,
     // TODO: Diff view between working copy and a snapshot
-    `Diff with Snapshot…\t${mod}D`,
+    `Diff with Take…\t${mod}D`,
   ],
   View: [
     `Toggle Sidebar\t${mod}\\`,

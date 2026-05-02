@@ -68,7 +68,7 @@ export default function SectionEditor({ lyricFont, readOnly, previewSections }: 
       return (
         <div className="flex flex-col items-center justify-center flex-1 gap-4">
           <LyraLogo size={48} dim />
-          <p className="text-muted text-sm">This snapshot has no sections.</p>
+          <p className="text-muted text-sm">This take has no sections.</p>
         </div>
       )
     }

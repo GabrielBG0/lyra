@@ -64,7 +64,7 @@ export default function SnapshotModal({ open, onClose, onSubmit }: SnapshotModal
                 Save Version
               </h2>
               <p className="text-muted mt-0.5" style={{ fontSize: 12 }}>
-                Add an optional note to describe this snapshot
+                Add an optional note to describe this take
               </p>
             </div>
             <button

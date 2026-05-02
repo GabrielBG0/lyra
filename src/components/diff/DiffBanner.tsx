@@ -10,8 +10,8 @@ export default function DiffBanner() {
 
   const snapA = diffTargetA !== 'now' ? loadedSnapshots[diffTargetA] : null
   const snapB = diffTargetB !== 'now' ? loadedSnapshots[diffTargetB] : null
-  const labelA = diffTargetA === 'now' ? 'Working copy' : (snapA?.note ?? `Snapshot ${diffTargetA.slice(0, 8)}`)
-  const labelB = diffTargetB === 'now' ? 'Working copy' : (snapB?.note ?? `Snapshot ${diffTargetB.slice(0, 8)}`)
+  const labelA = diffTargetA === 'now' ? 'Working copy' : (snapA?.note ?? `Take ${diffTargetA.slice(0, 8)}`)
+  const labelB = diffTargetB === 'now' ? 'Working copy' : (snapB?.note ?? `Take ${diffTargetB.slice(0, 8)}`)
 
   const handleRestoreB = async () => {
     if (diffTargetB === 'now') return

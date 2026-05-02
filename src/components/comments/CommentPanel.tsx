@@ -93,7 +93,7 @@ export default function CommentPanel({ sectionId }: CommentPanelProps) {
             checked={pinToSnapshot}
             onChange={e => setPinToSnapshot(e.target.checked)}
           />
-          pin to snapshot
+          pin to take
         </label>
         <button
           className="px-2 py-1 bg-accent text-bg rounded text-xs font-semibold disabled:opacity-40 cursor-pointer border-none"

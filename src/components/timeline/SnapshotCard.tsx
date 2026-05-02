@@ -79,7 +79,7 @@ export default function SnapshotCard({ header, index, isPreview, isShiftSelected
       onClick: () => diffWorkingVsSnapshot(header.id),
     },
     {
-      label: "Delete snapshot",
+      label: "Delete take",
       danger: true,
       onClick: () => {
         // TODO: implement delete_snapshot Rust command
@@ -121,7 +121,7 @@ export default function SnapshotCard({ header, index, isPreview, isShiftSelected
             overflow: "hidden",
           }}
         >
-          {header.note ?? "Untitled snapshot"}
+          {header.note ?? "Untitled take"}
         </div>
         <div className="text-2xs text-faint uppercase tracking-wide font-medium">
           {header.section_count} section{header.section_count !== 1 ? "s" : ""}
