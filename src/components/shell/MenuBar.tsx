@@ -14,6 +14,11 @@ const mod = isMac ? "⌘" : "Ctrl+";
 const shift = isMac ? "⇧" : "Shift+";
 
 const MENUS = {
+  Lyra: [
+    `Preferences…\t${mod},`,
+    "—",
+    "Vault Options…",
+  ],
   File: [
     `New Song\t${mod}N`,
     `Open Vault…\t${mod}O`,
@@ -58,6 +63,7 @@ const MENUS = {
 const IMPLEMENTED = new Set([
   "New Song",
   "Open Vault…",
+  "Vault Options…",
   "Export as Plain Text…",
   "Export as PDF…",
   "Close Song",
@@ -76,6 +82,7 @@ interface MenuBarProps {
   onCloseSong: () => void;
   onShowAbout: () => void;
   onToggleHistoryBar: () => void;
+  onShowVaultOptions: () => void;
 }
 
 export default function MenuBar({
@@ -85,6 +92,7 @@ export default function MenuBar({
   onCloseSong,
   onShowAbout,
   onToggleHistoryBar,
+  onShowVaultOptions,
 }: MenuBarProps) {
   const [open, setOpen] = useState<string | null>(null);
   const [maximized, setMaximized] = useState(false);
@@ -141,6 +149,7 @@ export default function MenuBar({
     setOpen(null);
     if (label === "New Song") onNewSong();
     else if (label === "Open Vault…") handleOpenVault();
+    else if (label === "Vault Options…") onShowVaultOptions();
     else if (label === "Export as Plain Text…") handleExportText();
     else if (label === "Export as PDF…") handleExportPdf();
     else if (label === "Close Song") onCloseSong();
@@ -160,12 +169,6 @@ export default function MenuBar({
       className="h-8 flex items-center gap-0 bg-panel border-b border-border-soft text-secondary relative z-50 shrink-0"
       style={{ fontSize: 12.5, paddingLeft: isMac ? 76 : 10 }}
     >
-      {/* Brand */}
-      <div className="flex items-center gap-1.5 px-2.5 font-semibold text-primary text-xs tracking-wide mr-1">
-        <LyraLogo size={14} glow={false} />
-        Lyra
-      </div>
-
       {/* Menu items */}
       {Object.keys(MENUS).map((menu) => (
         <div key={menu} className="relative">
@@ -174,11 +177,18 @@ export default function MenuBar({
               open === menu
                 ? "bg-elev text-primary"
                 : "text-secondary hover:bg-elev hover:text-primary"
-            }`}
+            } ${menu === "Lyra" ? "flex items-center gap-1.5 font-semibold text-xs tracking-wide mr-1" : ""}`}
             onMouseEnter={() => open && setOpen(menu)}
             onClick={() => setOpen(open === menu ? null : menu)}
           >
-            {menu}
+            {menu === "Lyra" ? (
+              <>
+                <LyraLogo size={14} glow={false} />
+                Lyra
+              </>
+            ) : (
+              menu
+            )}
           </button>
           {open === menu && (
             <div className="absolute top-full left-0 mt-0.5 min-w-55 bg-elev border border-border rounded-lg p-1 shadow-2xl z-50">

@@ -13,6 +13,7 @@ import SnapshotModal from "../ui/SnapshotModal";
 import KeyboardShortcutsModal from "../ui/KeyboardShortcutsModal";
 import AboutModal from "../ui/AboutModal";
 import DeleteSongModal from "../ui/DeleteSongModal";
+import VaultOptionsModal from "../ui/VaultOptionsModal";
 import { useCloseGuard } from "../../hooks/useCloseGuard";
 
 interface AppShellProps {
@@ -37,6 +38,9 @@ export default function AppShell({ vaultPath }: AppShellProps) {
     aboutModalOpen,
     openAboutModal,
     closeAboutModal,
+    vaultOptionsModalOpen,
+    openVaultOptionsModal,
+    closeVaultOptionsModal,
     toggleHistoryBar,
   } = useUIStore();
   const [lyricFont] = useState<string>('"Noto Serif", "Noto Serif JP", "Noto Serif KR", Georgia, serif');
@@ -61,6 +65,7 @@ export default function AppShell({ vaultPath }: AppShellProps) {
         onCloseSong={handleCloseSong}
         onShowAbout={openAboutModal}
         onToggleHistoryBar={toggleHistoryBar}
+        onShowVaultOptions={openVaultOptionsModal}
       />
       <div className="flex flex-1 min-h-0">
         {/* Collapsed sidebar strip */}
@@ -122,6 +127,10 @@ export default function AppShell({ vaultPath }: AppShellProps) {
       <AboutModal
         open={aboutModalOpen}
         onClose={closeAboutModal}
+      />
+      <VaultOptionsModal
+        open={vaultOptionsModalOpen}
+        onClose={closeVaultOptionsModal}
       />
       <DeleteSongModal
         open={deleteSongModal !== null}

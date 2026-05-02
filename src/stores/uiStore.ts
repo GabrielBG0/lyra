@@ -22,6 +22,9 @@ interface UIStore {
   aboutModalOpen: boolean
   openAboutModal: () => void
   closeAboutModal: () => void
+  vaultOptionsModalOpen: boolean
+  openVaultOptionsModal: () => void
+  closeVaultOptionsModal: () => void
 }
 
 export const useUIStore = create<UIStore>((set) => ({
@@ -46,4 +49,7 @@ export const useUIStore = create<UIStore>((set) => ({
   aboutModalOpen: false,
   openAboutModal: () => set({ aboutModalOpen: true }),
   closeAboutModal: () => set({ aboutModalOpen: false }),
+  vaultOptionsModalOpen: false,
+  openVaultOptionsModal: () => set({ vaultOptionsModalOpen: true }),
+  closeVaultOptionsModal: () => set({ vaultOptionsModalOpen: false }),
 }))
