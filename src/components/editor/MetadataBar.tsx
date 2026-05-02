@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef } from "react";
 import type { SongStatus } from "../../lib/types";
 import { useEditorStore } from "../../stores/editorStore";
-import { useSong } from "../../hooks/useSong";
 import { useSnapshot } from "../../hooks/useSnapshot";
 import { useUIStore } from "../../stores/uiStore";
 import { Icons } from "../ui/Icon";
+
+const isMac = navigator.platform.startsWith("Mac") || navigator.userAgent.includes("Mac");
 
 const STATUS_DOT: Record<SongStatus, string> = {
   idea: "bg-status-idea",
@@ -16,13 +17,11 @@ const STATUS_DOT: Record<SongStatus, string> = {
 const STATUS_LABELS: SongStatus[] = ["idea", "draft", "demo", "finished"];
 
 export default function MetadataBar() {
-  const { metadata, isDirty, updateMetadata } = useEditorStore();
-  const { saveSong } = useSong();
+  const { metadata, snapshotHeaders, updateMetadata } = useEditorStore();
   const { createSnapshot } = useSnapshot();
   const { openSnapshotModal } = useUIStore();
   const [editingTitle, setEditingTitle] = useState(false);
   const [titleDraft, setTitleDraft] = useState("");
-  const [savedBlink, setSavedBlink] = useState(false);
   const [statusOpen, setStatusOpen] = useState(false);
   const statusRef = useRef<HTMLDivElement | null>(null);
 
@@ -51,12 +50,6 @@ export default function MetadataBar() {
     const t = titleDraft.trim();
     if (t && t !== metadata.title) updateMetadata({ title: t });
     setEditingTitle(false);
-  };
-
-  const handleSave = async () => {
-    await saveSong();
-    setSavedBlink(true);
-    setTimeout(() => setSavedBlink(false), 1500);
   };
 
   const handleSnapshot = () => openSnapshotModal((note) => createSnapshot(note));
@@ -134,30 +127,12 @@ export default function MetadataBar() {
 
         {/* Actions */}
         <div className="flex items-center gap-1.5">
-          {savedBlink && (
-            <span className="text-xs text-accent px-2 py-0.5 bg-accent-soft rounded-full font-medium">
-              Saved
-            </span>
-          )}
           <button
-            className="relative w-7.5 h-7.5 flex items-center justify-center rounded text-secondary hover:bg-elev hover:text-primary transition-colors cursor-pointer border-none bg-transparent"
-            title={`Save (⌘S)${isDirty ? " · unsaved changes" : ""}`}
-            onClick={handleSave}
-          >
-            <Icons.Save size={15} />
-            {isDirty && (
-              <span
-                className="absolute top-1.25 right-1.25 w-1.25 h-1.25 rounded-full bg-accent"
-                style={{ boxShadow: "0 0 6px oklch(0.72 0.10 55)" }}
-              />
-            )}
-          </button>
-          <button
-            className="w-7.5 h-7.5 flex items-center justify-center rounded text-secondary hover:bg-elev hover:text-primary transition-colors cursor-pointer border-none bg-transparent"
-            title="Save version (⇧⌘S)"
+            className={`w-7.5 h-7.5 flex items-center justify-center rounded transition-colors cursor-pointer border-none bg-transparent ${snapshotHeaders.length === 0 ? "text-accent hover:bg-elev hover:brightness-110" : "text-secondary hover:bg-elev hover:text-primary"}`}
+            title={isMac ? "Save a take (⌘+⇧+S)" : "Save a take (ctrl+⇧+S)"}
             onClick={handleSnapshot}
           >
-            <Icons.Camera size={15} />
+            <Icons.Pin size={snapshotHeaders.length === 0 ? 16 : 15} />
           </button>
         </div>
       </div>

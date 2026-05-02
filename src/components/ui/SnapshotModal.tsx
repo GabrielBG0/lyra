@@ -61,7 +61,7 @@ export default function SnapshotModal({ open, onClose, onSubmit }: SnapshotModal
                 className="text-primary font-semibold"
                 style={{ fontSize: 15, letterSpacing: '-0.01em' }}
               >
-                Save Version
+                Save Take
               </h2>
               <p className="text-muted mt-0.5" style={{ fontSize: 12 }}>
                 Add an optional note to describe this take
@@ -123,7 +123,7 @@ export default function SnapshotModal({ open, onClose, onSubmit }: SnapshotModal
                   color: 'oklch(0.145 0.008 60)',
                 }}
               >
-                Save Version
+                Save Take
               </button>
             </div>
           </form>

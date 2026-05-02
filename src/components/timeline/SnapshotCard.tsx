@@ -51,15 +51,12 @@ export function NowCard({ onClick }: NowCardProps) {
         </span>
       </div>
       <div className="text-[12px] text-primary">Live draft</div>
-      <div className="text-2xs text-faint uppercase tracking-wide font-medium">
-        unsaved
-      </div>
     </div>
   );
 }
 
 export default function SnapshotCard({ header, index, isPreview, isShiftSelected, onClick }: SnapshotCardProps) {
-  const label = `v${index + 1}`;
+  const label = `#${index + 1}`;
   const [menuPos, setMenuPos] = useState<{ x: number; y: number } | null>(null);
   const { restoreSnapshot } = useSnapshot();
   const { diffWorkingVsSnapshot } = useDiff();
@@ -71,7 +68,7 @@ export default function SnapshotCard({ header, index, isPreview, isShiftSelected
 
   const menuItems = [
     {
-      label: "Restore this version",
+      label: "Restore this take",
       onClick: () => restoreSnapshot(header.id),
     },
     {
@@ -104,27 +101,27 @@ export default function SnapshotCard({ header, index, isPreview, isShiftSelected
         {isShiftSelected && (
           <div className="text-2xs text-accent font-semibold uppercase tracking-wide">compare from</div>
         )}
-        <div className="flex items-baseline justify-between">
-          <span className="text-[11px] font-bold text-primary font-ui tracking-wide">
-            {label}
-          </span>
-          <span className="text-[10.5px] text-faint">
+        <div className="flex items-start justify-between gap-2">
+          <div
+            className={`text-[12px] font-semibold leading-snug min-h-7.5 flex-1 overflow-hidden ${header.note ? "text-primary" : "text-faint italic"}`}
+            style={{
+              display: "-webkit-box",
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: "vertical",
+              overflow: "hidden",
+            }}
+          >
+            {header.note ?? "Untitled take"}
+          </div>
+          <span className="text-[10.5px] text-faint shrink-0">
             {timeAgo(header.created_at)}
           </span>
         </div>
-        <div
-          className={`text-[12px] leading-snug min-h-7.5 overflow-hidden ${header.note ? "text-secondary" : "text-faint italic"}`}
-          style={{
-            display: "-webkit-box",
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: "vertical",
-            overflow: "hidden",
-          }}
-        >
-          {header.note ?? "Untitled take"}
-        </div>
-        <div className="text-2xs text-faint uppercase tracking-wide font-medium">
-          {header.section_count} section{header.section_count !== 1 ? "s" : ""}
+        <div className="flex items-baseline justify-between">
+          <span className="text-2xs text-faint uppercase tracking-wide font-medium">
+            {header.section_count} section{header.section_count !== 1 ? "s" : ""}
+          </span>
+          <span className="text-[10.5px] text-faint">{label}</span>
         </div>
       </div>
       <ContextMenu
