@@ -31,7 +31,7 @@ export default function DiffBanner() {
           className="flex items-center gap-1 px-2.5 py-1 bg-elev border border-border-soft rounded text-secondary hover:bg-panel text-xs cursor-pointer"
           onClick={handleRestoreB}
         >
-          Restore this version
+          Restore this take
         </button>
       )}
       <button

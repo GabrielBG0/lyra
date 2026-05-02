@@ -23,7 +23,7 @@ export const SHORTCUT_CATEGORIES: ShortcutCategory[] = [
     title: 'Song',
     shortcuts: [
       { label: 'Save',         action: 'save',         keys: ['mod', 'S'] },
-      { label: 'Save Version', action: 'save-version', keys: ['mod', 'shift', 'S'] },
+      { label: 'Save Take', action: 'save-version', keys: ['mod', 'shift', 'S'] },
     ],
   },
 ]

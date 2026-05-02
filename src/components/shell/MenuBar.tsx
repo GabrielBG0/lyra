@@ -37,7 +37,7 @@ const MENUS = {
   ],
   Song: [
     `Save\t${mod}S`,
-    `Save Version…\t${shift}${mod}S`,
+    `Save Take…\t${shift}${mod}S`,
     "—",
     // TODO: Snapshot history timeline panel
     `Show History\t${mod}H`,
@@ -64,7 +64,7 @@ const IMPLEMENTED = new Set([
   "Export as PDF…",
   "Close Song",
   "Save",
-  "Save Version…",
+  "Save Take…",
   "Toggle Sidebar",
   "Keyboard Shortcuts…",
   "About Lyra",
@@ -135,7 +135,7 @@ export default function MenuBar({ onToggleSidebar, onNewSong, onShowShortcuts, o
     else if (label === "Close Song") onCloseSong();
     else if (label === "Toggle Sidebar") onToggleSidebar();
     else if (label === "Save") saveSong();
-    else if (label === "Save Version…") {
+    else if (label === "Save Take…") {
       openSnapshotModal((note) => createSnapshot(note));
     } else if (label === "Keyboard Shortcuts…") onShowShortcuts();
     else if (label === "About Lyra") onShowAbout();

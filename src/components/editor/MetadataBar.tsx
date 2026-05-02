@@ -5,7 +5,8 @@ import { useSnapshot } from "../../hooks/useSnapshot";
 import { useUIStore } from "../../stores/uiStore";
 import { Icons } from "../ui/Icon";
 
-const isMac = navigator.platform.startsWith("Mac") || navigator.userAgent.includes("Mac");
+const isMac =
+  navigator.platform.startsWith("Mac") || navigator.userAgent.includes("Mac");
 
 const STATUS_DOT: Record<SongStatus, string> = {
   idea: "bg-status-idea",
@@ -52,7 +53,8 @@ export default function MetadataBar() {
     setEditingTitle(false);
   };
 
-  const handleSnapshot = () => openSnapshotModal((note) => createSnapshot(note));
+  const handleSnapshot = () =>
+    openSnapshotModal((note) => createSnapshot(note));
 
   return (
     <div
@@ -128,11 +130,15 @@ export default function MetadataBar() {
         {/* Actions */}
         <div className="flex items-center gap-1.5">
           <button
-            className={`w-7.5 h-7.5 flex items-center justify-center rounded transition-colors cursor-pointer border-none bg-transparent ${snapshotHeaders.length === 0 ? "text-accent hover:bg-elev hover:brightness-110" : "text-secondary hover:bg-elev hover:text-primary"}`}
-            title={isMac ? "Save a take (⌘+⇧+S)" : "Save a take (ctrl+⇧+S)"}
+            className={`h-7.5 flex flex-row-reverse items-center rounded cursor-pointer border-none bg-transparent group/pin transition-colors ${snapshotHeaders.length === 0 ? "text-accent hover:bg-elev hover:brightness-110" : "text-secondary hover:bg-elev hover:text-primary"}`}
             onClick={handleSnapshot}
           >
-            <Icons.Pin size={snapshotHeaders.length === 0 ? 16 : 15} />
+            <span className="w-7.5 shrink-0 flex items-center justify-center">
+              <Icons.Pin size={snapshotHeaders.length === 0 ? 16 : 15} />
+            </span>
+            <span className="max-w-0 group-hover/pin:max-w-[6rem] overflow-hidden whitespace-nowrap transition-[max-width] duration-300 ease-out text-xs">
+              <span className="pl-3 pr-1">Save a Take</span>
+            </span>
           </button>
         </div>
       </div>
