@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { open as openDialog } from "@tauri-apps/plugin-dialog";
 import { tauriApi } from "../../lib/tauri";
 import LyraLogo from "../ui/LyraLogo";
 import { Icons } from "../ui/Icon";
@@ -55,8 +56,8 @@ export default function VaultSetup({ onDone }: VaultSetupProps) {
         </h1>
         <p className="text-sm text-muted leading-relaxed mb-7">
           Before you begin, point Lyra at a folder on your disk. This is your{" "}
-          <span className="text-accent font-medium">vault</span> — every song
-          you write lives here as a plain file.
+          <span className="text-accent font-medium">vault</span>, where every song
+          you write lives as a plain file.
         </p>
 
         {/* Options */}
@@ -83,7 +84,7 @@ export default function VaultSetup({ onDone }: VaultSetupProps) {
                 Create a new vault
               </div>
               <div className="text-xs text-muted">
-                Pick an empty folder — Lyra will make it yours.
+                Pick an empty folder. Lyra will make it yours.
               </div>
             </div>
           </button>
@@ -119,10 +120,10 @@ export default function VaultSetup({ onDone }: VaultSetupProps) {
 
         {mode && (
           <div className="mt-3.5">
-            <div className="flex items-center gap-2 px-2.5 py-2 bg-bg border border-border-soft rounded text-sm text-secondary font-ui">
-              <Icons.Folder size={13} className="text-faint shrink-0" />
+            <div className="flex items-center gap-2 bg-bg border border-border-soft rounded overflow-hidden">
+              <Icons.Folder size={13} className="text-faint shrink-0 ml-2.5" />
               <input
-                className="flex-1 bg-transparent border-none outline-none text-primary text-xs"
+                className="flex-1 bg-transparent border-none outline-none text-primary text-xs py-2"
                 placeholder={
                   mode === "create"
                     ? "~/Documents/New Lyra Vault"
@@ -135,6 +136,16 @@ export default function VaultSetup({ onDone }: VaultSetupProps) {
                 }}
                 autoFocus
               />
+              <button
+                className="shrink-0 px-2.5 py-2 text-xs text-secondary hover:text-primary hover:bg-elev transition-colors border-none border-l border-border-soft bg-transparent cursor-pointer"
+                style={{ borderLeft: '1px solid var(--color-border-soft)' }}
+                onClick={async () => {
+                  const selected = await openDialog({ directory: true, multiple: false });
+                  if (selected && !Array.isArray(selected)) setPath(selected);
+                }}
+              >
+                Browse…
+              </button>
             </div>
             {error && <p className="text-xs text-brand-rose mt-1.5">{error}</p>}
           </div>
@@ -164,7 +175,7 @@ export default function VaultSetup({ onDone }: VaultSetupProps) {
       <div className="flex flex-col items-center gap-5 justify-self-center opacity-85">
         <LyraLogo size={160} dim />
         <p className="text-xs text-faint tracking-wide text-center max-w-55 leading-relaxed italic">
-          Lyra — the lyre constellation. Home of Vega, the harp-star.
+          Lyra, the lyre constellation. Home of Vega, the harp-star.
         </p>
       </div>
     </div>

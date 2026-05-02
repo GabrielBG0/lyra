@@ -115,5 +115,8 @@ export const tauriApi = {
   debug: {
     nukeVault: () =>
       invoke<void>('nuke_vault'),
+
+    resetApp: () =>
+      invoke<void>('reset_app'),
   },
 }

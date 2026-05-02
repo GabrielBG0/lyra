@@ -52,3 +52,19 @@ pub async fn nuke_vault(state: tauri::State<'_, AppState>) -> AppResult<()> {
 
     Ok(())
 }
+
+#[tauri::command]
+pub async fn reset_app(state: tauri::State<'_, AppState>) -> AppResult<()> {
+    let updated = {
+        let mut config = state.config.lock().unwrap();
+        if !config.debug_mode {
+            return Err(AppError::Other("debug mode is not enabled".to_string()));
+        }
+        config.vault_path = None;
+        config.last_opened_song = None;
+        config.debug_mode = false;
+        config.clone()
+    };
+    save_config(&updated).await?;
+    Ok(())
+}

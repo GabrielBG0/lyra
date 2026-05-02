@@ -70,11 +70,14 @@ export default function PreferencesModal({ open, onClose }: PreferencesModalProp
   const [config, setConfig] = useState<AppConfig | null>(null)
   const [nukeConfirming, setNukeConfirming] = useState(false)
   const [nuking, setNuking] = useState(false)
+  const [resetConfirming, setResetConfirming] = useState(false)
+  const [resetting, setResetting] = useState(false)
   const { setNudgeDismissed } = useUIStore()
 
   useEffect(() => {
     if (!open) return
     setNukeConfirming(false)
+    setResetConfirming(false)
     tauriApi.config.get().then(setConfig)
   }, [open])
 
@@ -106,6 +109,17 @@ export default function PreferencesModal({ open, onClose }: PreferencesModalProp
     } finally {
       setNuking(false)
       setNukeConfirming(false)
+    }
+  }
+
+  const handleReset = async () => {
+    setResetting(true)
+    try {
+      await tauriApi.debug.resetApp()
+      window.location.reload()
+    } finally {
+      setResetting(false)
+      setResetConfirming(false)
     }
   }
 
@@ -244,6 +258,58 @@ export default function PreferencesModal({ open, onClose }: PreferencesModalProp
                         </div>
                       </div>
                     )}
+
+                    <div className="mt-2.5 pt-2.5" style={{ borderTop: '1px solid oklch(0.55 0.18 25 / 0.2)' }}>
+                      {!resetConfirming ? (
+                        <div className="flex items-center justify-between gap-3">
+                          <div>
+                            <div className="text-secondary" style={{ fontSize: 13 }}>Reset App</div>
+                            <div className="text-muted mt-0.5 leading-snug" style={{ fontSize: 11.5 }}>
+                              Clear vault path and return to first-launch state
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => setResetConfirming(true)}
+                            className="shrink-0 px-3 py-1.5 rounded-lg font-semibold border-none cursor-pointer transition-all hover:brightness-110"
+                            style={{
+                              fontSize: 12.5,
+                              background: 'var(--color-danger)',
+                              color: 'oklch(0.96 0.01 60)',
+                            }}
+                          >
+                            Reset App
+                          </button>
+                        </div>
+                      ) : (
+                        <div>
+                          <p className="text-secondary leading-snug mb-3" style={{ fontSize: 12.5 }}>
+                            This will clear your vault path and all app settings, returning Lyra to its first-launch state. Your song files will not be deleted.
+                          </p>
+                          <div className="flex items-center justify-end gap-2">
+                            <button
+                              onClick={() => setResetConfirming(false)}
+                              disabled={resetting}
+                              className="px-3 py-1.5 rounded-lg text-secondary hover:text-primary hover:bg-elev transition-colors border border-border-soft bg-transparent cursor-pointer disabled:opacity-40"
+                              style={{ fontSize: 12.5 }}
+                            >
+                              Cancel
+                            </button>
+                            <button
+                              onClick={handleReset}
+                              disabled={resetting}
+                              className="px-3 py-1.5 rounded-lg font-semibold border-none cursor-pointer transition-all hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed"
+                              style={{
+                                fontSize: 12.5,
+                                background: 'var(--color-danger)',
+                                color: 'oklch(0.96 0.01 60)',
+                              }}
+                            >
+                              {resetting ? 'Resetting…' : 'Reset everything'}
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
               </div>

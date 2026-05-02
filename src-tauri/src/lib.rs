@@ -114,6 +114,7 @@ pub fn run() {
             commands::vault::import_song,
             // debug
             commands::debug::nuke_vault,
+            commands::debug::reset_app,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
