@@ -17,7 +17,7 @@ export default function App() {
   const { loadSongs } = useVault()
   useAutosave()
 
-  const { toggleSidebar, openNewSongModal, openSnapshotModal } = useUIStore()
+  const { toggleSidebar, toggleHistoryBar, openNewSongModal, openSnapshotModal } = useUIStore()
   const { setSongs } = useSongStore()
 
   useKeyboardShortcuts({
@@ -40,6 +40,7 @@ export default function App() {
     },
     'new-song': () => openNewSongModal(),
     'toggle-sidebar': () => toggleSidebar(),
+    'toggle-history': () => toggleHistoryBar(),
     'close-song': () => {
       useEditorStore.getState().closeSong()
       useSongStore.getState().selectSong(null)

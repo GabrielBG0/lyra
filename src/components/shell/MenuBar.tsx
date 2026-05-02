@@ -8,7 +8,8 @@ import { useSnapshot } from "../../hooks/useSnapshot";
 import { useUIStore } from "../../stores/uiStore";
 import { tauriApi } from "../../lib/tauri";
 
-const isMac = navigator.platform.startsWith("Mac") || navigator.userAgent.includes("Mac");
+const isMac =
+  navigator.platform.startsWith("Mac") || navigator.userAgent.includes("Mac");
 const mod = isMac ? "⌘" : "Ctrl+";
 const shift = isMac ? "⇧" : "Shift+";
 
@@ -37,23 +38,20 @@ const MENUS = {
   ],
   Song: [
     `Save\t${mod}S`,
-    `Save Take…\t${shift}${mod}S`,
+    `Save Take\t${shift}${mod}S`,
     "—",
-    // TODO: Snapshot history timeline panel
-    `Show History\t${mod}H`,
     // TODO: Diff view between working copy and a snapshot
     `Diff with Take…\t${mod}D`,
   ],
   View: [
     `Toggle Sidebar\t${mod}\\`,
+    `Toggle History Bar\t${mod}H`,
+    "—",
     // TODO: Font size zoom
     `Zoom In\t${mod}+`,
     `Zoom Out\t${mod}-`,
   ],
-  Help: [
-    `Keyboard Shortcuts…\t${mod}?`,
-    "About Lyra",
-  ],
+  Help: [`Keyboard Shortcuts…\t${mod}?`, "About Lyra"],
 };
 
 // Labels that are wired to an actual implementation.
@@ -64,8 +62,9 @@ const IMPLEMENTED = new Set([
   "Export as PDF…",
   "Close Song",
   "Save",
-  "Save Take…",
+  "Save Take",
   "Toggle Sidebar",
+  "Toggle History Bar",
   "Keyboard Shortcuts…",
   "About Lyra",
 ]);
@@ -76,9 +75,17 @@ interface MenuBarProps {
   onShowShortcuts: () => void;
   onCloseSong: () => void;
   onShowAbout: () => void;
+  onToggleHistoryBar: () => void;
 }
 
-export default function MenuBar({ onToggleSidebar, onNewSong, onShowShortcuts, onCloseSong, onShowAbout }: MenuBarProps) {
+export default function MenuBar({
+  onToggleSidebar,
+  onNewSong,
+  onShowShortcuts,
+  onCloseSong,
+  onShowAbout,
+  onToggleHistoryBar,
+}: MenuBarProps) {
   const [open, setOpen] = useState<string | null>(null);
   const [maximized, setMaximized] = useState(false);
   const { metadata, isDirty, filePath } = useEditorStore();
@@ -91,7 +98,11 @@ export default function MenuBar({ onToggleSidebar, onNewSong, onShowShortcuts, o
   useEffect(() => {
     win.isMaximized().then(setMaximized);
     let unlisten: (() => void) | undefined;
-    win.onResized(() => win.isMaximized().then(setMaximized)).then((fn) => { unlisten = fn; });
+    win
+      .onResized(() => win.isMaximized().then(setMaximized))
+      .then((fn) => {
+        unlisten = fn;
+      });
     return () => unlisten?.();
   }, []);
 
@@ -134,8 +145,9 @@ export default function MenuBar({ onToggleSidebar, onNewSong, onShowShortcuts, o
     else if (label === "Export as PDF…") handleExportPdf();
     else if (label === "Close Song") onCloseSong();
     else if (label === "Toggle Sidebar") onToggleSidebar();
+    else if (label === "Toggle History Bar") onToggleHistoryBar();
     else if (label === "Save") saveSong();
-    else if (label === "Save Take…") {
+    else if (label === "Save Take") {
       openSnapshotModal((note) => createSnapshot(note));
     } else if (label === "Keyboard Shortcuts…") onShowShortcuts();
     else if (label === "About Lyra") onShowAbout();
@@ -224,43 +236,66 @@ export default function MenuBar({ onToggleSidebar, onNewSong, onShowShortcuts, o
       )}
 
       {/* Window controls — hidden on macOS (traffic lights handle this) */}
-      {!isMac && <div className="flex items-center ml-2">
-        <button
-          onClick={() => win.minimize()}
-          className="w-8 h-8 flex items-center justify-center text-muted hover:text-primary hover:bg-elev transition-colors"
-          title="Minimize"
-        >
-          <svg width="10" height="1" viewBox="0 0 10 1" fill="currentColor">
-            <rect width="10" height="1" />
-          </svg>
-        </button>
-        <button
-          onClick={() => win.toggleMaximize()}
-          className="w-8 h-8 flex items-center justify-center text-muted hover:text-primary hover:bg-elev transition-colors"
-          title={maximized ? "Restore" : "Maximize"}
-        >
-          {maximized ? (
-            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="1">
-              <rect x="2.5" y="0.5" width="7" height="7" />
-              <polyline points="0.5,2.5 0.5,9.5 7.5,9.5" />
+      {!isMac && (
+        <div className="flex items-center ml-2">
+          <button
+            onClick={() => win.minimize()}
+            className="w-8 h-8 flex items-center justify-center text-muted hover:text-primary hover:bg-elev transition-colors"
+            title="Minimize"
+          >
+            <svg width="10" height="1" viewBox="0 0 10 1" fill="currentColor">
+              <rect width="10" height="1" />
             </svg>
-          ) : (
-            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="1">
-              <rect x="0.5" y="0.5" width="9" height="9" />
+          </button>
+          <button
+            onClick={() => win.toggleMaximize()}
+            className="w-8 h-8 flex items-center justify-center text-muted hover:text-primary hover:bg-elev transition-colors"
+            title={maximized ? "Restore" : "Maximize"}
+          >
+            {maximized ? (
+              <svg
+                width="10"
+                height="10"
+                viewBox="0 0 10 10"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1"
+              >
+                <rect x="2.5" y="0.5" width="7" height="7" />
+                <polyline points="0.5,2.5 0.5,9.5 7.5,9.5" />
+              </svg>
+            ) : (
+              <svg
+                width="10"
+                height="10"
+                viewBox="0 0 10 10"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1"
+              >
+                <rect x="0.5" y="0.5" width="9" height="9" />
+              </svg>
+            )}
+          </button>
+          <button
+            onClick={() => win.close()}
+            className="w-8 h-8 flex items-center justify-center text-muted hover:text-white hover:bg-red-600 transition-colors"
+            title="Close"
+          >
+            <svg
+              width="10"
+              height="10"
+              viewBox="0 0 10 10"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.2"
+            >
+              <line x1="0" y1="0" x2="10" y2="10" />
+              <line x1="10" y1="0" x2="0" y2="10" />
             </svg>
-          )}
-        </button>
-        <button
-          onClick={() => win.close()}
-          className="w-8 h-8 flex items-center justify-center text-muted hover:text-white hover:bg-red-600 transition-colors"
-          title="Close"
-        >
-          <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="1.2">
-            <line x1="0" y1="0" x2="10" y2="10" />
-            <line x1="10" y1="0" x2="0" y2="10" />
-          </svg>
-        </button>
-      </div>}
+          </button>
+        </div>
+      )}
     </div>
   );
 }

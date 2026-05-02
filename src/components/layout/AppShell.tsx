@@ -37,6 +37,7 @@ export default function AppShell({ vaultPath }: AppShellProps) {
     aboutModalOpen,
     openAboutModal,
     closeAboutModal,
+    toggleHistoryBar,
   } = useUIStore();
   const [lyricFont] = useState<string>('"Noto Serif", "Noto Serif JP", "Noto Serif KR", Georgia, serif');
   const { createSong, deleteSong } = useSong();
@@ -59,6 +60,7 @@ export default function AppShell({ vaultPath }: AppShellProps) {
         onShowShortcuts={openShortcutsModal}
         onCloseSong={handleCloseSong}
         onShowAbout={openAboutModal}
+        onToggleHistoryBar={toggleHistoryBar}
       />
       <div className="flex flex-1 min-h-0">
         {/* Collapsed sidebar strip */}

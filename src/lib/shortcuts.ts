@@ -14,9 +14,8 @@ export const SHORTCUT_CATEGORIES: ShortcutCategory[] = [
   {
     title: 'File',
     shortcuts: [
-      { label: 'New Song',       action: 'new-song',       keys: ['mod', 'N'] },
-      { label: 'Toggle Sidebar', action: 'toggle-sidebar', keys: ['mod', '\\'] },
-      { label: 'Close Song',     action: 'close-song',     keys: ['mod', 'W'] },
+      { label: 'New Song',   action: 'new-song',   keys: ['mod', 'N'] },
+      { label: 'Close Song', action: 'close-song', keys: ['mod', 'W'] },
     ],
   },
   {
@@ -24,6 +23,13 @@ export const SHORTCUT_CATEGORIES: ShortcutCategory[] = [
     shortcuts: [
       { label: 'Save',         action: 'save',         keys: ['mod', 'S'] },
       { label: 'Save Take', action: 'save-version', keys: ['mod', 'shift', 'S'] },
+    ],
+  },
+  {
+    title: 'View',
+    shortcuts: [
+      { label: 'Toggle Sidebar',     action: 'toggle-sidebar',  keys: ['mod', '\\'] },
+      { label: 'Toggle History Bar', action: 'toggle-history',  keys: ['mod', 'H'] },
     ],
   },
 ]

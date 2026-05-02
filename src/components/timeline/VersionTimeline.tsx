@@ -10,7 +10,7 @@ const NUDGE_MIN_CHANGES = 10;
 const NUDGE_MIN_ELAPSED_MS = 5 * 60 * 1000;
 
 export default function VersionTimeline() {
-  const [expanded, setExpanded] = useState(false);
+  const { historyBarExpanded: expanded, toggleHistoryBar } = useUIStore();
   const [shiftSelectedId, setShiftSelectedId] = useState<string | null>(null);
   const { snapshotHeaders, previewSnapshotId, exitPreview, diffTargetB } = useEditorStore();
   const filePath = useEditorStore((s) => s.filePath);
@@ -113,7 +113,7 @@ export default function VersionTimeline() {
         <button
           className="flex items-center gap-1.5 bg-transparent border-none text-secondary font-medium font-ui cursor-pointer px-2 py-1 rounded-md hover:bg-elev hover:text-primary transition-colors"
           style={{ fontSize: 12 }}
-          onClick={() => setExpanded((e) => !e)}
+          onClick={toggleHistoryBar}
         >
           <Icons.History size={13} />
           <span>History</span>
