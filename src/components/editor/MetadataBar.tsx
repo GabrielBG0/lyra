@@ -5,9 +5,6 @@ import { useSnapshot } from "../../hooks/useSnapshot";
 import { useUIStore } from "../../stores/uiStore";
 import { Icons } from "../ui/Icon";
 
-const isMac =
-  navigator.platform.startsWith("Mac") || navigator.userAgent.includes("Mac");
-
 const STATUS_DOT: Record<SongStatus, string> = {
   idea: "bg-status-idea",
   draft: "bg-status-draft",
