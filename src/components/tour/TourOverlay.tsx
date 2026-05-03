@@ -14,6 +14,10 @@ export default function TourOverlay() {
     setTargetRect(null)
 
     const step = tourSteps[currentStep]
+    if (!step) {
+      dismiss()
+      return
+    }
 
     step.action?.()
 
@@ -64,6 +68,7 @@ export default function TourOverlay() {
   if (!active || !targetRect) return null
 
   const step = tourSteps[currentStep]
+  if (!step) return null
 
   return createPortal(
     <TooltipBubble step={step} targetRect={targetRect} />,

@@ -12,6 +12,8 @@ export default function TourNavigation() {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <button
           onClick={back}
+          tabIndex={isFirst ? -1 : 0}
+          aria-hidden={isFirst}
           style={{
             background: 'transparent',
             border: 'none',

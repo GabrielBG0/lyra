@@ -23,7 +23,7 @@ export default function TooltipBubble({ step, targetRect }: TooltipBubbleProps) 
   useEffect(() => {
     setPos(p => ({ ...p, opacity: 0 }))
 
-    requestAnimationFrame(() => {
+    const frameId = requestAnimationFrame(() => {
       if (!bubbleRef.current) return
       const bw = BUBBLE_WIDTH
       const bh = bubbleRef.current.offsetHeight
@@ -67,6 +67,8 @@ export default function TooltipBubble({ step, targetRect }: TooltipBubbleProps) 
 
       setPos({ top, left, opacity: 1 })
     })
+
+    return () => cancelAnimationFrame(frameId)
   }, [targetRect, step.id])
 
   return (
