@@ -160,30 +160,6 @@ export default function MetadataBar() {
             })
           }
         />
-        <MetaField
-          label="Capo"
-          value={(metadata.musical.capo ?? 0).toString()}
-          onCommit={(v) => {
-            const parsed = Number(v.trim());
-            updateMetadata({
-              musical: {
-                ...metadata.musical,
-                capo: Number.isNaN(parsed) ? null : parsed,
-              },
-            });
-          }}
-        />
-        <MetaField
-          label="Tuning"
-          value={metadata.musical.tuning ?? "Standard"}
-          width={92}
-          onCommit={(v) =>
-            updateMetadata({
-              musical: { ...metadata.musical, tuning: v || null },
-            })
-          }
-        />
-
         <div className="w-px h-5 bg-border-soft mx-0.5" />
 
         <ChipGroup
