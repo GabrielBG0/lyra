@@ -3,17 +3,38 @@ import { listen } from '@tauri-apps/api/event'
 import { getCurrentWindow } from '@tauri-apps/api/window'
 import { ask } from '@tauri-apps/plugin-dialog'
 import { tauriApi } from './lib/tauri'
+import type { SongIndexEntry } from './lib/types'
 import { useVault } from './hooks/useVault'
 import { useAutosave } from './hooks/useAutosave'
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts'
 import { useEditorStore } from './stores/editorStore'
 import { useSongStore } from './stores/songStore'
 import { useUIStore } from './stores/uiStore'
+import { useTourStore } from './stores/tourStore'
 import AppShell from './components/layout/AppShell'
 import VaultSetup from './components/vault/VaultSetup'
+import TourOverlay from './components/tour/TourOverlay'
+
+async function startTour(songs: SongIndexEntry[]) {
+  console.log('[Tour] startTour called, songs:', songs.length)
+  if (songs.length === 0) {
+    const payload = await tauriApi.song.create('Welcome to Lyra')
+    useEditorStore.getState().loadSong(payload)
+    useSongStore.getState().selectSong(payload.file_path)
+    const all = await tauriApi.vault.listSongs()
+    const entry = all.find(s => s.file_path === payload.file_path)
+    if (entry) useSongStore.getState().upsertSong(entry)
+  } else {
+    const payload = await tauriApi.song.open(songs[0].file_path)
+    useEditorStore.getState().loadSong(payload)
+    useSongStore.getState().selectSong(songs[0].file_path)
+  }
+  useTourStore.getState().start()
+}
 
 export default function App() {
   const [vaultPath, setVaultPath] = useState<string | null | undefined>(undefined)
+  const [pendingTour, setPendingTour] = useState(false)
   const { loadSongs } = useVault()
   useAutosave()
 
@@ -49,12 +70,29 @@ export default function App() {
   })
 
   useEffect(() => {
-    tauriApi.config.get().then(cfg => {
-      setVaultPath(cfg.vault_path)
-      setNudgeDismissed(cfg.nudge_dismissed)
-      if (cfg.vault_path) loadSongs()
-    }).catch(() => setVaultPath(null))
+    async function init() {
+      try {
+        const cfg = await tauriApi.config.get()
+        console.log('[Tour] init: tutorial_completed=', cfg.tutorial_completed, 'vault_path=', cfg.vault_path)
+        setVaultPath(cfg.vault_path ?? null)
+        setNudgeDismissed(cfg.nudge_dismissed)
+        if (cfg.vault_path) {
+          await loadSongs()
+          if (!cfg.tutorial_completed) setPendingTour(true)
+        }
+      } catch {
+        setVaultPath(null)
+      }
+    }
+    init()
   }, [])
+
+  useEffect(() => {
+    console.log('[Tour] pendingTour effect: vaultPath=', vaultPath, 'pendingTour=', pendingTour)
+    if (!vaultPath || !pendingTour) return
+    setPendingTour(false)
+    startTour(useSongStore.getState().songs).catch(err => console.error('[Tour] startTour failed:', err))
+  }, [vaultPath, pendingTour])
 
   useEffect(() => {
     const unlisteners = [
@@ -128,8 +166,9 @@ export default function App() {
           try {
             const current = await tauriApi.config.get()
             await tauriApi.config.set({ ...current, vault_path: path, last_opened_song: null })
+            await loadSongs()
             setVaultPath(path)
-            loadSongs()
+            if (!current.tutorial_completed) setPendingTour(true)
           } catch (err) {
             console.error('Failed to save config:', err)
           }
@@ -138,5 +177,10 @@ export default function App() {
     )
   }
 
-  return <AppShell vaultPath={vaultPath} />
+  return (
+    <>
+      <AppShell vaultPath={vaultPath} />
+      <TourOverlay />
+    </>
+  )
 }

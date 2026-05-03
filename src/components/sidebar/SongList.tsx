@@ -72,7 +72,7 @@ export default function SongList({ vaultPath, onCreateSong }: SongListProps) {
   };
 
   return (
-    <aside className="w-65 shrink-0 bg-panel border-r border-border-soft flex flex-col h-full">
+    <aside data-tour="sidebar" className="w-65 shrink-0 bg-panel border-r border-border-soft flex flex-col h-full">
       {/* Header */}
       <div className="flex flex-col px-3.5 pt-3.5 pb-2.5 pr-11">
         <div className="font-semibold text-primary text-[13px] tracking-wide leading-tight mb-1">
@@ -113,6 +113,7 @@ export default function SongList({ vaultPath, onCreateSong }: SongListProps) {
             )}
           </div>
           <button
+            data-tour="new-song-button"
             className="flex items-center gap-1 px-2 py-1.5 bg-transparent border border-border-soft rounded text-secondary hover:bg-elev transition-colors font-ui text-[12px] cursor-pointer"
             title="New song (⌘N)"
             onClick={onCreateSong}

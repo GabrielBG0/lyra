@@ -100,7 +100,7 @@ export default function SectionEditor({ lyricFont, readOnly, previewSections }: 
 
   if (sections.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center flex-1 gap-4">
+      <div data-tour="section-editor" className="flex flex-col items-center justify-center flex-1 gap-4">
         <LyraLogo size={48} dim />
         <p className="text-muted text-sm">This song has no sections yet.</p>
         <AddSection onAdd={(type, name) => handleAdd(type, name)} />
@@ -111,7 +111,7 @@ export default function SectionEditor({ lyricFont, readOnly, previewSections }: 
   return (
     <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
       <SortableContext items={sections.map(s => s.id)} strategy={verticalListSortingStrategy}>
-        <div className="w-[85%] mx-auto px-14 py-3.5 pb-16">
+        <div data-tour="section-editor" className="w-[85%] mx-auto px-14 py-3.5 pb-16">
           {sections.map((section, i) => (
             <SectionBlock
               key={section.id}

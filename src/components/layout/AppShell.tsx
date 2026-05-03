@@ -60,7 +60,7 @@ export default function AppShell({ vaultPath }: AppShellProps) {
   const handleNewSong = () => openNewSongModal();
 
   return (
-    <div className="h-full flex flex-col bg-bg text-primary font-ui overflow-hidden">
+    <div data-tour="app-shell" className="h-full flex flex-col bg-bg text-primary font-ui overflow-hidden">
       <MenuBar
         onToggleSidebar={() => setSidebarCollapsed(!sidebarCollapsed)}
         onNewSong={handleNewSong}

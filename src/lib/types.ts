@@ -116,4 +116,5 @@ export interface AppConfig {
   last_opened_song: string | null
   debug_mode: boolean
   nudge_dismissed: boolean
+  tutorial_completed: boolean
 }

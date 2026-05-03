@@ -14,6 +14,8 @@ pub struct AppConfig {
     pub debug_mode: bool,
     #[serde(default)]
     pub nudge_dismissed: bool,
+    #[serde(default)]
+    pub tutorial_completed: bool,
 }
 
 fn config_path() -> AppResult<PathBuf> {

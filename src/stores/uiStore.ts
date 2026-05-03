@@ -6,6 +6,7 @@ interface UIStore {
   setSidebarCollapsed: (v: boolean) => void
   historyBarExpanded: boolean
   toggleHistoryBar: () => void
+  setHistoryBarExpanded: (v: boolean) => void
   nudgeDismissed: boolean
   setNudgeDismissed: (v: boolean) => void
   newSongModalOpen: boolean
@@ -38,6 +39,7 @@ export const useUIStore = create<UIStore>((set) => ({
   setSidebarCollapsed: (v) => set({ sidebarCollapsed: v }),
   historyBarExpanded: false,
   toggleHistoryBar: () => set((s) => ({ historyBarExpanded: !s.historyBarExpanded })),
+  setHistoryBarExpanded: (v) => set({ historyBarExpanded: v }),
   nudgeDismissed: false,
   setNudgeDismissed: (v) => set({ nudgeDismissed: v }),
   newSongModalOpen: false,

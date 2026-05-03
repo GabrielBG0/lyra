@@ -22,7 +22,7 @@ export default function EditorPanel({
 
   if (!metadata) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center gap-3.5 bg-bg">
+      <div data-tour="editor-panel" className="flex-1 flex flex-col items-center justify-center gap-3.5 bg-bg">
         <LyraLogo size={72} dim />
         <div className="text-base font-medium text-primary">
           No song selected
@@ -44,7 +44,7 @@ export default function EditorPanel({
   const previewSnapshot = previewSnapshotId ? loadedSnapshots[previewSnapshotId] : null;
 
   return (
-    <div className="flex-1 flex flex-col min-h-0 bg-bg">
+    <div data-tour="editor-panel" className="flex-1 flex flex-col min-h-0 bg-bg">
       <MetadataBar />
       {diffResult !== null && <DiffBanner />}
       {previewSnapshotId && !diffResult && (

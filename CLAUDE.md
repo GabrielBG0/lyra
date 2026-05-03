@@ -47,3 +47,7 @@ All entities (songs, sections, snapshots, comments) use **ULIDs** — sortable, 
 When writing text for the UI components, keep these principles in mind:
 - Never use "—" (em dash). Always prefer to use a comma or split into multiple sentences. 
 - Write in a more human way, when appropriate. For example, instead of "This is the song editor, where you can edit your songs", say "Here you can edit your songs".
+
+## Design Style Guidelines
+
+For design-related decisions, consult the style_guidelines.md file in the root of the repository. It contains detailed instructions on design principles, color usage, typography, and more. Always refer to it when making design choices or implementing UI components.

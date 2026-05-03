@@ -63,6 +63,7 @@ pub async fn reset_app(state: tauri::State<'_, AppState>) -> AppResult<()> {
         config.vault_path = None;
         config.last_opened_song = None;
         config.debug_mode = false;
+        config.tutorial_completed = false;
         config.clone()
     };
     save_config(&updated).await?;

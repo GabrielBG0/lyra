@@ -10,6 +10,7 @@ export default function SongSearch({ value, onChange }: SongSearchProps) {
     <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-bg border border-border-soft rounded-lg text-muted focus-within:border-accent focus-within:text-primary transition-colors">
       <Icons.Search size={13} />
       <input
+        data-tour="song-search"
         className="flex-1 bg-transparent border-none outline-none text-primary font-ui min-w-0"
         style={{ fontSize: 12.5 }}
         placeholder="Search songs…"

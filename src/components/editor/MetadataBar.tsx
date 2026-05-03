@@ -58,6 +58,7 @@ export default function MetadataBar() {
 
   return (
     <div
+      data-tour="metadata-bar"
       className="px-7 pt-5 pb-4 border-b border-border-soft shrink-0"
       style={{
         background:
@@ -130,6 +131,7 @@ export default function MetadataBar() {
         {/* Actions */}
         <div className="flex items-center gap-1.5">
           <button
+            data-tour="snapshot-button"
             className={`h-7.5 flex flex-row-reverse items-center rounded cursor-pointer border-none bg-transparent group/pin transition-colors ${snapshotHeaders.length === 0 ? "text-accent hover:bg-elev hover:brightness-110" : "text-secondary hover:bg-elev hover:text-primary"}`}
             onClick={handleSnapshot}
           >

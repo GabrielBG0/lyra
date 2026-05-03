@@ -103,6 +103,7 @@ export default function VersionTimeline() {
 
   return (
     <div
+      data-tour="version-timeline"
       className="border-t border-border-soft bg-panel shrink-0 transition-all"
       style={{ height: expanded ? 160 : 42 }}
     >
