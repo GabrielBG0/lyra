@@ -8,6 +8,7 @@ import EditorErrorBoundary from "./EditorErrorBoundary";
 import DiffBanner from "../diff/DiffBanner";
 import DiffSection from "../diff/DiffSection";
 import SnapshotPreviewBanner from "../timeline/SnapshotPreviewBanner";
+import FindPanel from "../editor/FindPanel";
 
 interface EditorPanelProps {
   lyricFont: string;
@@ -46,28 +47,31 @@ export default function EditorPanel({
   return (
     <div data-tour="editor-panel" className="flex-1 flex flex-col min-h-0 bg-bg">
       <MetadataBar />
-      {diffResult !== null && <DiffBanner />}
-      {previewSnapshotId && !diffResult && (
-        <SnapshotPreviewBanner snapshotId={previewSnapshotId} />
-      )}
-      <EditorErrorBoundary>
-        <div className="flex-1 overflow-y-auto">
-          {diffResult !== null ? (
-            <div className="w-[85%] mx-auto px-14 py-3.5 pb-16">
-              {diffResult.map((d) => (
-                <DiffSection key={d.section_id} diff={d} />
-              ))}
-            </div>
-          ) : (
-            <SectionEditor
-              lyricFont={lyricFont}
-              readOnly={previewSnapshotId !== null}
-              previewSections={previewSnapshot?.sections ?? null}
-            />
-          )}
-        </div>
-      </EditorErrorBoundary>
-      <VersionTimeline />
+      <div className="flex-1 flex flex-col min-h-0 relative">
+        <FindPanel />
+        {diffResult !== null && <DiffBanner />}
+        {previewSnapshotId && !diffResult && (
+          <SnapshotPreviewBanner snapshotId={previewSnapshotId} />
+        )}
+        <EditorErrorBoundary>
+          <div className="flex-1 overflow-y-auto">
+            {diffResult !== null ? (
+              <div className="w-[85%] mx-auto px-14 py-3.5 pb-16">
+                {diffResult.map((d) => (
+                  <DiffSection key={d.section_id} diff={d} />
+                ))}
+              </div>
+            ) : (
+              <SectionEditor
+                lyricFont={lyricFont}
+                readOnly={previewSnapshotId !== null}
+                previewSections={previewSnapshot?.sections ?? null}
+              />
+            )}
+          </div>
+        </EditorErrorBoundary>
+        <VersionTimeline />
+      </div>
     </div>
   );
 }

@@ -31,6 +31,11 @@ interface UIStore {
   preferencesModalOpen: boolean
   openPreferencesModal: () => void
   closePreferencesModal: () => void
+  findPanelOpen: boolean
+  findReplaceMode: boolean
+  openFindPanel: (withReplace?: boolean) => void
+  closeFindPanel: () => void
+  toggleFindReplace: () => void
 }
 
 export const useUIStore = create<UIStore>((set) => ({
@@ -64,4 +69,9 @@ export const useUIStore = create<UIStore>((set) => ({
   preferencesModalOpen: false,
   openPreferencesModal: () => set({ preferencesModalOpen: true }),
   closePreferencesModal: () => set({ preferencesModalOpen: false }),
+  findPanelOpen: false,
+  findReplaceMode: false,
+  openFindPanel: (withReplace = false) => set({ findPanelOpen: true, findReplaceMode: withReplace }),
+  closeFindPanel: () => set({ findPanelOpen: false, findReplaceMode: false }),
+  toggleFindReplace: () => set((s) => ({ findReplaceMode: !s.findReplaceMode, findPanelOpen: true })),
 }))

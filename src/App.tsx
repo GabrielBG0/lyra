@@ -38,7 +38,7 @@ export default function App() {
   const { loadSongs } = useVault()
   useAutosave()
 
-  const { toggleSidebar, toggleHistoryBar, openNewSongModal, openSnapshotModal, openPreferencesModal, setNudgeDismissed } = useUIStore()
+  const { toggleSidebar, toggleHistoryBar, openNewSongModal, openSnapshotModal, openPreferencesModal, setNudgeDismissed, openFindPanel, toggleFindReplace } = useUIStore()
   const { setSongs } = useSongStore()
 
   useKeyboardShortcuts({
@@ -67,6 +67,22 @@ export default function App() {
       useSongStore.getState().selectSong(null)
     },
     'preferences': () => openPreferencesModal(),
+    'find': () => {
+      const { filePath } = useEditorStore.getState()
+      if (!filePath) return
+      if (useUIStore.getState().findPanelOpen) {
+        window.dispatchEvent(new Event('find-panel:focus-input'))
+      } else {
+        openFindPanel()
+      }
+    },
+    'find-next': () => {
+      if (useUIStore.getState().findPanelOpen) useEditorStore.getState().findNext()
+    },
+    'find-prev': () => {
+      if (useUIStore.getState().findPanelOpen) useEditorStore.getState().findPrev()
+    },
+    'toggle-find-replace': () => toggleFindReplace(),
   })
 
   useEffect(() => {

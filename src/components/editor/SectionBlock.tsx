@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from 'react'
-import type { Section, SectionType } from '../../lib/types'
+import { useEffect, useRef, useState, type MutableRefObject } from 'react'
+import type { ReactNode } from 'react'
+import type { FindMatch, Section, SectionType } from '../../lib/types'
 import { useEditorStore } from '../../stores/editorStore'
 import SectionHeader from './SectionHeader'
 import CommentPanel from '../comments/CommentPanel'
@@ -17,10 +18,50 @@ interface SectionBlockProps {
   readOnly?: boolean
 }
 
+function renderHighlightedContent(content: string, matches: FindMatch[], activeMatch: FindMatch | undefined) {
+  const nodes: ReactNode[] = []
+  let pos = 0
+  for (const match of matches) {
+    if (match.start > pos) {
+      nodes.push(content.slice(pos, match.start))
+    }
+    const isActive = match === activeMatch
+    nodes.push(
+      <mark
+        key={`${match.sectionId}-${match.matchIndex}`}
+        style={{
+          background: isActive ? 'oklch(0.72 0.10 55 / 0.55)' : 'oklch(0.72 0.10 55 / 0.25)',
+          color: 'transparent',
+          borderRadius: 2,
+          outline: isActive ? '1px solid oklch(0.72 0.10 55 / 0.8)' : undefined,
+        }}
+      >
+        {content.slice(match.start, match.end)}
+      </mark>
+    )
+    pos = match.end
+  }
+  if (pos < content.length) {
+    nodes.push(content.slice(pos))
+  }
+  return nodes
+}
+
 export default function SectionBlock({ section, isFirst, lyricFont, commentCount, onInsertBefore, onDelete, readOnly }: SectionBlockProps) {
-  const { updateSection, setFocusedSection } = useEditorStore()
+  const { updateSection, setFocusedSection, findMatches, findActiveIndex } = useEditorStore()
   const [commentsOpen, setCommentsOpen] = useState(false)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const rootRef = useRef<HTMLDivElement>(null)
+
+  const sectionMatches = findMatches.filter(m => m.sectionId === section.id)
+  const activeMatch = findMatches[findActiveIndex]
+  const activeMatchForSection = activeMatch?.sectionId === section.id ? activeMatch : undefined
+
+  useEffect(() => {
+    if (activeMatchForSection) {
+      rootRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+    }
+  }, [findActiveIndex])
 
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: section.id,
@@ -43,7 +84,7 @@ export default function SectionBlock({ section, isFirst, lyricFont, commentCount
   useEffect(resize, [section.content])
 
   return (
-    <div ref={setNodeRef} style={style} className="group relative" onFocus={() => setFocusedSection(section.id)}>
+    <div ref={(el) => { setNodeRef(el); (rootRef as MutableRefObject<HTMLDivElement | null>).current = el }} style={style} className="group relative" onFocus={() => setFocusedSection(section.id)}>
       {/* Divider with insert affordance */}
       {!isFirst && !readOnly && (
         <div className="group/divider relative h-7 flex items-center cursor-default">
@@ -74,21 +115,46 @@ export default function SectionBlock({ section, isFirst, lyricFont, commentCount
 
       {/* Lyric textarea */}
       <div className="pb-2">
-        <textarea
-          ref={textareaRef}
-          className="lyric-textarea"
-          style={{ fontFamily: lyricFont }}
-          value={section.content}
-          onChange={e => {
-            if (readOnly) return
-            updateSection(section.id, e.target.value)
-            resize()
-          }}
-          onInput={resize}
-          spellCheck={false}
-          placeholder={readOnly ? '' : `Write ${section.name.toLowerCase()}…`}
-          disabled={readOnly}
-        />
+        <div className="relative">
+          {sectionMatches.length > 0 && (
+            <div
+              aria-hidden="true"
+              style={{
+                position: 'absolute',
+                inset: 0,
+                pointerEvents: 'none',
+                overflow: 'hidden',
+                fontFamily: lyricFont,
+                fontSize: '16px',
+                lineHeight: '1.85',
+                letterSpacing: '0.002em',
+                fontVariantLigatures: 'common-ligatures',
+                padding: 0,
+                whiteSpace: 'pre-wrap',
+                wordBreak: 'break-word',
+                color: 'transparent',
+                zIndex: 0,
+              }}
+            >
+              {renderHighlightedContent(section.content, sectionMatches, activeMatchForSection)}
+            </div>
+          )}
+          <textarea
+            ref={textareaRef}
+            className="lyric-textarea"
+            style={{ fontFamily: lyricFont, position: 'relative', zIndex: 1 }}
+            value={section.content}
+            onChange={e => {
+              if (readOnly) return
+              updateSection(section.id, e.target.value)
+              resize()
+            }}
+            onInput={resize}
+            spellCheck={false}
+            placeholder={readOnly ? '' : `Write ${section.name.toLowerCase()}…`}
+            disabled={readOnly}
+          />
+        </div>
       </div>
 
       {/* Comments panel */}

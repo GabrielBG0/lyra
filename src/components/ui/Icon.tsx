@@ -19,6 +19,9 @@ import {
   Trash2,
   Undo2,
   Redo2,
+  CaseSensitive,
+  Replace,
+  WholeWord,
 } from 'lucide-react'
 
 export const Icons = {
@@ -42,4 +45,7 @@ export const Icons = {
   Trash: Trash2,
   Undo: Undo2,
   Redo: Redo2,
+  CaseSensitive,
+  Replace,
+  WholeWord,
 }

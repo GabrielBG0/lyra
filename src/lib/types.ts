@@ -118,3 +118,11 @@ export interface AppConfig {
   nudge_dismissed: boolean
   tutorial_completed: boolean
 }
+
+export interface FindMatch {
+  sectionId: string
+  sectionIndex: number
+  matchIndex: number
+  start: number
+  end: number
+}

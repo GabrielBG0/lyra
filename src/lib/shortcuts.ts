@@ -3,6 +3,7 @@ export interface ShortcutDef {
   action: string
   // Use 'mod' for Ctrl/⌘, 'shift' for Shift. All other tokens are literal keys.
   keys: string[]
+  bypassInputFilter?: boolean
 }
 
 export interface ShortcutCategory {
@@ -30,6 +31,15 @@ export const SHORTCUT_CATEGORIES: ShortcutCategory[] = [
     shortcuts: [
       { label: 'Toggle Sidebar',     action: 'toggle-sidebar',  keys: ['mod', 'B'] },
       { label: 'Toggle History Bar', action: 'toggle-history',  keys: ['mod', 'H'] },
+    ],
+  },
+  {
+    title: 'Find',
+    shortcuts: [
+      { label: 'Find',              action: 'find',               keys: ['mod', 'F'],           bypassInputFilter: true },
+      { label: 'Find Next',         action: 'find-next',          keys: ['mod', 'G'],           bypassInputFilter: true },
+      { label: 'Find Previous',     action: 'find-prev',          keys: ['mod', 'shift', 'G'], bypassInputFilter: true },
+      { label: 'Show Replace',      action: 'toggle-find-replace', keys: ['mod', 'shift', 'H'], bypassInputFilter: true },
     ],
   },
   {

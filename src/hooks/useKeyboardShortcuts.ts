@@ -9,10 +9,11 @@ export function useKeyboardShortcuts(handlers: Handlers) {
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return
+      const isInput = e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement
 
       for (const category of SHORTCUT_CATEGORIES) {
         for (const shortcut of category.shortcuts) {
+          if (isInput && !shortcut.bypassInputFilter) continue
           if (matchesShortcut(shortcut, e)) {
             e.preventDefault()
             handlersRef.current[shortcut.action]?.()

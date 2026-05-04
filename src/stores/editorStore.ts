@@ -3,6 +3,7 @@
 
 import { create } from 'zustand'
 import type {
+  FindMatch,
   Section,
   SectionDiff,
   Snapshot,
@@ -11,6 +12,8 @@ import type {
   SongPayload,
 } from '../lib/types'
 import type { EditorCommand } from '../lib/commands'
+import { computeMatches } from '../lib/findMatches'
+import { useUIStore } from './uiStore'
 
 // Internal type for updateSection commands — enables command merging during typing
 interface UpdateSectionCommand extends EditorCommand {
@@ -37,6 +40,11 @@ interface EditorStore {
   past: EditorCommand[]
   future: EditorCommand[]
   focusedSectionId: string | null
+  findQuery: string
+  findCaseSensitive: boolean
+  findWholeWord: boolean
+  findMatches: FindMatch[]
+  findActiveIndex: number
 
   // Actions
   loadSong: (payload: SongPayload) => void
@@ -57,6 +65,14 @@ interface EditorStore {
   undo: () => void
   redo: () => void
   setFocusedSection: (id: string | null) => void
+  setFindQuery: (query: string, caseSensitive: boolean) => void
+  setFindCaseSensitive: (v: boolean) => void
+  setFindWholeWord: (v: boolean) => void
+  findNext: () => void
+  findPrev: () => void
+  clearFind: () => void
+  replaceCurrent: (replaceWith: string) => void
+  replaceAll: (replaceWith: string) => void
 }
 
 export const useEditorStore = create<EditorStore>((set, get) => ({
@@ -73,8 +89,14 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   past: [],
   future: [],
   focusedSectionId: null,
+  findQuery: '',
+  findCaseSensitive: false,
+  findWholeWord: false,
+  findMatches: [],
+  findActiveIndex: 0,
 
-  loadSong: (payload) =>
+  loadSong: (payload) => {
+    useUIStore.getState().closeFindPanel()
     set({
       filePath: payload.file_path,
       metadata: payload.metadata,
@@ -88,7 +110,13 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
       previewSnapshotId: null,
       past: [],
       future: [],
-    }),
+      findQuery: '',
+      findCaseSensitive: false,
+      findWholeWord: false,
+      findMatches: [],
+      findActiveIndex: 0,
+    })
+  },
 
   closeSong: () =>
     set({
@@ -139,6 +167,13 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
     const section = state.sections.find(s => s.id === id)
     if (!section) return
 
+    const recomputeFind = () => {
+      const { findQuery, findCaseSensitive, findWholeWord, sections } = get()
+      if (findQuery) {
+        set({ findMatches: computeMatches(findQuery, findCaseSensitive, sections, findWholeWord) })
+      }
+    }
+
     // Merge with the top command if it's for the same section within 2 seconds
     const top = state.past.length > 0 ? state.past[state.past.length - 1] : null
     if (
@@ -155,6 +190,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
         sections: s.sections.map(sec => sec.id === id ? { ...sec, content } : sec),
         isDirty: true,
       }))
+      recomputeFind()
       return
     }
 
@@ -171,12 +207,14 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
           sections: s.sections.map(sec => sec.id === id ? { ...sec, content: cmd._after } : sec),
           isDirty: true,
         }))
+        recomputeFind()
       },
       undo() {
         set((s) => ({
           sections: s.sections.map(sec => sec.id === id ? { ...sec, content: cmd._before } : sec),
           isDirty: true,
         }))
+        recomputeFind()
       },
     }
 
@@ -228,6 +266,10 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   addSection: (section, insertAt) => {
     const state = get()
     const insertIdx = insertAt !== undefined ? insertAt : state.sections.length
+    const recomputeFind = () => {
+      const { findQuery, findCaseSensitive, findWholeWord, sections } = get()
+      if (findQuery) set({ findMatches: computeMatches(findQuery, findCaseSensitive, sections, findWholeWord) })
+    }
     const cmd: EditorCommand = {
       description: `Add ${section.name}`,
       apply() {
@@ -236,12 +278,14 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
           arr.splice(insertIdx, 0, section)
           return { sections: arr, isDirty: true, focusedSectionId: section.id }
         })
+        recomputeFind()
       },
       undo() {
         set((s) => ({
           sections: s.sections.filter(sec => sec.id !== section.id),
           isDirty: true,
         }))
+        recomputeFind()
       },
     }
     get().execute(cmd)
@@ -252,6 +296,10 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
     const originalIndex = state.sections.findIndex(s => s.id === id)
     if (originalIndex === -1) return
     const sectionToRemove = state.sections[originalIndex]
+    const recomputeFind = () => {
+      const { findQuery, findCaseSensitive, findWholeWord, sections } = get()
+      if (findQuery) set({ findMatches: computeMatches(findQuery, findCaseSensitive, sections, findWholeWord) })
+    }
 
     const cmd: EditorCommand = {
       description: `Delete ${sectionToRemove.name}`,
@@ -261,6 +309,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
           isDirty: true,
           focusedSectionId: s.focusedSectionId === id ? null : s.focusedSectionId,
         }))
+        recomputeFind()
       },
       undo() {
         set((s) => {
@@ -268,6 +317,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
           arr.splice(originalIndex, 0, sectionToRemove)
           return { sections: arr, isDirty: true }
         })
+        recomputeFind()
       },
     }
     get().execute(cmd)
@@ -293,4 +343,105 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
 
   enterPreview: (snapshotId) => set({ previewSnapshotId: snapshotId }),
   exitPreview: () => set({ previewSnapshotId: null }),
+
+  setFindQuery: (query, caseSensitive) => {
+    const { sections, findWholeWord } = get()
+    const matches = computeMatches(query, caseSensitive, sections, findWholeWord)
+    set({ findQuery: query, findCaseSensitive: caseSensitive, findMatches: matches, findActiveIndex: 0 })
+  },
+
+  setFindCaseSensitive: (v) => {
+    const { findQuery, findWholeWord, sections } = get()
+    const matches = computeMatches(findQuery, v, sections, findWholeWord)
+    set({ findCaseSensitive: v, findMatches: matches, findActiveIndex: 0 })
+  },
+
+  setFindWholeWord: (v) => {
+    const { findQuery, findCaseSensitive, sections } = get()
+    const matches = computeMatches(findQuery, findCaseSensitive, sections, v)
+    set({ findWholeWord: v, findMatches: matches, findActiveIndex: 0 })
+  },
+
+  findNext: () => {
+    const { findMatches, findActiveIndex } = get()
+    if (findMatches.length === 0) return
+    set({ findActiveIndex: (findActiveIndex + 1) % findMatches.length })
+  },
+
+  findPrev: () => {
+    const { findMatches, findActiveIndex } = get()
+    if (findMatches.length === 0) return
+    set({ findActiveIndex: (findActiveIndex - 1 + findMatches.length) % findMatches.length })
+  },
+
+  clearFind: () => set({ findQuery: '', findMatches: [], findActiveIndex: 0 }),
+
+  replaceCurrent: (replaceWith) => {
+    const { findMatches, findActiveIndex, findQuery, findCaseSensitive, findWholeWord, sections } = get()
+    if (findMatches.length === 0) return
+    const match = findMatches[findActiveIndex]
+    const section = sections.find(s => s.id === match.sectionId)
+    if (!section) return
+
+    const newContent = section.content.slice(0, match.start) + replaceWith + section.content.slice(match.end)
+    const oldIndex = findActiveIndex
+    const cmd: EditorCommand = {
+      description: 'Replace',
+      apply() {
+        set((s) => ({
+          sections: s.sections.map(sec => sec.id === match.sectionId ? { ...sec, content: newContent } : sec),
+          isDirty: true,
+        }))
+      },
+      undo() {
+        set((s) => ({
+          sections: s.sections.map(sec => sec.id === match.sectionId ? { ...sec, content: section.content } : sec),
+          isDirty: true,
+        }))
+      },
+    }
+    get().execute(cmd)
+    const newMatches = computeMatches(findQuery, findCaseSensitive, get().sections, findWholeWord)
+    const len = newMatches.length
+    set({ findMatches: newMatches, findActiveIndex: len > 0 ? Math.min(oldIndex, len - 1) : 0 })
+  },
+
+  replaceAll: (replaceWith) => {
+    const { findMatches, findQuery, findCaseSensitive, findWholeWord, sections } = get()
+    if (findMatches.length === 0) return
+
+    const sectionIds = [...new Set(findMatches.map(m => m.sectionId))]
+    const beforeMap = new Map(sections.map(s => [s.id, s.content]))
+    const afterMap = new Map<string, string>()
+
+    for (const sid of sectionIds) {
+      const sectionMatches = findMatches.filter(m => m.sectionId === sid)
+      const originalContent = beforeMap.get(sid)!
+      let content = originalContent
+      for (let i = sectionMatches.length - 1; i >= 0; i--) {
+        const m = sectionMatches[i]
+        content = content.slice(0, m.start) + replaceWith + content.slice(m.end)
+      }
+      afterMap.set(sid, content)
+    }
+
+    const cmd: EditorCommand = {
+      description: 'Replace All',
+      apply() {
+        set((s) => ({
+          sections: s.sections.map(sec => afterMap.has(sec.id) ? { ...sec, content: afterMap.get(sec.id)! } : sec),
+          isDirty: true,
+        }))
+      },
+      undo() {
+        set((s) => ({
+          sections: s.sections.map(sec => beforeMap.has(sec.id) ? { ...sec, content: beforeMap.get(sec.id)! } : sec),
+          isDirty: true,
+        }))
+      },
+    }
+    get().execute(cmd)
+    const newMatches = computeMatches(findQuery, findCaseSensitive, get().sections, findWholeWord)
+    set({ findMatches: newMatches, findActiveIndex: 0 })
+  },
 }))

@@ -87,6 +87,10 @@
   --color-diff-remove: #310c10;
   --color-diff-remove-text: #e68478;
 
+  /* ── Find highlights */
+  --color-find-match: oklch(0.72 0.10 55 / 0.25);
+  --color-find-match-active: oklch(0.72 0.10 55 / 0.55);
+
   /* ── Typography */
   --font-ui: "Satoshi", -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
   --font-lyrics: "Noto Serif", "Noto Serif JP", "Noto Serif KR", Georgia, "Times New Roman", serif;

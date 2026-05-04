@@ -16,50 +16,6 @@ const isMac =
 const mod = isMac ? "⌘" : "Ctrl+";
 const shift = isMac ? "⇧" : "Shift+";
 
-const MENUS = {
-  Lyra: [
-    `Preferences…\t${mod},`,
-    "—",
-    "Vault Options…",
-  ],
-  File: [
-    `New Song\t${mod}N`,
-    `Open Vault…\t${mod}O`,
-    "—",
-    "Export as Plain Text…",
-    `Export as PDF…\t${mod}P`,
-    "—",
-    `Close Song\t${mod}W`,
-  ],
-  Edit: [
-    `Undo\t${mod}Z`,
-    `Redo\t${mod}${shift}Z`,
-    "—",
-    `Cut\t${mod}X`,
-    `Copy\t${mod}C`,
-    `Paste\t${mod}V`,
-    "—",
-    // TODO: In-editor find/replace
-    `Find…\t${mod}F`,
-  ],
-  Song: [
-    `Save\t${mod}S`,
-    `Save Take\t${mod}${shift}S`,
-    "—",
-    // TODO: Diff view between working copy and a snapshot
-    `Diff with Take…\t${mod}D`,
-  ],
-  View: [
-    `Toggle Sidebar\t${mod}B`,
-    `Toggle History Bar\t${mod}H`,
-    "—",
-    // TODO: Font size zoom
-    `Zoom In\t${mod}+`,
-    `Zoom Out\t${mod}-`,
-  ],
-  Help: [`Keyboard Shortcuts…\t${mod}?`, "About Lyra"],
-};
-
 // Labels that are wired to an actual implementation.
 const IMPLEMENTED = new Set([
   "New Song",
@@ -80,6 +36,11 @@ const IMPLEMENTED = new Set([
   "Toggle History Bar",
   "Keyboard Shortcuts…",
   "About Lyra",
+  "Find…",
+  "Find Next",
+  "Find Previous",
+  "Show Replace",
+  "Hide Replace",
 ]);
 
 interface MenuBarProps {
@@ -103,12 +64,59 @@ export default function MenuBar({
 }: MenuBarProps) {
   const [open, setOpen] = useState<string | null>(null);
   const [maximized, setMaximized] = useState(false);
-  const { metadata, isDirty, filePath, past, future, undo, redo, focusedSectionId, sections, addSection, removeSection } = useEditorStore();
+  const { metadata, isDirty, filePath, past, future, undo, redo, focusedSectionId, sections, addSection, removeSection, findMatches, findNext, findPrev } = useEditorStore();
   const { saveSong } = useSong();
   const { createSnapshot } = useSnapshot();
-  const { openSnapshotModal, openPreferencesModal } = useUIStore();
+  const { openSnapshotModal, openPreferencesModal, openFindPanel, toggleFindReplace, findPanelOpen, findReplaceMode } = useUIStore();
   const menuRef = useRef<HTMLDivElement>(null);
   const win = getCurrentWindow();
+
+  const MENUS = {
+    Lyra: [
+      `Preferences…\t${mod},`,
+      "—",
+      "Vault Options…",
+    ],
+    File: [
+      `New Song\t${mod}N`,
+      `Open Vault…\t${mod}O`,
+      "—",
+      "Export as Plain Text…",
+      `Export as PDF…\t${mod}P`,
+      "—",
+      `Close Song\t${mod}W`,
+    ],
+    Edit: [
+      `Undo\t${mod}Z`,
+      `Redo\t${mod}${shift}Z`,
+      "—",
+      `Cut\t${mod}X`,
+      `Copy\t${mod}C`,
+      `Paste\t${mod}V`,
+      "—",
+      `Find…\t${mod}F`,
+      `Find Next\t${mod}G`,
+      `Find Previous\t${mod}${shift}G`,
+      "—",
+      `${findReplaceMode ? "Hide Replace" : "Show Replace"}\t${mod}${shift}H`,
+    ],
+    Song: [
+      `Save\t${mod}S`,
+      `Save Take\t${mod}${shift}S`,
+      "—",
+      // TODO: Diff view between working copy and a snapshot
+      `Diff with Take…\t${mod}D`,
+    ],
+    View: [
+      `Toggle Sidebar\t${mod}B`,
+      `Toggle History Bar\t${mod}H`,
+      "—",
+      // TODO: Font size zoom
+      `Zoom In\t${mod}+`,
+      `Zoom Out\t${mod}-`,
+    ],
+    Help: [`Keyboard Shortcuts…\t${mod}?`, "About Lyra"],
+  };
 
   useEffect(() => {
     win.isMaximized().then(setMaximized);
@@ -188,6 +196,8 @@ export default function MenuBar({
     if (label === "Redo") return future.length > 0;
     if (label === "Cut" || label === "Copy") return !!focusedSectionId && !!metadata;
     if (label === "Paste") return !!metadata;
+    if (label === "Find…" || label === "Show Replace" || label === "Hide Replace") return !!filePath;
+    if (label === "Find Next" || label === "Find Previous") return findPanelOpen && findMatches.length > 0;
     return IMPLEMENTED.has(label);
   };
 
@@ -226,6 +236,10 @@ export default function MenuBar({
     else if (label === "Cut") handleCut();
     else if (label === "Copy") handleCopy();
     else if (label === "Paste") handlePaste();
+    else if (label === "Find…") openFindPanel();
+    else if (label === "Find Next") findNext();
+    else if (label === "Find Previous") findPrev();
+    else if (label === "Show Replace" || label === "Hide Replace") toggleFindReplace();
     else if (label === "Toggle Sidebar") onToggleSidebar();
     else if (label === "Toggle History Bar") onToggleHistoryBar();
     else if (label === "Save") saveSong();
