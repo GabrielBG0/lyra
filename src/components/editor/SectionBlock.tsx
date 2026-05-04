@@ -18,7 +18,7 @@ interface SectionBlockProps {
 }
 
 export default function SectionBlock({ section, isFirst, lyricFont, commentCount, onInsertBefore, onDelete, readOnly }: SectionBlockProps) {
-  const { updateSection } = useEditorStore()
+  const { updateSection, setFocusedSection } = useEditorStore()
   const [commentsOpen, setCommentsOpen] = useState(false)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
@@ -43,7 +43,7 @@ export default function SectionBlock({ section, isFirst, lyricFont, commentCount
   useEffect(resize, [section.content])
 
   return (
-    <div ref={setNodeRef} style={style} className="group relative">
+    <div ref={setNodeRef} style={style} className="group relative" onFocus={() => setFocusedSection(section.id)}>
       {/* Divider with insert affordance */}
       {!isFirst && !readOnly && (
         <div className="group/divider relative h-7 flex items-center cursor-default">

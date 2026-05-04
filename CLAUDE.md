@@ -42,6 +42,15 @@ All entities (songs, sections, snapshots, comments) use **ULIDs** — sortable, 
 - Window decorations are **disabled** (custom chrome via `MenuBar.tsx`)
 - App identifier: `dev.gabrielbg.lyra`
 
+## Keyboard Shortcut Hints
+
+When displaying keyboard shortcut hints in the UI (menu items, tooltips, etc.), always use this order: **command/control first, then modifiers (Shift, Alt), then the key**.
+
+- Correct: `Ctrl+Shift+Z`, `⌘⇧Z`
+- Wrong: `Shift+Ctrl+Z`, `⇧⌘Z`
+
+In code, use `${mod}${shift}Z` — never `${shift}${mod}Z`.
+
 ## Writing preferences
 
 When writing text for the UI components, keep these principles in mind:
@@ -51,3 +60,9 @@ When writing text for the UI components, keep these principles in mind:
 ## Design Style Guidelines
 
 For design-related decisions, consult the style_guidelines.md file in the root of the repository. It contains detailed instructions on design principles, color usage, typography, and more. Always refer to it when making design choices or implementing UI components.
+
+## Updating the project_overview.md
+
+The `project_overview.md` file in the root of the repository contains a high-level summary of the project, its goals, and its architecture. If you make significant changes to the project structure, data format, or design principles, please update this file accordingly to keep it accurate and helpful for new contributors.
+
+Before updating the `project_overview.md`, ask of the user input if they want to update it, and if so, what specific changes they would like to make. This ensures that the overview remains relevant and up-to-date with the current state of the project. When in doubt if you should update the overview, ask for clarification instead of making assumptions. It's better to ask than to guess wrong.

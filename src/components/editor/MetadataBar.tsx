@@ -15,7 +15,7 @@ const STATUS_DOT: Record<SongStatus, string> = {
 const STATUS_LABELS: SongStatus[] = ["idea", "draft", "demo", "finished"];
 
 export default function MetadataBar() {
-  const { metadata, snapshotHeaders, updateMetadata } = useEditorStore();
+  const { metadata, snapshotHeaders, updateMetadata, past, future, undo, redo } = useEditorStore();
   const { createSnapshot } = useSnapshot();
   const { openSnapshotModal } = useUIStore();
   const [editingTitle, setEditingTitle] = useState(false);
@@ -65,6 +65,25 @@ export default function MetadataBar() {
       {/* Title row */}
       <div className="flex items-center gap-3.5 mb-3">
         <div className="flex items-center gap-3.5 flex-1 min-w-0">
+          {/* Undo / Redo */}
+          <div className="flex items-center gap-0.5 shrink-0">
+            <button
+              className="w-6.5 h-6.5 flex items-center justify-center rounded text-faint hover:bg-elev hover:text-secondary transition-colors border-none bg-transparent cursor-pointer disabled:opacity-30 disabled:cursor-default disabled:hover:bg-transparent disabled:hover:text-faint"
+              title={past.length > 0 ? `Undo: ${past[past.length - 1].description}` : 'Undo'}
+              disabled={past.length === 0}
+              onClick={undo}
+            >
+              <Icons.Undo size={13} />
+            </button>
+            <button
+              className="w-6.5 h-6.5 flex items-center justify-center rounded text-faint hover:bg-elev hover:text-secondary transition-colors border-none bg-transparent cursor-pointer disabled:opacity-30 disabled:cursor-default disabled:hover:bg-transparent disabled:hover:text-faint"
+              title={future.length > 0 ? `Redo: ${future[future.length - 1].description}` : 'Redo'}
+              disabled={future.length === 0}
+              onClick={redo}
+            >
+              <Icons.Redo size={13} />
+            </button>
+          </div>
           {editingTitle ? (
             <input
               className="text-title font-semibold bg-elev border border-accent text-primary outline-none rounded px-1 tracking-tight font-ui w-full"

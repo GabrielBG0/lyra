@@ -7,6 +7,9 @@ import { useSong } from "../../hooks/useSong";
 import { useSnapshot } from "../../hooks/useSnapshot";
 import { useUIStore } from "../../stores/uiStore";
 import { tauriApi } from "../../lib/tauri";
+import { serializeSection, looksLikeSection, parseSection } from "../../lib/sectionClipboard";
+import { generateUlid } from "../../lib/ulid";
+import type { Section } from "../../lib/types";
 
 const isMac =
   navigator.platform.startsWith("Mac") || navigator.userAgent.includes("Mac");
@@ -29,11 +32,9 @@ const MENUS = {
     `Close Song\t${mod}W`,
   ],
   Edit: [
-    // TODO: Undo/Redo require an undo history stack (not yet implemented)
     `Undo\t${mod}Z`,
-    `Redo\t${shift}${mod}Z`,
+    `Redo\t${mod}${shift}Z`,
     "—",
-    // TODO: Cut/Copy/Paste menu items (native shortcuts still work in text fields)
     `Cut\t${mod}X`,
     `Copy\t${mod}C`,
     `Paste\t${mod}V`,
@@ -43,7 +44,7 @@ const MENUS = {
   ],
   Song: [
     `Save\t${mod}S`,
-    `Save Take\t${shift}${mod}S`,
+    `Save Take\t${mod}${shift}S`,
     "—",
     // TODO: Diff view between working copy and a snapshot
     `Diff with Take…\t${mod}D`,
@@ -68,6 +69,11 @@ const IMPLEMENTED = new Set([
   "Export as Plain Text…",
   "Export as PDF…",
   "Close Song",
+  "Undo",
+  "Redo",
+  "Cut",
+  "Copy",
+  "Paste",
   "Save",
   "Save Take",
   "Toggle Sidebar",
@@ -97,7 +103,7 @@ export default function MenuBar({
 }: MenuBarProps) {
   const [open, setOpen] = useState<string | null>(null);
   const [maximized, setMaximized] = useState(false);
-  const { metadata, isDirty, filePath } = useEditorStore();
+  const { metadata, isDirty, filePath, past, future, undo, redo, focusedSectionId, sections, addSection, removeSection } = useEditorStore();
   const { saveSong } = useSong();
   const { createSnapshot } = useSnapshot();
   const { openSnapshotModal, openPreferencesModal } = useUIStore();
@@ -126,6 +132,65 @@ export default function MenuBar({
     return () => document.removeEventListener("mousedown", handler);
   }, [open]);
 
+  const handleCopy = async () => {
+    if (!focusedSectionId) return;
+    const section = sections.find((s) => s.id === focusedSectionId);
+    if (!section) return;
+    try {
+      await navigator.clipboard.writeText(serializeSection(section));
+    } catch {
+      console.warn("[clipboard] writeText failed");
+    }
+  };
+
+  const handleCut = async () => {
+    if (!focusedSectionId) return;
+    const section = sections.find((s) => s.id === focusedSectionId);
+    if (!section) return;
+    try {
+      await navigator.clipboard.writeText(serializeSection(section));
+    } catch {
+      console.warn("[clipboard] writeText failed");
+    }
+    removeSection(focusedSectionId);
+  };
+
+  const handlePaste = async () => {
+    let text: string;
+    try {
+      text = await navigator.clipboard.readText();
+    } catch {
+      console.warn("[clipboard] readText failed");
+      return;
+    }
+    if (!looksLikeSection(text)) return;
+    const parsed = parseSection(text);
+    if (!parsed) return;
+    const focusedIdx = focusedSectionId
+      ? sections.findIndex((s) => s.id === focusedSectionId)
+      : -1;
+    const insertAt = focusedIdx >= 0 ? focusedIdx + 1 : sections.length;
+    const now = new Date().toISOString();
+    const newSection: Section = {
+      id: generateUlid(),
+      name: parsed.name,
+      section_type: parsed.section_type,
+      order: insertAt + 1,
+      content: parsed.content,
+      created_at: now,
+      updated_at: now,
+    };
+    addSection(newSection, insertAt);
+  };
+
+  const isEnabled = (label: string): boolean => {
+    if (label === "Undo") return past.length > 0;
+    if (label === "Redo") return future.length > 0;
+    if (label === "Cut" || label === "Copy") return !!focusedSectionId && !!metadata;
+    if (label === "Paste") return !!metadata;
+    return IMPLEMENTED.has(label);
+  };
+
   const handleOpenVault = async () => {
     const selected = await openDialog({ directory: true, multiple: false });
     if (!selected || Array.isArray(selected)) return;
@@ -147,7 +212,7 @@ export default function MenuBar({
 
   const handleItem = (_menu: string, item: string) => {
     const label = item.split("\t")[0];
-    if (!IMPLEMENTED.has(label)) return;
+    if (!isEnabled(label)) return;
     setOpen(null);
     if (label === "Preferences…") openPreferencesModal();
     else if (label === "New Song") onNewSong();
@@ -156,6 +221,11 @@ export default function MenuBar({
     else if (label === "Export as Plain Text…") handleExportText();
     else if (label === "Export as PDF…") handleExportPdf();
     else if (label === "Close Song") onCloseSong();
+    else if (label === "Undo") undo();
+    else if (label === "Redo") redo();
+    else if (label === "Cut") handleCut();
+    else if (label === "Copy") handleCopy();
+    else if (label === "Paste") handlePaste();
     else if (label === "Toggle Sidebar") onToggleSidebar();
     else if (label === "Toggle History Bar") onToggleHistoryBar();
     else if (label === "Save") saveSong();
@@ -202,13 +272,14 @@ export default function MenuBar({
                   );
                 }
                 const [label, kbd] = item.split("\t");
+                const enabled = isEnabled(label);
                 const implemented = IMPLEMENTED.has(label);
                 return (
                   <button
                     key={i}
-                    disabled={!implemented}
+                    disabled={!enabled}
                     className={`flex items-center justify-between w-full px-2.5 py-1.5 rounded text-[12.5px] ${
-                      implemented
+                      enabled
                         ? "menu-item text-secondary hover:text-primary hover:bg-panel cursor-pointer"
                         : "text-muted cursor-not-allowed opacity-50"
                     }`}
