@@ -50,7 +50,7 @@ const MENUS = {
     `Diff with Take…\t${mod}D`,
   ],
   View: [
-    `Toggle Sidebar\t${mod}\\`,
+    `Toggle Sidebar\t${mod}B`,
     `Toggle History Bar\t${mod}H`,
     "—",
     // TODO: Font size zoom

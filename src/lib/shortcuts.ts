@@ -28,7 +28,7 @@ export const SHORTCUT_CATEGORIES: ShortcutCategory[] = [
   {
     title: 'View',
     shortcuts: [
-      { label: 'Toggle Sidebar',     action: 'toggle-sidebar',  keys: ['mod', '\\'] },
+      { label: 'Toggle Sidebar',     action: 'toggle-sidebar',  keys: ['mod', 'B'] },
       { label: 'Toggle History Bar', action: 'toggle-history',  keys: ['mod', 'H'] },
     ],
   },
