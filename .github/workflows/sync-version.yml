@@ -1,0 +1,46 @@
+name: Sync Version
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "**.md"
+      - ".gitignore"
+      - "LICENSE"
+      - "docs/**"
+
+jobs:
+  sync:
+    name: Sync version from package.json
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Read version
+        id: ver
+        run: echo "version=$(jq -r .version package.json)" >> $GITHUB_OUTPUT
+
+      - name: Update Cargo.toml
+        run: |
+          sed -i 's/^version = "[^"]*"/version = "${{ steps.ver.outputs.version }}"/' src-tauri/Cargo.toml
+
+      - name: Update tauri.conf.json
+        run: |
+          jq --arg v "${{ steps.ver.outputs.version }}" '.version = $v' src-tauri/tauri.conf.json > tmp.json
+          mv tmp.json src-tauri/tauri.conf.json
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src-tauri/Cargo.toml src-tauri/tauri.conf.json
+          if git diff --cached --quiet; then
+            echo "Versions already in sync, nothing to commit."
+          else
+            git commit -m "chore: sync version to ${{ steps.ver.outputs.version }}"
+            git push
+          fi
