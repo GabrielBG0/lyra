@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/GabrielBG0/lyra/actions/workflows/ci.yml/badge.svg)](https://github.com/GabrielBG0/lyra/actions/workflows/ci.yml)
 [![Release](https://github.com/GabrielBG0/lyra/actions/workflows/release.yml/badge.svg)](https://github.com/GabrielBG0/lyra/actions/workflows/release.yml)
-[![Latest release](https://img.shields.io/github/v/release/GabrielBG0/lyra)](https://github.com/GabrielBG0/lyra/releases)
+[![Latest release](https://img.shields.io/github/v/release/GabrielBG0/lyra?include_prereleases)](https://github.com/GabrielBG0/lyra/releases)
 
 **A desktop app for songwriters to write, version, and compare lyrics.**
 
