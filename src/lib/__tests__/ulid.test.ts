@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, vi, afterEach } from "vitest";
 import { generateUlid } from "../ulid";
 
 const ULID_REGEX = /^[0-9A-HJKMNP-TV-Z]{26}$/;
