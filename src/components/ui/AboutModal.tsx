@@ -3,6 +3,10 @@ import LyraLogo from "./LyraLogo";
 import { Icons } from "./Icon";
 import pkg from "../../../package.json";
 
+const preRelease = pkg.version.includes("-") ? pkg.version.split("-")[1] : null;
+const isBeta = preRelease !== null && /^\d+$/.test(preRelease);
+const displayVersion = pkg.version.split("-")[0];
+
 interface AboutModalProps {
   open: boolean;
   onClose: () => void;
@@ -71,17 +75,19 @@ export default function AboutModal({ open, onClose }: AboutModalProps) {
             >
               Lyra
             </h2>
-            <span
-              className="text-[9px] font-semibold uppercase tracking-widest px-1.5 py-0.5 rounded"
-              style={{
-                background: "oklch(0.72 0.10 55 / 0.15)",
-                color: "oklch(0.72 0.10 55)",
-                border: "1px solid oklch(0.72 0.10 55 / 0.3)",
-                letterSpacing: "0.12em",
-              }}
-            >
-              beta
-            </span>
+            {isBeta && (
+              <span
+                className="text-[9px] font-semibold uppercase tracking-widest px-1.5 py-0.5 rounded"
+                style={{
+                  background: "oklch(0.72 0.10 55 / 0.15)",
+                  color: "oklch(0.72 0.10 55)",
+                  border: "1px solid oklch(0.72 0.10 55 / 0.3)",
+                  letterSpacing: "0.12em",
+                }}
+              >
+                beta
+              </span>
+            )}
           </div>
 
           {/* Description */}
@@ -95,7 +101,7 @@ export default function AboutModal({ open, onClose }: AboutModalProps) {
 
           {/* Version */}
           <span className="text-faint font-mono" style={{ fontSize: 11.5 }}>
-            Version {pkg.version}
+            Version {displayVersion}
           </span>
         </div>
       </div>
