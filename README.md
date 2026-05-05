@@ -8,7 +8,7 @@
 
 Lyra keeps every draft of your lyrics as immutable snapshots, lets you diff any two versions at the character level, and stores everything in plain files you own. No cloud, no accounts, no lock-in.
 
-> ![Version](https://img.shields.io/github/v/release/GabrielBG0/lyra?label=version) — macOS and Windows.
+> ![Version](https://img.shields.io/github/v/release/GabrielBG0/lyra?label=version) — macOS, Windows, and Linux.
 
 ---
 
@@ -33,6 +33,7 @@ Lyra keeps every draft of your lyrics as immutable snapshots, lets you diff any 
 | [Rust](https://rustup.rs/)                                     | stable  | For the Tauri backend                            |
 | [Tauri system deps](https://v2.tauri.app/start/prerequisites/) | —       | Platform-specific (see link)                     |
 | WebView2                                                       | —       | Windows only, usually pre-installed on Win 10/11 |
+| WebKitGTK + other libs                                         | —       | Linux only, install via your distro's package manager (see Tauri prerequisites link above) |
 
 Follow the [Tauri v2 prerequisites guide](https://v2.tauri.app/start/prerequisites/) for your OS before continuing.
 
@@ -64,7 +65,7 @@ This starts the Vite dev server on port 1420 with hot module replacement, then l
 npm run tauri build
 ```
 
-Produces a native installer for your current platform in `src-tauri/target/release/bundle/`. On macOS this is a `.dmg`; on Windows an `.msi` and `.exe` installer.
+Produces a native installer for your current platform in `src-tauri/target/release/bundle/`. On macOS this is a `.dmg`; on Windows an `.msi` and `.exe` installer; on Linux an `.AppImage`, `.deb`, and `.rpm`.
 
 ---
 
