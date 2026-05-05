@@ -44,28 +44,100 @@ fn config_path() -> AppResult<PathBuf> {
 }
 
 pub async fn load_config() -> AppResult<AppConfig> {
-    let path = config_path()?;
+    load_config_from(&config_path()?).await
+}
 
+pub async fn save_config(config: &AppConfig) -> AppResult<()> {
+    save_config_to(&config_path()?, config).await
+}
+
+async fn load_config_from(path: &std::path::Path) -> AppResult<AppConfig> {
     if !path.exists() {
         return Ok(AppConfig::default());
     }
 
-    let content = tokio::fs::read_to_string(&path).await?;
+    let content = tokio::fs::read_to_string(path).await?;
     let config: AppConfig = toml::from_str(&content)?;
 
     Ok(config)
 }
 
-pub async fn save_config(config: &AppConfig) -> AppResult<()> {
-    let path = config_path()?;
-
+async fn save_config_to(path: &std::path::Path, config: &AppConfig) -> AppResult<()> {
     if let Some(parent) = path.parent() {
         tokio::fs::create_dir_all(parent).await?;
     }
 
     let serial = toml::to_string_pretty(config)?;
-
-    tokio::fs::write(&path, serial).await?;
+    tokio::fs::write(path, serial).await?;
 
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use tempfile::TempDir;
+
+    #[tokio::test]
+    async fn load_config_from_missing_file_returns_default() {
+        let dir = TempDir::new().unwrap();
+        let path = dir.path().join("config.toml");
+
+        let config = load_config_from(&path).await.unwrap();
+
+        assert_eq!(config.vault_path, None);
+        assert_eq!(config.last_opened_song, None);
+        assert!(!config.debug_mode);
+        assert!(!config.nudge_dismissed);
+        assert!(!config.tutorial_completed);
+    }
+
+    #[tokio::test]
+    async fn save_and_load_config_roundtrip() {
+        let dir = TempDir::new().unwrap();
+        let path = dir.path().join("config.toml");
+
+        let original = AppConfig {
+            vault_path: Some("/my/vault".to_owned()),
+            last_opened_song: Some("/my/vault/song.lyr".to_owned()),
+            debug_mode: true,
+            nudge_dismissed: true,
+            tutorial_completed: false,
+        };
+
+        save_config_to(&path, &original).await.unwrap();
+        let loaded = load_config_from(&path).await.unwrap();
+
+        assert_eq!(loaded.vault_path, original.vault_path);
+        assert_eq!(loaded.last_opened_song, original.last_opened_song);
+        assert_eq!(loaded.debug_mode, original.debug_mode);
+        assert_eq!(loaded.nudge_dismissed, original.nudge_dismissed);
+        assert_eq!(loaded.tutorial_completed, original.tutorial_completed);
+    }
+
+    #[tokio::test]
+    async fn save_config_creates_parent_directories() {
+        let dir = TempDir::new().unwrap();
+        let path = dir.path().join("nested").join("deep").join("config.toml");
+
+        save_config_to(&path, &AppConfig::default()).await.unwrap();
+
+        assert!(path.exists());
+    }
+
+    #[tokio::test]
+    async fn load_config_from_partial_toml_uses_field_defaults() {
+        let dir = TempDir::new().unwrap();
+        let path = dir.path().join("config.toml");
+
+        tokio::fs::write(&path, r#"vault_path = "/some/vault""#)
+            .await
+            .unwrap();
+
+        let config = load_config_from(&path).await.unwrap();
+
+        assert_eq!(config.vault_path, Some("/some/vault".to_owned()));
+        assert!(!config.debug_mode);
+        assert!(!config.nudge_dismissed);
+    }
 }

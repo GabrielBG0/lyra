@@ -179,3 +179,165 @@ pub async fn clear_index(pool: &SqlitePool) -> AppResult<()> {
     sqlx::query!("DELETE FROM songs").execute(pool).await?;
     Ok(())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::models::song::SongStatus;
+
+    async fn test_pool() -> SqlitePool {
+        let pool = sqlx::SqlitePool::connect("sqlite::memory:").await.unwrap();
+        sqlx::migrate!("./migrations").run(&pool).await.unwrap();
+        pool
+    }
+
+    fn make_entry(id: &str, title: &str, path: &str, updated_at: &str) -> SongIndexEntry {
+        SongIndexEntry {
+            id: id.to_owned(),
+            title: title.to_owned(),
+            status: SongStatus::Idea,
+            bpm: None,
+            key_sig: None,
+            genre: vec![],
+            mood: vec![],
+            language: vec![],
+            file_path: path.to_owned(),
+            created_at: "2025-01-01T00:00:00Z".to_owned(),
+            updated_at: updated_at.to_owned(),
+        }
+    }
+
+    // ── upsert_song / list_songs ──────────────────────────────────────
+
+    #[tokio::test]
+    async fn upsert_song_and_list_songs_roundtrip() {
+        let pool = test_pool().await;
+        let entry = make_entry("id-1", "Blue Hour", "/vault/blue-hour.lyr", "2025-01-01T00:00:00Z");
+
+        upsert_song(&pool, &entry).await.unwrap();
+
+        let songs = list_songs(&pool).await.unwrap();
+        assert_eq!(songs.len(), 1);
+        assert_eq!(songs[0].title, "Blue Hour");
+        assert_eq!(songs[0].file_path, "/vault/blue-hour.lyr");
+    }
+
+    #[tokio::test]
+    async fn upsert_song_on_conflict_updates_existing_row() {
+        let pool = test_pool().await;
+        let entry = make_entry("id-1", "Original", "/vault/song.lyr", "2025-01-01T00:00:00Z");
+        upsert_song(&pool, &entry).await.unwrap();
+
+        let updated = make_entry("id-1", "Updated", "/vault/song.lyr", "2025-01-02T00:00:00Z");
+        upsert_song(&pool, &updated).await.unwrap();
+
+        let songs = list_songs(&pool).await.unwrap();
+        assert_eq!(songs.len(), 1);
+        assert_eq!(songs[0].title, "Updated");
+    }
+
+    #[tokio::test]
+    async fn list_songs_ordered_newest_updated_at_first() {
+        let pool = test_pool().await;
+
+        upsert_song(&pool, &make_entry("a", "A", "/v/a.lyr", "2025-01-01T00:00:00Z"))
+            .await
+            .unwrap();
+        upsert_song(&pool, &make_entry("b", "B", "/v/b.lyr", "2025-01-03T00:00:00Z"))
+            .await
+            .unwrap();
+        upsert_song(&pool, &make_entry("c", "C", "/v/c.lyr", "2025-01-02T00:00:00Z"))
+            .await
+            .unwrap();
+
+        let songs = list_songs(&pool).await.unwrap();
+
+        assert_eq!(songs[0].id, "b"); // newest
+        assert_eq!(songs[1].id, "c");
+        assert_eq!(songs[2].id, "a"); // oldest
+    }
+
+    // ── remove_song ───────────────────────────────────────────────────
+
+    #[tokio::test]
+    async fn remove_song_deletes_the_correct_row() {
+        let pool = test_pool().await;
+
+        upsert_song(&pool, &make_entry("id-1", "Keep", "/v/keep.lyr", "2025-01-01T00:00:00Z"))
+            .await
+            .unwrap();
+        upsert_song(&pool, &make_entry("id-2", "Delete", "/v/del.lyr", "2025-01-01T00:00:00Z"))
+            .await
+            .unwrap();
+
+        remove_song(&pool, "/v/del.lyr").await.unwrap();
+
+        let songs = list_songs(&pool).await.unwrap();
+        assert_eq!(songs.len(), 1);
+        assert_eq!(songs[0].id, "id-1");
+    }
+
+    #[tokio::test]
+    async fn remove_song_nonexistent_path_is_a_no_op() {
+        let pool = test_pool().await;
+
+        let result = remove_song(&pool, "/does/not/exist.lyr").await;
+
+        assert!(result.is_ok());
+    }
+
+    // ── get_song_by_path ──────────────────────────────────────────────
+
+    #[tokio::test]
+    async fn get_song_by_path_returns_correct_entry() {
+        let pool = test_pool().await;
+        let entry = make_entry("id-1", "Found", "/v/found.lyr", "2025-01-01T00:00:00Z");
+        upsert_song(&pool, &entry).await.unwrap();
+
+        let result = get_song_by_path(&pool, "/v/found.lyr").await.unwrap();
+
+        assert!(result.is_some());
+        assert_eq!(result.unwrap().title, "Found");
+    }
+
+    #[tokio::test]
+    async fn get_song_by_path_missing_path_returns_none() {
+        let pool = test_pool().await;
+
+        let result = get_song_by_path(&pool, "/no/such/file.lyr").await.unwrap();
+
+        assert!(result.is_none());
+    }
+
+    // ── clear_index ───────────────────────────────────────────────────
+
+    #[tokio::test]
+    async fn clear_index_removes_all_rows() {
+        let pool = test_pool().await;
+
+        upsert_song(&pool, &make_entry("a", "A", "/v/a.lyr", "2025-01-01T00:00:00Z"))
+            .await
+            .unwrap();
+        upsert_song(&pool, &make_entry("b", "B", "/v/b.lyr", "2025-01-01T00:00:00Z"))
+            .await
+            .unwrap();
+
+        clear_index(&pool).await.unwrap();
+
+        let songs = list_songs(&pool).await.unwrap();
+        assert!(songs.is_empty());
+    }
+
+    // ── init_index ────────────────────────────────────────────────────
+
+    #[tokio::test]
+    async fn init_index_creates_database_and_applies_migrations() {
+        let dir = tempfile::TempDir::new().unwrap();
+
+        let pool = init_index(dir.path()).await.unwrap();
+        let songs = list_songs(&pool).await.unwrap();
+
+        assert!(songs.is_empty()); // empty but table exists
+        assert!(dir.path().join(".lyrindex").join("index.db").exists());
+    }
+}

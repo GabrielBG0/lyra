@@ -97,6 +97,163 @@ pub async fn list_comments(path: &Path, section_id: &str) -> AppResult<Vec<Comme
     Ok(all.into_iter().filter(|c| c.section_id == section_id).collect())
 }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::core::song::create_lyr_file;
+    use tempfile::TempDir;
+
+    // ── read_comments ─────────────────────────────────────────────────
+
+    #[tokio::test]
+    async fn read_comments_on_fresh_song_returns_empty_vec() {
+        let dir = TempDir::new().unwrap();
+        let (path, _) = create_lyr_file(dir.path(), "Test").await.unwrap();
+
+        let comments = read_comments(&path).await.unwrap();
+
+        assert!(comments.is_empty());
+    }
+
+    // ── add_comment ───────────────────────────────────────────────────
+
+    #[tokio::test]
+    async fn add_comment_persists_and_is_readable() {
+        let dir = TempDir::new().unwrap();
+        let (path, _) = create_lyr_file(dir.path(), "Test").await.unwrap();
+
+        add_comment(&path, "sec-1".to_owned(), None, "Great line!".to_owned())
+            .await
+            .unwrap();
+
+        let comments = read_comments(&path).await.unwrap();
+
+        assert_eq!(comments.len(), 1);
+        assert_eq!(comments[0].section_id, "sec-1");
+        assert_eq!(comments[0].text, "Great line!");
+        assert!(!comments[0].resolved);
+    }
+
+    #[tokio::test]
+    async fn add_comment_returns_correct_fields() {
+        let dir = TempDir::new().unwrap();
+        let (path, _) = create_lyr_file(dir.path(), "Test").await.unwrap();
+
+        let comment = add_comment(
+            &path,
+            "sec-1".to_owned(),
+            Some("snap-abc".to_owned()),
+            "Nice!".to_owned(),
+        )
+        .await
+        .unwrap();
+
+        assert_eq!(comment.section_id, "sec-1");
+        assert_eq!(comment.snapshot_id.as_deref(), Some("snap-abc"));
+        assert_eq!(comment.text, "Nice!");
+        assert!(!comment.resolved);
+        assert!(!comment.id.is_empty());
+    }
+
+    #[tokio::test]
+    async fn add_multiple_comments_all_persisted() {
+        let dir = TempDir::new().unwrap();
+        let (path, _) = create_lyr_file(dir.path(), "Test").await.unwrap();
+
+        add_comment(&path, "s1".to_owned(), None, "First".to_owned())
+            .await
+            .unwrap();
+        add_comment(&path, "s2".to_owned(), None, "Second".to_owned())
+            .await
+            .unwrap();
+
+        let comments = read_comments(&path).await.unwrap();
+        assert_eq!(comments.len(), 2);
+    }
+
+    // ── resolve_comment ───────────────────────────────────────────────
+
+    #[tokio::test]
+    async fn resolve_comment_marks_it_resolved() {
+        let dir = TempDir::new().unwrap();
+        let (path, _) = create_lyr_file(dir.path(), "Test").await.unwrap();
+
+        let comment = add_comment(&path, "s1".to_owned(), None, "Fix this".to_owned())
+            .await
+            .unwrap();
+
+        resolve_comment(&path, &comment.id).await.unwrap();
+
+        let comments = read_comments(&path).await.unwrap();
+        assert!(comments[0].resolved);
+    }
+
+    #[tokio::test]
+    async fn resolve_comment_only_affects_target_comment() {
+        let dir = TempDir::new().unwrap();
+        let (path, _) = create_lyr_file(dir.path(), "Test").await.unwrap();
+
+        let c1 = add_comment(&path, "s1".to_owned(), None, "One".to_owned())
+            .await
+            .unwrap();
+        add_comment(&path, "s1".to_owned(), None, "Two".to_owned())
+            .await
+            .unwrap();
+
+        resolve_comment(&path, &c1.id).await.unwrap();
+
+        let comments = read_comments(&path).await.unwrap();
+        let resolved_count = comments.iter().filter(|c| c.resolved).count();
+        assert_eq!(resolved_count, 1);
+        assert_eq!(comments.iter().find(|c| c.resolved).unwrap().id, c1.id);
+    }
+
+    #[tokio::test]
+    async fn resolve_comment_with_unknown_id_returns_error() {
+        let dir = TempDir::new().unwrap();
+        let (path, _) = create_lyr_file(dir.path(), "Test").await.unwrap();
+
+        let result = resolve_comment(&path, "no-such-id").await;
+
+        assert!(result.is_err());
+    }
+
+    // ── list_comments ─────────────────────────────────────────────────
+
+    #[tokio::test]
+    async fn list_comments_filters_by_section_id() {
+        let dir = TempDir::new().unwrap();
+        let (path, _) = create_lyr_file(dir.path(), "Test").await.unwrap();
+
+        add_comment(&path, "sec-a".to_owned(), None, "For A".to_owned())
+            .await
+            .unwrap();
+        add_comment(&path, "sec-b".to_owned(), None, "For B".to_owned())
+            .await
+            .unwrap();
+        add_comment(&path, "sec-a".to_owned(), None, "Also For A".to_owned())
+            .await
+            .unwrap();
+
+        let a_comments = list_comments(&path, "sec-a").await.unwrap();
+        let b_comments = list_comments(&path, "sec-b").await.unwrap();
+
+        assert_eq!(a_comments.len(), 2);
+        assert_eq!(b_comments.len(), 1);
+        assert!(a_comments.iter().all(|c| c.section_id == "sec-a"));
+    }
+
+    #[tokio::test]
+    async fn list_comments_unknown_section_returns_empty() {
+        let dir = TempDir::new().unwrap();
+        let (path, _) = create_lyr_file(dir.path(), "Test").await.unwrap();
+
+        let comments = list_comments(&path, "no-such-section").await.unwrap();
+
+        assert!(comments.is_empty());
+    }
+}
+
 // ── Internal ────────────────────────────────────────────────────────────────
 
 /// Atomically replace `comments.toml` inside the archive.

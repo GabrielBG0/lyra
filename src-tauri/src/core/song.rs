@@ -297,6 +297,158 @@ pub async fn create_lyr_file(vault_path: &Path, title: &str) -> AppResult<(PathB
     Ok((file_path, payload))
 }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::{
+        core::snapshot::create_snapshot,
+        test_utils::build_test_lyr,
+    };
+    use tempfile::TempDir;
+
+    // ── create_lyr_file ───────────────────────────────────────────────
+
+    #[tokio::test]
+    async fn create_lyr_file_roundtrip_title_and_default_section() {
+        let dir = TempDir::new().unwrap();
+        let (path, created) = create_lyr_file(dir.path(), "Blue Hour").await.unwrap();
+
+        assert!(path.exists());
+        assert_eq!(created.metadata.title, "Blue Hour");
+        assert_eq!(created.sections.len(), 1);
+        assert_eq!(created.sections[0].name, "Verse 1");
+        assert!(created.snapshot_headers.is_empty());
+        assert!(created.comments.is_empty());
+    }
+
+    #[tokio::test]
+    async fn create_lyr_file_derives_filename_from_title() {
+        let dir = TempDir::new().unwrap();
+        let (path, _) = create_lyr_file(dir.path(), "Blue Hour").await.unwrap();
+
+        assert_eq!(path.file_name().unwrap(), "blue-hour.lyr");
+    }
+
+    #[tokio::test]
+    async fn create_lyr_file_avoids_filename_collision() {
+        let dir = TempDir::new().unwrap();
+        let (path1, _) = create_lyr_file(dir.path(), "Song").await.unwrap();
+        let (path2, _) = create_lyr_file(dir.path(), "Song").await.unwrap();
+
+        assert_ne!(path1, path2);
+        assert_eq!(path1.file_name().unwrap(), "song.lyr");
+        assert_eq!(path2.file_name().unwrap(), "song-2.lyr");
+    }
+
+    #[tokio::test]
+    async fn create_lyr_file_status_defaults_to_idea() {
+        let dir = TempDir::new().unwrap();
+        let (_, payload) = create_lyr_file(dir.path(), "My Song").await.unwrap();
+
+        assert_eq!(payload.metadata.status, SongStatus::Idea);
+    }
+
+    // ── read_lyr_file ─────────────────────────────────────────────────
+
+    #[tokio::test]
+    async fn read_lyr_file_returns_sections_sorted_by_order() {
+        let dir = TempDir::new().unwrap();
+        let (path, payload) = create_lyr_file(dir.path(), "Test").await.unwrap();
+
+        // Add a second section with a lower order to verify sorting
+        let mut sections = payload.sections.clone();
+        sections.push(Section {
+            id: "sec-000".to_owned(),
+            name: "Intro".to_owned(),
+            section_type: SectionType::Intro,
+            order: 0,
+            content: String::new(),
+            created_at: payload.sections[0].created_at.clone(),
+            updated_at: payload.sections[0].updated_at.clone(),
+        });
+
+        write_lyr_file(&path, &payload.metadata, &sections).await.unwrap();
+        let read_back = read_lyr_file(&path).await.unwrap();
+
+        assert_eq!(read_back.sections[0].name, "Intro");
+        assert_eq!(read_back.sections[1].name, "Verse 1");
+    }
+
+    #[tokio::test]
+    async fn read_lyr_file_rejects_unsupported_format_version() {
+        let dir = TempDir::new().unwrap();
+        let path = dir.path().join("bad.lyr");
+
+        // Write a ZIP with an unsupported format version
+        let file = std::fs::File::create(&path).unwrap();
+        let mut writer = ZipWriter::new(file);
+        let opts = SimpleFileOptions::default();
+        writer.start_file("meta.json", opts).unwrap();
+        writer
+            .write_all(br#"{"lyr_format_version":"99.0"}"#)
+            .unwrap();
+        writer.finish().unwrap();
+
+        let result = read_lyr_file(&path).await;
+
+        assert!(result.is_err());
+        let msg = result.unwrap_err().to_string();
+        assert!(msg.contains("unsupported format version"));
+    }
+
+    #[tokio::test]
+    async fn read_lyr_file_missing_comments_toml_yields_empty_comments() {
+        let dir = TempDir::new().unwrap();
+        let lyr_path = dir.path().join("no-comments.lyr");
+        build_test_lyr(&lyr_path, "No Comments", "s1");
+
+        let payload = read_lyr_file(&lyr_path).await.unwrap();
+
+        assert!(payload.comments.is_empty());
+    }
+
+    // ── write_lyr_file ────────────────────────────────────────────────
+
+    #[tokio::test]
+    async fn write_lyr_file_updates_metadata_and_preserves_snapshots() {
+        let dir = TempDir::new().unwrap();
+        let (path, payload) = create_lyr_file(dir.path(), "Original Title").await.unwrap();
+
+        // Create a snapshot so we have something to preserve
+        create_snapshot(&path, &payload.sections, Some("v1".to_owned()))
+            .await
+            .unwrap();
+
+        let mut updated_meta = payload.metadata.clone();
+        updated_meta.title = "New Title".to_owned();
+        write_lyr_file(&path, &updated_meta, &payload.sections)
+            .await
+            .unwrap();
+
+        let read_back = read_lyr_file(&path).await.unwrap();
+
+        assert_eq!(read_back.metadata.title, "New Title");
+        assert_eq!(read_back.snapshot_headers.len(), 1);
+    }
+
+    #[tokio::test]
+    async fn write_lyr_file_replaces_sections() {
+        let dir = TempDir::new().unwrap();
+        let (path, payload) = create_lyr_file(dir.path(), "Test").await.unwrap();
+
+        let mut updated_section = payload.sections[0].clone();
+        updated_section.content = "Updated lyrics".to_owned();
+
+        write_lyr_file(&path, &payload.metadata, &[updated_section])
+            .await
+            .unwrap();
+
+        let read_back = read_lyr_file(&path).await.unwrap();
+
+        assert_eq!(read_back.sections[0].content, "Updated lyrics");
+    }
+}
+
 // ══════════════════════════════════════════════════════════════════════
 //  Internal utilities
 // ══════════════════════════════════════════════════════════════════════
