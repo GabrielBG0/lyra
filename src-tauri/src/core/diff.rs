@@ -91,9 +91,7 @@ pub fn diff_snapshots(snapshot_a: &Snapshot, snapshot_b: &Snapshot) -> Vec<Secti
             (Some(a), Some(b)) => {
                 let content_changed = a.content != b.content;
                 let metadata_changed =
-                    a.name != b.name ||
-                    a.section_type != b.section_type ||
-                    a.order != b.order;
+                    a.name != b.name || a.section_type != b.section_type || a.order != b.order;
 
                 let (status, hunks) = if !content_changed && !metadata_changed {
                     (DiffStatus::Equal, vec![])
@@ -128,10 +126,7 @@ pub fn diff_snapshots(snapshot_a: &Snapshot, snapshot_b: &Snapshot) -> Vec<Secti
 mod tests {
     use super::*;
     use crate::{
-        models::{
-            diff::{DiffStatus, HunkKind},
-            section::SectionType,
-        },
+        models::diff::{DiffStatus, HunkKind},
         test_utils::{make_section, make_snapshot, make_snapshot_section},
     };
 
@@ -291,8 +286,16 @@ mod tests {
 
         // "abc" vs "xyz" — all chars are different, so we expect one Delete
         // hunk and one Insert hunk (merged), not 6 separate single-char hunks.
-        let delete_hunks: Vec<_> = diffs[0].hunks.iter().filter(|h| h.kind == HunkKind::Delete).collect();
-        let insert_hunks: Vec<_> = diffs[0].hunks.iter().filter(|h| h.kind == HunkKind::Insert).collect();
+        let delete_hunks: Vec<_> = diffs[0]
+            .hunks
+            .iter()
+            .filter(|h| h.kind == HunkKind::Delete)
+            .collect();
+        let insert_hunks: Vec<_> = diffs[0]
+            .hunks
+            .iter()
+            .filter(|h| h.kind == HunkKind::Insert)
+            .collect();
         assert_eq!(delete_hunks.len(), 1);
         assert_eq!(insert_hunks.len(), 1);
         assert_eq!(delete_hunks[0].text, "abc");
