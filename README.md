@@ -1,5 +1,9 @@
 # Lyra
 
+[![CI](https://github.com/GabrielBG0/lyra/actions/workflows/ci.yml/badge.svg)](https://github.com/GabrielBG0/lyra/actions/workflows/ci.yml)
+[![Release](https://github.com/GabrielBG0/lyra/actions/workflows/release.yml/badge.svg)](https://github.com/GabrielBG0/lyra/actions/workflows/release.yml)
+[![Latest release](https://img.shields.io/github/v/release/GabrielBG0/lyra)](https://github.com/GabrielBG0/lyra/releases)
+
 **A desktop app for songwriters to write, version, and compare lyrics.**
 
 Lyra keeps every draft of your lyrics as immutable snapshots, lets you diff any two versions at the character level, and stores everything in plain files you own. No cloud, no accounts, no lock-in.
@@ -37,7 +41,7 @@ Follow the [Tauri v2 prerequisites guide](https://v2.tauri.app/start/prerequisit
 ## Installation
 
 ```bash
-git clone https://github.com/your-username/lyra.git
+git clone https://github.com/GabrielBG0/lyra.git
 cd lyra
 npm install
 ```
