@@ -10,7 +10,7 @@ export default defineConfig(async () => ({
   plugins: [react(), tailwindcss()],
 
   optimizeDeps: {
-    include: ['lucide-react'],
+    include: ["lucide-react"],
   },
 
   // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`

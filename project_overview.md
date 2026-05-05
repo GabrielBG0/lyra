@@ -31,6 +31,7 @@
 Lyra is a **desktop application for songwriters** to manage lyrics with version snapshots, diffs, and annotations. It is built with **Tauri 2 + React 19 + Rust** and runs on macOS and Windows.
 
 Core workflow:
+
 1. The user picks a folder on disk — the **vault**.
 2. Each song is a `.lyr` file (ZIP archive) in that folder.
 3. Songs are composed of ordered **sections** (verse, chorus, bridge, etc.).
@@ -482,11 +483,12 @@ In addition to command/response, the frontend listens to events emitted by Rust 
 
 ```typescript
 // useVault.ts
-listen<SongIndexEntry>('vault:song-updated', (e) => upsertSong(e.payload))
-listen<string>('vault:song-removed', (e) => removeSong(e.payload))
+listen<SongIndexEntry>("vault:song-updated", (e) => upsertSong(e.payload));
+listen<string>("vault:song-removed", (e) => removeSong(e.payload));
 ```
 
 App-level events that Rust emits to the frontend (from MenuBar native integrations):
+
 - `window:close-requested` — intercepted native window close
 - `new-song`, `save`, `save-version`, `toggle-sidebar`, etc. (emitted by the Rust command-event bridge)
 
@@ -502,29 +504,29 @@ The largest and most important store. Holds the working copy of the currently op
 
 ```typescript
 interface EditorStore {
-  filePath: string | null
-  metadata: SongMetadata | null
-  sections: Section[]
-  isDirty: boolean
-  snapshotHeaders: SnapshotHeader[]
-  loadedSnapshots: Record<string, Snapshot>   // in-memory cache
-  diffResult: SectionDiff[] | null
-  diffTargetA: string | null   // snapshot id or 'now'
-  diffTargetB: string | null
-  previewSnapshotId: string | null
-  past: EditorCommand[]        // undo stack
-  future: EditorCommand[]      // redo stack
-  focusedSectionId: string | null
+  filePath: string | null;
+  metadata: SongMetadata | null;
+  sections: Section[];
+  isDirty: boolean;
+  snapshotHeaders: SnapshotHeader[];
+  loadedSnapshots: Record<string, Snapshot>; // in-memory cache
+  diffResult: SectionDiff[] | null;
+  diffTargetA: string | null; // snapshot id or 'now'
+  diffTargetB: string | null;
+  previewSnapshotId: string | null;
+  past: EditorCommand[]; // undo stack
+  future: EditorCommand[]; // redo stack
+  focusedSectionId: string | null;
 
   // Actions
-  loadSong(payload: SongPayload): void
-  closeSong(): void
-  updateSection(id: string, content: string): void
-  updateMetadata(partial: Partial<SongMetadata>): void
-  reorderSections(orderedIds: string[]): void
-  addSection(section: Section, insertAt?: number): void
-  removeSection(id: string): void
-  markClean(): void
+  loadSong(payload: SongPayload): void;
+  closeSong(): void;
+  updateSection(id: string, content: string): void;
+  updateMetadata(partial: Partial<SongMetadata>): void;
+  reorderSections(orderedIds: string[]): void;
+  addSection(section: Section, insertAt?: number): void;
+  removeSection(id: string): void;
+  markClean(): void;
   // ... snapshot, diff, preview, undo/redo actions
 }
 ```
@@ -533,13 +535,13 @@ interface EditorStore {
 
 ```typescript
 interface SongStore {
-  songs: SongIndexEntry[]          // from SQLite index
-  selectedSongPath: string | null  // path of open song
+  songs: SongIndexEntry[]; // from SQLite index
+  selectedSongPath: string | null; // path of open song
 
-  setSongs(songs: SongIndexEntry[]): void
-  upsertSong(entry: SongIndexEntry): void   // insert or update by file_path
-  removeSong(filePath: string): void
-  selectSong(path: string | null): void
+  setSongs(songs: SongIndexEntry[]): void;
+  upsertSong(entry: SongIndexEntry): void; // insert or update by file_path
+  removeSong(filePath: string): void;
+  selectSong(path: string | null): void;
 }
 ```
 
@@ -555,6 +557,7 @@ closeNewSongModal: () => void
 ```
 
 Also manages:
+
 - `sidebarCollapsed` / `historyBarExpanded` — layout flags
 - `nudgeDismissed` — whether the "save a take?" nudge has been dismissed
 
@@ -562,12 +565,12 @@ Also manages:
 
 ```typescript
 interface TourStore {
-  active: boolean
-  currentStep: number
-  start(): void
-  next(): void
-  back(): void
-  dismiss(): void   // marks tutorial_completed=true in config
+  active: boolean;
+  currentStep: number;
+  start(): void;
+  next(): void;
+  back(): void;
+  dismiss(): void; // marks tutorial_completed=true in config
 }
 ```
 
@@ -577,10 +580,10 @@ Components read slices with selectors to avoid unnecessary re-renders:
 
 ```typescript
 // Good: subscribe only to what you need
-const filePath = useEditorStore((s) => s.filePath)
+const filePath = useEditorStore((s) => s.filePath);
 
 // Inside event handlers, read current state imperatively (no re-render cost)
-const state = useEditorStore.getState()
+const state = useEditorStore.getState();
 ```
 
 ---
@@ -591,9 +594,9 @@ Every mutation to the song goes through the **Command pattern** (defined in `src
 
 ```typescript
 export interface EditorCommand {
-  readonly description: string
-  apply(): void
-  undo(): void
+  readonly description: string;
+  apply(): void;
+  undo(): void;
 }
 ```
 
@@ -620,14 +623,14 @@ For `updateSection`, rapid keystrokes within 2 seconds are **merged** into a sin
 // and it was pushed less than 2000ms ago, update _after in-place
 // instead of pushing a new command.
 if (
-  top._kind === 'updateSection' &&
+  top._kind === "updateSection" &&
   top._sectionId === id &&
   Date.now() - top._pushedAt < 2000
 ) {
-  existing._after = content
-  existing._pushedAt = Date.now()
+  existing._after = content;
+  existing._pushedAt = Date.now();
   // Update state directly, no new command pushed
-  return
+  return;
 }
 ```
 
@@ -698,19 +701,19 @@ Key elements carry `data-tour="..."` attributes for the first-launch tour to tar
 Watches `isDirty` in `editorStore`. When dirty, starts a 2-second debounce timer. On fire, reads latest state and calls `tauriApi.song.save(...)`, then `markClean()` and refreshes the sidebar entry.
 
 ```typescript
-const AUTOSAVE_DELAY_MS = 2_000
+const AUTOSAVE_DELAY_MS = 2_000;
 
 useEffect(() => {
-  if (!isDirty || !filePath || !metadata) return
+  if (!isDirty || !filePath || !metadata) return;
   const timer = setTimeout(async () => {
-    const state = useEditorStore.getState()  // re-read at fire time
-    if (!state.isDirty || !state.filePath) return
-    await tauriApi.song.save(state.filePath, state.metadata, state.sections)
-    state.markClean()
+    const state = useEditorStore.getState(); // re-read at fire time
+    if (!state.isDirty || !state.filePath) return;
+    await tauriApi.song.save(state.filePath, state.metadata, state.sections);
+    state.markClean();
     // ...refresh sidebar
-  }, AUTOSAVE_DELAY_MS)
-  return () => clearTimeout(timer)
-}, [isDirty, filePath, metadata, sections, markClean])
+  }, AUTOSAVE_DELAY_MS);
+  return () => clearTimeout(timer);
+}, [isDirty, filePath, metadata, sections, markClean]);
 ```
 
 The re-read at fire time is important: React's stale closure would capture old state without it.
@@ -718,6 +721,7 @@ The re-read at fire time is important: React's stale closure would capture old s
 ### Diff system (`useDiff.ts`, `core/diff.rs`)
 
 Two diff modes:
+
 1. **Snapshot vs. snapshot**: `diffTwoSnapshots(idA, idB)` — both are loaded from disk (or cache), then sent to Rust's `diff_snapshots` command.
 2. **Working copy vs. snapshot**: `diffWorkingVsSnapshot(id)` — current `sections` in `editorStore` are sent alongside the snapshot ID.
 
@@ -770,6 +774,7 @@ I find the words I've always run from
 ### Snapshot nudge
 
 The `VersionTimeline` tracks:
+
 - `changeCount` — incremented every time `sections` or `metadata` changes in `editorStore` (via `useEditorStore.subscribe`)
 - `songOpenTime` — reset when a new song is opened
 
@@ -778,10 +783,12 @@ After `NUDGE_MIN_CHANGES = 10` changes AND `NUDGE_MIN_ELAPSED_MS = 5 minutes` si
 ### First-launch tour
 
 The tour is triggered on first launch (when `config.tutorial_completed === false` after vault setup). It:
+
 1. Creates a "Welcome to Lyra" demo song if the vault is empty
 2. Calls `useTourStore.start()`
 
 `TourOverlay` is a portaled component that:
+
 - Uses `document.querySelector(step.target)` to find the target element
 - Waits 220ms after step activation for layout to settle (`requestAnimationFrame` + `setTimeout`)
 - Positions a `TooltipBubble` relative to the target's `getBoundingClientRect()`
@@ -800,6 +807,7 @@ The full design system is documented in `style_guidelines.md`. This is the autho
 > Writing is the protagonist — the interface is the theater.
 
 Five principles:
+
 1. **The page is sacred** — lyric area uses serif font and generous leading; chrome does not invade it.
 2. **Ink over glass** — no glassmorphism, no gradients on content surfaces.
 3. **Warm restraint** — single amber accent + rose secondary. No blues, no saturated chrome.
@@ -840,11 +848,13 @@ All colors use **OKLCH** (perceptually uniform). Defined in `src/styles/global.c
 | `finished` | `status-finished` = `0.8 0.1 115` | Pale green |
 
 Status pill pattern:
+
 ```tsx
-"text-status-draft bg-status-draft/10 border-status-draft/20"
+"text-status-draft bg-status-draft/10 border-status-draft/20";
 ```
 
 **Diff palette** (pre-computed hex for legibility against their own backgrounds):
+
 - Add: `bg: #00220b`, text: `#48aa79`
 - Remove: `bg: #310c10`, text: `#e68478` (also `line-through`)
 
@@ -894,6 +904,7 @@ className="w-7 h-7 flex items-center justify-center rounded text-secondary
 ```
 
 **Modals** — canonical recipe:
+
 - `fixed inset-0 z-50 flex items-center justify-center`
 - Backdrop: `oklch(0.08 0.006 60 / 0.75)` + `backdrop-filter: blur(4px)` (only place blur is used)
 - Surface: `oklch(0.205 0.012 60)`, `rounded-xl`, `border border-border`
@@ -920,18 +931,21 @@ onKeyDown={(e) => {
 ```
 
 **Hover reveals** — use `opacity`, not `display`, to avoid layout shift:
+
 ```tsx
 // Section header tools
-className="opacity-0 group-hover:opacity-100 transition-opacity"
+className = "opacity-0 group-hover:opacity-100 transition-opacity";
 ```
 
 **Icons** — always from `Icons` namespace, never direct `lucide-react` imports:
+
 ```tsx
-import { Icons } from '../ui/Icon'
-<Icons.Pin size={15} />
+import { Icons } from "../ui/Icon";
+<Icons.Pin size={15} />;
 ```
 
 **Dirty indicator** — a `w-1.5 h-1.5 rounded-full bg-accent` dot with amber `box-shadow` glow when `isDirty`:
+
 ```tsx
 style={{ boxShadow: isDirty ? '0 0 6px oklch(0.72 0.10 55)' : 'none' }}
 ```
@@ -963,6 +977,7 @@ All shortcuts are defined in `src/lib/shortcuts.ts` as `SHORTCUT_CATEGORIES`. Th
 | `Esc`         | Close modal / exit diff / cancel inline edit |
 
 Two hook layers:
+
 - `useKeyboardShortcuts` — handles app-level actions (Save, New, Toggle)
 - `useGlobalShortcuts` — handles undo/redo and section clipboard (Cmd+Z/C/X/V)
 
@@ -973,6 +988,7 @@ Both hooks skip events when `target` is `INPUT` or `TEXTAREA` to allow normal ty
 ## 14. IDs — ULIDs
 
 All entities use **ULIDs** (Universally Unique Lexicographically Sortable Identifiers):
+
 - 26 characters, Crockford base32
 - Prefix: 10-char millisecond timestamp (sortable chronologically by string comparison)
 - Suffix: 16-char cryptographically random
@@ -982,9 +998,10 @@ Used for: song IDs, section IDs, snapshot IDs, comment IDs.
 **Rust**: `ulid::Ulid::new().to_string()`
 
 **TypeScript** (`src/lib/ulid.ts`): hand-rolled implementation using `crypto.getRandomValues` for the random portion:
+
 ```typescript
 export function generateUlid(): string {
-  return encodeTime(Date.now()) + encodeRandom()
+  return encodeTime(Date.now()) + encodeRandom();
 }
 ```
 
@@ -1011,12 +1028,12 @@ Intercepts `onCloseRequested` from Tauri. Saves if dirty, then calls `win.destro
 Registered on `window` (not on any specific element). Uses `handlersRef` pattern to avoid stale closures while the handler function changes:
 
 ```typescript
-const handlersRef = useRef(handlers)
-handlersRef.current = handlers  // always current
+const handlersRef = useRef(handlers);
+handlersRef.current = handlers; // always current
 useEffect(() => {
-  window.addEventListener('keydown', onKeyDown)
-  return () => window.removeEventListener('keydown', onKeyDown)
-}, [])  // empty deps: listener registered once, reads from ref
+  window.addEventListener("keydown", onKeyDown);
+  return () => window.removeEventListener("keydown", onKeyDown);
+}, []); // empty deps: listener registered once, reads from ref
 ```
 
 ### `useGlobalShortcuts` — undo/redo + clipboard
@@ -1032,13 +1049,15 @@ Handles `mod+Z`, `mod+Shift+Z`, `mod+C`, `mod+X`, `mod+V`. For clipboard, only a
 {
   "identifier": "dev.gabrielbg.lyra",
   "app": {
-    "windows": [{
-      "decorations": false,         // custom chrome via MenuBar.tsx
-      "width": 1200,
-      "height": 750,
-      "minWidth": 720,
-      "minHeight": 480
-    }]
+    "windows": [
+      {
+        "decorations": false, // custom chrome via MenuBar.tsx
+        "width": 1200,
+        "height": 750,
+        "minWidth": 720,
+        "minHeight": 480
+      }
+    ]
   }
 }
 ```
@@ -1090,6 +1109,7 @@ On **macOS**, the MenuBar has `paddingLeft: 76px` to clear the traffic-light but
 ### Keyboard shortcuts (display order)
 
 Always render in this order: **command/control first, then Shift, then Alt, then the key**.
+
 - Correct: `Ctrl+Shift+Z`, `⌘⇧Z`
 - Wrong: `Shift+Ctrl+Z`, `⇧⌘Z`
 

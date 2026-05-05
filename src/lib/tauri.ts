@@ -2,7 +2,7 @@
 // One function per Rust command. All arg keys use camelCase —
 // Tauri 2 maps them to snake_case on the Rust side automatically.
 
-import { invoke } from '@tauri-apps/api/core'
+import { invoke } from "@tauri-apps/api/core";
 import type {
   AppConfig,
   Comment,
@@ -14,71 +14,80 @@ import type {
   SongIndexEntry,
   SongMetadata,
   SongPayload,
-} from './types'
+} from "./types";
 
 export const tauriApi = {
   vault: {
-    listSongs: () =>
-      invoke<SongIndexEntry[]>('list_songs'),
+    listSongs: () => invoke<SongIndexEntry[]>("list_songs"),
 
-    setVaultPath: (path: string) =>
-      invoke<void>('set_vault_path', { path }),
+    setVaultPath: (path: string) => invoke<void>("set_vault_path", { path }),
 
-    getVaultPath: () =>
-      invoke<string | null>('get_vault_path'),
+    getVaultPath: () => invoke<string | null>("get_vault_path"),
 
-    rebuildIndex: () =>
-      invoke<SongIndexEntry[]>('rebuild_index'),
+    rebuildIndex: () => invoke<SongIndexEntry[]>("rebuild_index"),
 
     importSong: (externalPathStr: string) =>
-      invoke<SongIndexEntry>('import_song', { externalPathStr }),
+      invoke<SongIndexEntry>("import_song", { externalPathStr }),
   },
 
   song: {
-    open: (path: string) =>
-      invoke<SongPayload>('open_song', { path }),
+    open: (path: string) => invoke<SongPayload>("open_song", { path }),
 
     save: (path: string, metadata: SongMetadata, sections: Section[]) =>
-      invoke<void>('save_song', { path, metadata, sections }),
+      invoke<void>("save_song", { path, metadata, sections }),
 
-    create: (title: string) =>
-      invoke<SongPayload>('create_song', { title }),
+    create: (title: string) => invoke<SongPayload>("create_song", { title }),
 
-    delete: (path: string) =>
-      invoke<void>('delete_song', { path }),
+    delete: (path: string) => invoke<void>("delete_song", { path }),
   },
 
   snapshot: {
     create: (path: string, sections: Section[], note: string | null) =>
-      invoke<SnapshotHeader>('create_snapshot', { path, sections, note }),
+      invoke<SnapshotHeader>("create_snapshot", { path, sections, note }),
 
     load: (path: string, snapshotId: string) =>
-      invoke<Snapshot>('load_snapshot', { path, snapshotId }),
+      invoke<Snapshot>("load_snapshot", { path, snapshotId }),
 
     restore: (path: string, snapshotId: string) =>
-      invoke<Section[]>('restore_snapshot', { path, snapshotId }),
+      invoke<Section[]>("restore_snapshot", { path, snapshotId }),
 
     cherryPick: (path: string, snapshotId: string, sectionId: string) =>
-      invoke<Section>('cherry_pick_section', { path, snapshotId, sectionId }),
+      invoke<Section>("cherry_pick_section", { path, snapshotId, sectionId }),
   },
 
   diff: {
     diffSnapshots: (path: string, snapshotIdA: string, snapshotIdB: string) =>
-      invoke<SectionDiff[]>('diff_snapshots', { path, snapshotIdA, snapshotIdB }),
+      invoke<SectionDiff[]>("diff_snapshots", {
+        path,
+        snapshotIdA,
+        snapshotIdB,
+      }),
 
-    diffWorkingVsSnapshot: (path: string, snapshotId: string, sections: Section[]) =>
-      invoke<SectionDiff[]>('diff_working_vs_snapshot', { path, snapshotId, sections }),
+    diffWorkingVsSnapshot: (
+      path: string,
+      snapshotId: string,
+      sections: Section[],
+    ) =>
+      invoke<SectionDiff[]>("diff_working_vs_snapshot", {
+        path,
+        snapshotId,
+        sections,
+      }),
   },
 
   section: {
-    add: (path: string, sectionType: SectionType, name: string, order: number) =>
-      invoke<Section>('add_section', { path, sectionType, name, order }),
+    add: (
+      path: string,
+      sectionType: SectionType,
+      name: string,
+      order: number,
+    ) => invoke<Section>("add_section", { path, sectionType, name, order }),
 
     delete: (path: string, sectionId: string) =>
-      invoke<void>('delete_section', { path, sectionId }),
+      invoke<void>("delete_section", { path, sectionId }),
 
     reorder: (path: string, orderedIds: string[]) =>
-      invoke<void>('reorder_sections', { path, orderedIds }),
+      invoke<void>("reorder_sections", { path, orderedIds }),
   },
 
   comment: {
@@ -87,36 +96,32 @@ export const tauriApi = {
       sectionId: string,
       snapshotId: string | null,
       text: string,
-    ) => invoke<Comment>('add_comment', { path, sectionId, snapshotId, text }),
+    ) => invoke<Comment>("add_comment", { path, sectionId, snapshotId, text }),
 
     resolve: (path: string, commentId: string) =>
-      invoke<void>('resolve_comment', { path, commentId }),
+      invoke<void>("resolve_comment", { path, commentId }),
 
     list: (path: string, sectionId: string) =>
-      invoke<Comment[]>('list_comments', { path, sectionId }),
+      invoke<Comment[]>("list_comments", { path, sectionId }),
   },
 
   config: {
-    get: () =>
-      invoke<AppConfig>('get_config'),
+    get: () => invoke<AppConfig>("get_config"),
 
-    set: (config: AppConfig) =>
-      invoke<void>('set_config', { config }),
+    set: (config: AppConfig) => invoke<void>("set_config", { config }),
   },
 
   export: {
     plainText: (path: string, includeHistory: boolean) =>
-      invoke<void>('export_plain_text', { path, includeHistory }),
+      invoke<void>("export_plain_text", { path, includeHistory }),
 
     pdf: (path: string, includeHistory: boolean) =>
-      invoke<void>('export_pdf', { path, includeHistory }),
+      invoke<void>("export_pdf", { path, includeHistory }),
   },
 
   debug: {
-    nukeVault: () =>
-      invoke<void>('nuke_vault'),
+    nukeVault: () => invoke<void>("nuke_vault"),
 
-    resetApp: () =>
-      invoke<void>('reset_app'),
+    resetApp: () => invoke<void>("reset_app"),
   },
-}
+};

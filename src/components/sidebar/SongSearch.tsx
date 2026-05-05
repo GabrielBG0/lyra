@@ -1,8 +1,8 @@
-import { Icons } from '../ui/Icon'
+import { Icons } from "../ui/Icon";
 
 interface SongSearchProps {
-  value: string
-  onChange: (value: string) => void
+  value: string;
+  onChange: (value: string) => void;
 }
 
 export default function SongSearch({ value, onChange }: SongSearchProps) {
@@ -15,13 +15,16 @@ export default function SongSearch({ value, onChange }: SongSearchProps) {
         style={{ fontSize: 12.5 }}
         placeholder="Search songs…"
         value={value}
-        onChange={e => onChange(e.target.value)}
+        onChange={(e) => onChange(e.target.value)}
       />
       {value && (
-        <button className="text-faint hover:text-muted flex p-0 border-none bg-transparent cursor-pointer" onClick={() => onChange('')}>
+        <button
+          className="text-faint hover:text-muted flex p-0 border-none bg-transparent cursor-pointer"
+          onClick={() => onChange("")}
+        >
           <Icons.X size={11} />
         </button>
       )}
     </div>
-  )
+  );
 }

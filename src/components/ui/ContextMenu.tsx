@@ -12,7 +12,11 @@ interface ContextMenuProps {
   onClose: () => void;
 }
 
-export default function ContextMenu({ position, items, onClose }: ContextMenuProps) {
+export default function ContextMenu({
+  position,
+  items,
+  onClose,
+}: ContextMenuProps) {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

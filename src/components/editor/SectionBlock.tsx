@@ -1,90 +1,121 @@
-import { useEffect, useRef, useState, type MutableRefObject } from 'react'
-import type { ReactNode } from 'react'
-import type { FindMatch, Section, SectionType } from '../../lib/types'
-import { useEditorStore } from '../../stores/editorStore'
-import SectionHeader from './SectionHeader'
-import CommentPanel from '../comments/CommentPanel'
-import AddSection from './AddSection'
-import { useSortable } from '@dnd-kit/sortable'
-import { CSS } from '@dnd-kit/utilities'
+import { useEffect, useRef, useState, type MutableRefObject } from "react";
+import type { ReactNode } from "react";
+import type { FindMatch, Section, SectionType } from "../../lib/types";
+import { useEditorStore } from "../../stores/editorStore";
+import SectionHeader from "./SectionHeader";
+import CommentPanel from "../comments/CommentPanel";
+import AddSection from "./AddSection";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 interface SectionBlockProps {
-  section: Section
-  isFirst: boolean
-  lyricFont: string
-  commentCount: number
-  onInsertBefore: (type: SectionType, name: string) => void
-  onDelete: (id: string) => void
-  readOnly?: boolean
+  section: Section;
+  isFirst: boolean;
+  lyricFont: string;
+  commentCount: number;
+  onInsertBefore: (type: SectionType, name: string) => void;
+  onDelete: (id: string) => void;
+  readOnly?: boolean;
 }
 
-function renderHighlightedContent(content: string, matches: FindMatch[], activeMatch: FindMatch | undefined) {
-  const nodes: ReactNode[] = []
-  let pos = 0
+function renderHighlightedContent(
+  content: string,
+  matches: FindMatch[],
+  activeMatch: FindMatch | undefined,
+) {
+  const nodes: ReactNode[] = [];
+  let pos = 0;
   for (const match of matches) {
     if (match.start > pos) {
-      nodes.push(content.slice(pos, match.start))
+      nodes.push(content.slice(pos, match.start));
     }
-    const isActive = match === activeMatch
+    const isActive = match === activeMatch;
     nodes.push(
       <mark
         key={`${match.sectionId}-${match.matchIndex}`}
         style={{
-          background: isActive ? 'oklch(0.72 0.10 55 / 0.55)' : 'oklch(0.72 0.10 55 / 0.25)',
-          color: 'transparent',
+          background: isActive
+            ? "oklch(0.72 0.10 55 / 0.55)"
+            : "oklch(0.72 0.10 55 / 0.25)",
+          color: "transparent",
           borderRadius: 2,
-          outline: isActive ? '1px solid oklch(0.72 0.10 55 / 0.8)' : undefined,
+          outline: isActive ? "1px solid oklch(0.72 0.10 55 / 0.8)" : undefined,
         }}
       >
         {content.slice(match.start, match.end)}
-      </mark>
-    )
-    pos = match.end
+      </mark>,
+    );
+    pos = match.end;
   }
   if (pos < content.length) {
-    nodes.push(content.slice(pos))
+    nodes.push(content.slice(pos));
   }
-  return nodes
+  return nodes;
 }
 
-export default function SectionBlock({ section, isFirst, lyricFont, commentCount, onInsertBefore, onDelete, readOnly }: SectionBlockProps) {
-  const { updateSection, setFocusedSection, findMatches, findActiveIndex } = useEditorStore()
-  const [commentsOpen, setCommentsOpen] = useState(false)
-  const textareaRef = useRef<HTMLTextAreaElement>(null)
-  const rootRef = useRef<HTMLDivElement>(null)
+export default function SectionBlock({
+  section,
+  isFirst,
+  lyricFont,
+  commentCount,
+  onInsertBefore,
+  onDelete,
+  readOnly,
+}: SectionBlockProps) {
+  const { updateSection, setFocusedSection, findMatches, findActiveIndex } =
+    useEditorStore();
+  const [commentsOpen, setCommentsOpen] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
 
-  const sectionMatches = findMatches.filter(m => m.sectionId === section.id)
-  const activeMatch = findMatches[findActiveIndex]
-  const activeMatchForSection = activeMatch?.sectionId === section.id ? activeMatch : undefined
+  const sectionMatches = findMatches.filter((m) => m.sectionId === section.id);
+  const activeMatch = findMatches[findActiveIndex];
+  const activeMatchForSection =
+    activeMatch?.sectionId === section.id ? activeMatch : undefined;
 
   useEffect(() => {
     if (activeMatchForSection) {
-      rootRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+      rootRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
     }
-  }, [findActiveIndex])
+  }, [findActiveIndex]);
 
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({
     id: section.id,
     disabled: readOnly,
-  })
+  });
 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.5 : 1,
-  }
+  };
 
   const resize = () => {
-    const el = textareaRef.current
-    if (!el) return
-    el.style.height = 'auto'
-    el.style.height = el.scrollHeight + 'px'
-  }
+    const el = textareaRef.current;
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = el.scrollHeight + "px";
+  };
 
-  useEffect(resize, [section.content])
+  useEffect(resize, [section.content]);
 
   return (
-    <div ref={(el) => { setNodeRef(el); (rootRef as MutableRefObject<HTMLDivElement | null>).current = el }} style={style} className="group relative" onFocus={() => setFocusedSection(section.id)}>
+    <div
+      ref={(el) => {
+        setNodeRef(el);
+        (rootRef as MutableRefObject<HTMLDivElement | null>).current = el;
+      }}
+      style={style}
+      className="group relative"
+      onFocus={() => setFocusedSection(section.id)}
+    >
       {/* Divider with insert affordance */}
       {!isFirst && !readOnly && (
         <div className="group/divider relative h-7 flex items-center cursor-default">
@@ -106,7 +137,7 @@ export default function SectionBlock({ section, isFirst, lyricFont, commentCount
         name={section.name}
         commentCount={commentCount}
         commentsOpen={commentsOpen}
-        onToggleComments={() => setCommentsOpen(o => !o)}
+        onToggleComments={() => setCommentsOpen((o) => !o)}
         onDelete={() => onDelete(section.id)}
         readOnly={readOnly}
         dragListeners={listeners}
@@ -120,38 +151,42 @@ export default function SectionBlock({ section, isFirst, lyricFont, commentCount
             <div
               aria-hidden="true"
               style={{
-                position: 'absolute',
+                position: "absolute",
                 inset: 0,
-                pointerEvents: 'none',
-                overflow: 'hidden',
+                pointerEvents: "none",
+                overflow: "hidden",
                 fontFamily: lyricFont,
-                fontSize: '16px',
-                lineHeight: '1.85',
-                letterSpacing: '0.002em',
-                fontVariantLigatures: 'common-ligatures',
+                fontSize: "16px",
+                lineHeight: "1.85",
+                letterSpacing: "0.002em",
+                fontVariantLigatures: "common-ligatures",
                 padding: 0,
-                whiteSpace: 'pre-wrap',
-                wordBreak: 'break-word',
-                color: 'transparent',
+                whiteSpace: "pre-wrap",
+                wordBreak: "break-word",
+                color: "transparent",
                 zIndex: 0,
               }}
             >
-              {renderHighlightedContent(section.content, sectionMatches, activeMatchForSection)}
+              {renderHighlightedContent(
+                section.content,
+                sectionMatches,
+                activeMatchForSection,
+              )}
             </div>
           )}
           <textarea
             ref={textareaRef}
             className="lyric-textarea"
-            style={{ fontFamily: lyricFont, position: 'relative', zIndex: 1 }}
+            style={{ fontFamily: lyricFont, position: "relative", zIndex: 1 }}
             value={section.content}
-            onChange={e => {
-              if (readOnly) return
-              updateSection(section.id, e.target.value)
-              resize()
+            onChange={(e) => {
+              if (readOnly) return;
+              updateSection(section.id, e.target.value);
+              resize();
             }}
             onInput={resize}
             spellCheck={false}
-            placeholder={readOnly ? '' : `Write ${section.name.toLowerCase()}…`}
+            placeholder={readOnly ? "" : `Write ${section.name.toLowerCase()}…`}
             disabled={readOnly}
           />
         </div>
@@ -160,5 +195,5 @@ export default function SectionBlock({ section, isFirst, lyricFont, commentCount
       {/* Comments panel */}
       {commentsOpen && <CommentPanel sectionId={section.id} />}
     </div>
-  )
+  );
 }

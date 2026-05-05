@@ -47,7 +47,9 @@ export default function AppShell({ vaultPath }: AppShellProps) {
     closePreferencesModal,
     toggleHistoryBar,
   } = useUIStore();
-  const [lyricFont] = useState<string>('"Noto Serif", "Noto Serif JP", "Noto Serif KR", Georgia, serif');
+  const [lyricFont] = useState<string>(
+    '"Noto Serif", "Noto Serif JP", "Noto Serif KR", Georgia, serif',
+  );
   const { createSong, deleteSong } = useSong();
   const { selectSong } = useSongStore();
   const { closeSong } = useEditorStore();
@@ -62,7 +64,10 @@ export default function AppShell({ vaultPath }: AppShellProps) {
   const handleNewSong = () => openNewSongModal();
 
   return (
-    <div data-tour="app-shell" className="h-full flex flex-col bg-bg text-primary font-ui overflow-hidden">
+    <div
+      data-tour="app-shell"
+      className="h-full flex flex-col bg-bg text-primary font-ui overflow-hidden"
+    >
       <MenuBar
         onToggleSidebar={() => setSidebarCollapsed(!sidebarCollapsed)}
         onNewSong={handleNewSong}
@@ -129,22 +134,19 @@ export default function AppShell({ vaultPath }: AppShellProps) {
         open={shortcutsModalOpen}
         onClose={closeShortcutsModal}
       />
-      <AboutModal
-        open={aboutModalOpen}
-        onClose={closeAboutModal}
-      />
+      <AboutModal open={aboutModalOpen} onClose={closeAboutModal} />
       <VaultOptionsModal
         open={vaultOptionsModalOpen}
         onClose={closeVaultOptionsModal}
       />
       <DeleteSongModal
         open={deleteSongModal !== null}
-        songTitle={deleteSongModal?.title ?? ''}
+        songTitle={deleteSongModal?.title ?? ""}
         onClose={closeDeleteSongModal}
         onConfirm={async () => {
           if (deleteSongModal) {
-            await deleteSong(deleteSongModal.path)
-            closeDeleteSongModal()
+            await deleteSong(deleteSongModal.path);
+            closeDeleteSongModal();
           }
         }}
       />

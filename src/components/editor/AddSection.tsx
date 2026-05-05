@@ -48,7 +48,10 @@ export default function AddSection({ onAdd, inline = false }: AddSectionProps) {
     const handleOpen = () => {
       if (buttonRef.current) {
         const rect = buttonRef.current.getBoundingClientRect();
-        setPopoverPos({ top: rect.bottom + 4, left: rect.left + rect.width / 2 });
+        setPopoverPos({
+          top: rect.bottom + 4,
+          left: rect.left + rect.width / 2,
+        });
       }
       setOpen(true);
     };
@@ -63,29 +66,40 @@ export default function AddSection({ onAdd, inline = false }: AddSectionProps) {
         >
           <span className="text-[17px] leading-[0] select-none">+</span>
         </button>
-        {open && createPortal(
-          <>
-            <div className="fixed inset-0 z-40" onMouseDown={() => setOpen(false)} />
-            <div
-              style={{ position: "fixed", top: popoverPos.top, left: popoverPos.left, transform: "translateX(-50%)" }}
-              className="z-50 bg-elev border border-border rounded-lg p-3 shadow-2xl min-w-55"
-            >
-              <TypeAndNamePicker
-                selectedType={selectedType}
-                name={name}
-                onTypeChange={(t) => {
-                  setSelectedType(t);
-                  setName(SECTION_TYPES.find((s) => s.type === t)?.label ?? "");
-                }}
-                onNameChange={setName}
-                onSubmit={handleAdd}
-                inputRef={inputRef}
-                onCancel={() => setOpen(false)}
+        {open &&
+          createPortal(
+            <>
+              <div
+                className="fixed inset-0 z-40"
+                onMouseDown={() => setOpen(false)}
               />
-            </div>
-          </>,
-          document.body
-        )}
+              <div
+                style={{
+                  position: "fixed",
+                  top: popoverPos.top,
+                  left: popoverPos.left,
+                  transform: "translateX(-50%)",
+                }}
+                className="z-50 bg-elev border border-border rounded-lg p-3 shadow-2xl min-w-55"
+              >
+                <TypeAndNamePicker
+                  selectedType={selectedType}
+                  name={name}
+                  onTypeChange={(t) => {
+                    setSelectedType(t);
+                    setName(
+                      SECTION_TYPES.find((s) => s.type === t)?.label ?? "",
+                    );
+                  }}
+                  onNameChange={setName}
+                  onSubmit={handleAdd}
+                  inputRef={inputRef}
+                  onCancel={() => setOpen(false)}
+                />
+              </div>
+            </>,
+            document.body,
+          )}
       </div>
     );
   }

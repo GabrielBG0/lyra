@@ -1,67 +1,80 @@
-import { useEffect, useRef, useState } from 'react'
-import { Icons } from './Icon'
+import { useEffect, useRef, useState } from "react";
+import { Icons } from "./Icon";
 
 interface NewSongModalProps {
-  open: boolean
-  onClose: () => void
-  onCreate: (title: string) => Promise<unknown>
+  open: boolean;
+  onClose: () => void;
+  onCreate: (title: string) => Promise<unknown>;
 }
 
-export default function NewSongModal({ open, onClose, onCreate }: NewSongModalProps) {
-  const [title, setTitle] = useState('')
-  const [busy, setBusy] = useState(false)
-  const inputRef = useRef<HTMLInputElement>(null)
+export default function NewSongModal({
+  open,
+  onClose,
+  onCreate,
+}: NewSongModalProps) {
+  const [title, setTitle] = useState("");
+  const [busy, setBusy] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (open) {
-      setTitle('')
-      setBusy(false)
-      setTimeout(() => inputRef.current?.focus(), 30)
+      setTitle("");
+      setBusy(false);
+      setTimeout(() => inputRef.current?.focus(), 30);
     }
-  }, [open])
+  }, [open]);
 
   useEffect(() => {
-    if (!open) return
+    if (!open) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
-    }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [open, onClose])
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open, onClose]);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    const trimmed = title.trim()
-    if (!trimmed || busy) return
-    setBusy(true)
+    e.preventDefault();
+    const trimmed = title.trim();
+    if (!trimmed || busy) return;
+    setBusy(true);
     try {
-      await onCreate(trimmed)
-      onClose()
+      await onCreate(trimmed);
+      onClose();
     } finally {
-      setBusy(false)
+      setBusy(false);
     }
-  }
+  };
 
-  if (!open) return null
+  if (!open) return null;
 
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center"
-      style={{ background: 'oklch(0.08 0.006 60 / 0.75)', backdropFilter: 'blur(4px)' }}
-      onMouseDown={(e) => { if (e.target === e.currentTarget) onClose() }}
+      style={{
+        background: "oklch(0.08 0.006 60 / 0.75)",
+        backdropFilter: "blur(4px)",
+      }}
+      onMouseDown={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
     >
       <div
         className="relative w-full max-w-md mx-4 rounded-xl border border-border overflow-hidden"
         style={{
-          background: 'oklch(0.205 0.012 60)',
-          boxShadow: '0 24px 64px oklch(0.06 0.005 60 / 0.8), 0 0 0 1px oklch(0.32 0.012 60 / 0.4)',
+          background: "oklch(0.205 0.012 60)",
+          boxShadow:
+            "0 24px 64px oklch(0.06 0.005 60 / 0.8), 0 0 0 1px oklch(0.32 0.012 60 / 0.4)",
         }}
         onMouseDown={(e) => e.stopPropagation()}
       >
         {/* Subtle top accent line */}
         <div
           className="absolute top-0 left-0 right-0 h-px"
-          style={{ background: 'linear-gradient(90deg, transparent, oklch(0.72 0.10 55 / 0.6), transparent)' }}
+          style={{
+            background:
+              "linear-gradient(90deg, transparent, oklch(0.72 0.10 55 / 0.6), transparent)",
+          }}
         />
 
         <div className="px-6 pt-6 pb-5">
@@ -69,7 +82,7 @@ export default function NewSongModal({ open, onClose, onCreate }: NewSongModalPr
             <div>
               <h2
                 className="text-primary font-semibold"
-                style={{ fontSize: 15, letterSpacing: '-0.01em' }}
+                style={{ fontSize: 15, letterSpacing: "-0.01em" }}
               >
                 New Song
               </h2>
@@ -89,7 +102,11 @@ export default function NewSongModal({ open, onClose, onCreate }: NewSongModalPr
           <form onSubmit={handleSubmit}>
             <label
               className="block text-secondary mb-1.5"
-              style={{ fontSize: 11.5, letterSpacing: '0.04em', textTransform: 'uppercase' }}
+              style={{
+                fontSize: 11.5,
+                letterSpacing: "0.04em",
+                textTransform: "uppercase",
+              }}
             >
               Title
             </label>
@@ -101,18 +118,20 @@ export default function NewSongModal({ open, onClose, onCreate }: NewSongModalPr
               disabled={busy}
               className="w-full rounded-lg px-3 py-2.5 text-primary placeholder:text-faint outline-none transition-all"
               style={{
-                background: 'oklch(0.145 0.008 60)',
-                border: '1px solid oklch(0.32 0.012 60 / 0.5)',
+                background: "oklch(0.145 0.008 60)",
+                border: "1px solid oklch(0.32 0.012 60 / 0.5)",
                 fontSize: 14,
-                fontFamily: 'inherit',
+                fontFamily: "inherit",
               }}
               onFocus={(e) => {
-                e.currentTarget.style.borderColor = 'oklch(0.72 0.10 55 / 0.6)'
-                e.currentTarget.style.boxShadow = '0 0 0 3px oklch(0.72 0.10 55 / 0.1)'
+                e.currentTarget.style.borderColor = "oklch(0.72 0.10 55 / 0.6)";
+                e.currentTarget.style.boxShadow =
+                  "0 0 0 3px oklch(0.72 0.10 55 / 0.1)";
               }}
               onBlur={(e) => {
-                e.currentTarget.style.borderColor = 'oklch(0.32 0.012 60 / 0.5)'
-                e.currentTarget.style.boxShadow = 'none'
+                e.currentTarget.style.borderColor =
+                  "oklch(0.32 0.012 60 / 0.5)";
+                e.currentTarget.style.boxShadow = "none";
               }}
             />
 
@@ -132,21 +151,23 @@ export default function NewSongModal({ open, onClose, onCreate }: NewSongModalPr
                 className="px-4 py-2 rounded-lg font-semibold transition-all cursor-pointer border-none"
                 style={{
                   fontSize: 13,
-                  background: title.trim() && !busy
-                    ? 'oklch(0.72 0.10 55)'
-                    : 'oklch(0.72 0.10 55 / 0.35)',
-                  color: title.trim() && !busy
-                    ? 'oklch(0.145 0.008 60)'
-                    : 'oklch(0.72 0.10 55 / 0.5)',
-                  cursor: title.trim() && !busy ? 'pointer' : 'not-allowed',
+                  background:
+                    title.trim() && !busy
+                      ? "oklch(0.72 0.10 55)"
+                      : "oklch(0.72 0.10 55 / 0.35)",
+                  color:
+                    title.trim() && !busy
+                      ? "oklch(0.145 0.008 60)"
+                      : "oklch(0.72 0.10 55 / 0.5)",
+                  cursor: title.trim() && !busy ? "pointer" : "not-allowed",
                 }}
               >
-                {busy ? 'Creating…' : 'Create Song'}
+                {busy ? "Creating…" : "Create Song"}
               </button>
             </div>
           </form>
         </div>
       </div>
     </div>
-  )
+  );
 }

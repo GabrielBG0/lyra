@@ -33,7 +33,7 @@ export default function VaultOptionsModal({
   useEffect(() => {
     if (open) {
       tauriApi.vault.getVaultPath().then(setCurrentPath);
-      tauriApi.config.get().then(cfg => setDebugMode(cfg.debug_mode));
+      tauriApi.config.get().then((cfg) => setDebugMode(cfg.debug_mode));
       setNewPath(null);
       setNukeConfirming(false);
     }
@@ -51,7 +51,11 @@ export default function VaultOptionsModal({
     try {
       await tauriApi.vault.setVaultPath(newPath);
       const current = await tauriApi.config.get();
-      await tauriApi.config.set({ ...current, vault_path: newPath, last_opened_song: null });
+      await tauriApi.config.set({
+        ...current,
+        vault_path: newPath,
+        last_opened_song: null,
+      });
       window.location.reload();
     } finally {
       setLoading(false);
@@ -135,9 +139,7 @@ export default function VaultOptionsModal({
             >
               Vault folder
             </label>
-            <div
-              className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg border border-border bg-bg"
-            >
+            <div className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg border border-border bg-bg">
               <Icons.Folder size={14} className="text-accent shrink-0" />
               <span
                 className="flex-1 text-secondary truncate font-mono"
@@ -160,13 +162,13 @@ export default function VaultOptionsModal({
             <div
               className="mt-5 rounded-lg border px-3 py-3"
               style={{
-                background: 'oklch(0.55 0.18 25 / 0.06)',
-                borderColor: 'oklch(0.55 0.18 25 / 0.25)',
+                background: "oklch(0.55 0.18 25 / 0.06)",
+                borderColor: "oklch(0.55 0.18 25 / 0.25)",
               }}
             >
               <div
                 className="font-semibold uppercase tracking-wide mb-2.5"
-                style={{ fontSize: 10.5, color: 'oklch(0.65 0.18 25)' }}
+                style={{ fontSize: 10.5, color: "oklch(0.65 0.18 25)" }}
               >
                 Danger Zone
               </div>
@@ -174,23 +176,36 @@ export default function VaultOptionsModal({
               {!nukeConfirming ? (
                 <div className="flex items-center justify-between gap-3">
                   <div>
-                    <div className="text-secondary" style={{ fontSize: 13 }}>Nuke Vault</div>
-                    <div className="text-muted mt-0.5 leading-snug" style={{ fontSize: 11.5 }}>
+                    <div className="text-secondary" style={{ fontSize: 13 }}>
+                      Nuke Vault
+                    </div>
+                    <div
+                      className="text-muted mt-0.5 leading-snug"
+                      style={{ fontSize: 11.5 }}
+                    >
                       Delete all songs and reset the vault index
                     </div>
                   </div>
                   <button
                     onClick={() => setNukeConfirming(true)}
                     className="shrink-0 px-3 py-1.5 rounded-lg font-semibold border-none cursor-pointer transition-all hover:brightness-110"
-                    style={{ fontSize: 12.5, background: 'var(--color-danger)', color: 'oklch(0.96 0.01 60)' }}
+                    style={{
+                      fontSize: 12.5,
+                      background: "var(--color-danger)",
+                      color: "oklch(0.96 0.01 60)",
+                    }}
                   >
                     Nuke Vault
                   </button>
                 </div>
               ) : (
                 <div>
-                  <p className="text-secondary leading-snug mb-3" style={{ fontSize: 12.5 }}>
-                    This will permanently delete all songs and reset the vault index. This cannot be undone.
+                  <p
+                    className="text-secondary leading-snug mb-3"
+                    style={{ fontSize: 12.5 }}
+                  >
+                    This will permanently delete all songs and reset the vault
+                    index. This cannot be undone.
                   </p>
                   <div className="flex items-center justify-end gap-2">
                     <button
@@ -205,9 +220,13 @@ export default function VaultOptionsModal({
                       onClick={handleNuke}
                       disabled={nuking}
                       className="px-3 py-1.5 rounded-lg font-semibold border-none cursor-pointer transition-all hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed"
-                      style={{ fontSize: 12.5, background: 'var(--color-danger)', color: 'oklch(0.96 0.01 60)' }}
+                      style={{
+                        fontSize: 12.5,
+                        background: "var(--color-danger)",
+                        color: "oklch(0.96 0.01 60)",
+                      }}
                     >
-                      {nuking ? 'Deleting…' : 'Delete everything'}
+                      {nuking ? "Deleting…" : "Delete everything"}
                     </button>
                   </div>
                 </div>

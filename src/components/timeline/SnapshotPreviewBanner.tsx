@@ -6,7 +6,9 @@ interface SnapshotPreviewBannerProps {
   snapshotId: string;
 }
 
-export default function SnapshotPreviewBanner({ snapshotId }: SnapshotPreviewBannerProps) {
+export default function SnapshotPreviewBanner({
+  snapshotId,
+}: SnapshotPreviewBannerProps) {
   const { loadedSnapshots, exitPreview } = useEditorStore();
   const { restoreSnapshot } = useSnapshot();
 
@@ -18,7 +20,9 @@ export default function SnapshotPreviewBanner({ snapshotId }: SnapshotPreviewBan
   };
 
   const formattedDate = snapshot
-    ? new Date(snapshot.created_at).toLocaleDateString(undefined, { dateStyle: 'medium' })
+    ? new Date(snapshot.created_at).toLocaleDateString(undefined, {
+        dateStyle: "medium",
+      })
     : null;
 
   return (
@@ -27,7 +31,9 @@ export default function SnapshotPreviewBanner({ snapshotId }: SnapshotPreviewBan
       <span className="text-secondary">Viewing take</span>
       {snapshot ? (
         <>
-          <span className="font-medium text-primary">{snapshot.note ?? 'Untitled'}</span>
+          <span className="font-medium text-primary">
+            {snapshot.note ?? "Untitled"}
+          </span>
           <span className="text-muted">·</span>
           <span className="text-muted text-xs">{formattedDate}</span>
         </>

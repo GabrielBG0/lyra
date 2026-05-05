@@ -72,7 +72,10 @@ export default function SongList({ vaultPath, onCreateSong }: SongListProps) {
   };
 
   return (
-    <aside data-tour="sidebar" className="w-65 shrink-0 bg-panel border-r border-border-soft flex flex-col h-full">
+    <aside
+      data-tour="sidebar"
+      className="w-65 shrink-0 bg-panel border-r border-border-soft flex flex-col h-full"
+    >
       {/* Header */}
       <div className="flex flex-col px-3.5 pt-3.5 pb-2.5 pr-11">
         <div className="font-semibold text-primary text-[13px] tracking-wide leading-tight mb-1">
@@ -96,7 +99,10 @@ export default function SongList({ vaultPath, onCreateSong }: SongListProps) {
               onClick={() => setSortOpen((o) => !o)}
             >
               <span>{SORT_LABELS[sort]}</span>
-              <Icons.ChevronDown size={11} className="text-faint shrink-0 ml-1" />
+              <Icons.ChevronDown
+                size={11}
+                className="text-faint shrink-0 ml-1"
+              />
             </button>
             {sortOpen && (
               <div className="absolute top-full left-0 right-0 mt-1 z-20 menu-popover">
@@ -104,7 +110,10 @@ export default function SongList({ vaultPath, onCreateSong }: SongListProps) {
                   <button
                     key={key}
                     className="menu-item w-full text-left px-2.5 py-1.5 rounded text-[11.5px] cursor-pointer border-none bg-transparent hover:bg-panel text-secondary hover:text-primary"
-                    onClick={() => { setSort(key); setSortOpen(false); }}
+                    onClick={() => {
+                      setSort(key);
+                      setSortOpen(false);
+                    }}
                   >
                     {SORT_LABELS[key]}
                   </button>

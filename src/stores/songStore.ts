@@ -1,17 +1,17 @@
 // Song list and selection state.
 // Populated by useVault on startup and kept live by file-watcher events.
 
-import { create } from 'zustand'
-import type { SongIndexEntry } from '../lib/types'
+import { create } from "zustand";
+import type { SongIndexEntry } from "../lib/types";
 
 interface SongStore {
-  songs: SongIndexEntry[]
-  selectedSongPath: string | null
+  songs: SongIndexEntry[];
+  selectedSongPath: string | null;
 
-  setSongs: (songs: SongIndexEntry[]) => void
-  upsertSong: (entry: SongIndexEntry) => void
-  removeSong: (filePath: string) => void
-  selectSong: (path: string | null) => void
+  setSongs: (songs: SongIndexEntry[]) => void;
+  upsertSong: (entry: SongIndexEntry) => void;
+  removeSong: (filePath: string) => void;
+  selectSong: (path: string | null) => void;
 }
 
 export const useSongStore = create<SongStore>((set) => ({
@@ -22,11 +22,15 @@ export const useSongStore = create<SongStore>((set) => ({
 
   upsertSong: (entry) =>
     set((state) => {
-      const exists = state.songs.some((s) => s.file_path === entry.file_path)
+      const exists = state.songs.some((s) => s.file_path === entry.file_path);
       if (exists) {
-        return { songs: state.songs.map((s) => (s.file_path === entry.file_path ? entry : s)) }
+        return {
+          songs: state.songs.map((s) =>
+            s.file_path === entry.file_path ? entry : s,
+          ),
+        };
       }
-      return { songs: [...state.songs, entry] }
+      return { songs: [...state.songs, entry] };
     }),
 
   removeSong: (filePath) =>
@@ -37,4 +41,4 @@ export const useSongStore = create<SongStore>((set) => ({
     })),
 
   selectSong: (path) => set({ selectedSongPath: path }),
-}))
+}));

@@ -7,7 +7,11 @@ import { useSong } from "../../hooks/useSong";
 import { useSnapshot } from "../../hooks/useSnapshot";
 import { useUIStore } from "../../stores/uiStore";
 import { tauriApi } from "../../lib/tauri";
-import { serializeSection, looksLikeSection, parseSection } from "../../lib/sectionClipboard";
+import {
+  serializeSection,
+  looksLikeSection,
+  parseSection,
+} from "../../lib/sectionClipboard";
 import { generateUlid } from "../../lib/ulid";
 import type { Section } from "../../lib/types";
 
@@ -64,19 +68,37 @@ export default function MenuBar({
 }: MenuBarProps) {
   const [open, setOpen] = useState<string | null>(null);
   const [maximized, setMaximized] = useState(false);
-  const { metadata, isDirty, filePath, past, future, undo, redo, focusedSectionId, sections, addSection, removeSection, findMatches, findNext, findPrev } = useEditorStore();
+  const {
+    metadata,
+    isDirty,
+    filePath,
+    past,
+    future,
+    undo,
+    redo,
+    focusedSectionId,
+    sections,
+    addSection,
+    removeSection,
+    findMatches,
+    findNext,
+    findPrev,
+  } = useEditorStore();
   const { saveSong } = useSong();
   const { createSnapshot } = useSnapshot();
-  const { openSnapshotModal, openPreferencesModal, openFindPanel, toggleFindReplace, findPanelOpen, findReplaceMode } = useUIStore();
+  const {
+    openSnapshotModal,
+    openPreferencesModal,
+    openFindPanel,
+    toggleFindReplace,
+    findPanelOpen,
+    findReplaceMode,
+  } = useUIStore();
   const menuRef = useRef<HTMLDivElement>(null);
   const win = getCurrentWindow();
 
   const MENUS = {
-    Lyra: [
-      `Preferences…\t${mod},`,
-      "—",
-      "Vault Options…",
-    ],
+    Lyra: [`Preferences…\t${mod},`, "—", "Vault Options…"],
     File: [
       `New Song\t${mod}N`,
       `Open Vault…\t${mod}O`,
@@ -194,10 +216,17 @@ export default function MenuBar({
   const isEnabled = (label: string): boolean => {
     if (label === "Undo") return past.length > 0;
     if (label === "Redo") return future.length > 0;
-    if (label === "Cut" || label === "Copy") return !!focusedSectionId && !!metadata;
+    if (label === "Cut" || label === "Copy")
+      return !!focusedSectionId && !!metadata;
     if (label === "Paste") return !!metadata;
-    if (label === "Find…" || label === "Show Replace" || label === "Hide Replace") return !!filePath;
-    if (label === "Find Next" || label === "Find Previous") return findPanelOpen && findMatches.length > 0;
+    if (
+      label === "Find…" ||
+      label === "Show Replace" ||
+      label === "Hide Replace"
+    )
+      return !!filePath;
+    if (label === "Find Next" || label === "Find Previous")
+      return findPanelOpen && findMatches.length > 0;
     return IMPLEMENTED.has(label);
   };
 
@@ -206,7 +235,11 @@ export default function MenuBar({
     if (!selected || Array.isArray(selected)) return;
     await tauriApi.vault.setVaultPath(selected);
     const current = await tauriApi.config.get();
-    await tauriApi.config.set({ ...current, vault_path: selected, last_opened_song: null });
+    await tauriApi.config.set({
+      ...current,
+      vault_path: selected,
+      last_opened_song: null,
+    });
     window.location.reload();
   };
 
@@ -239,7 +272,8 @@ export default function MenuBar({
     else if (label === "Find…") openFindPanel();
     else if (label === "Find Next") findNext();
     else if (label === "Find Previous") findPrev();
-    else if (label === "Show Replace" || label === "Hide Replace") toggleFindReplace();
+    else if (label === "Show Replace" || label === "Hide Replace")
+      toggleFindReplace();
     else if (label === "Toggle Sidebar") onToggleSidebar();
     else if (label === "Toggle History Bar") onToggleHistoryBar();
     else if (label === "Save") saveSong();

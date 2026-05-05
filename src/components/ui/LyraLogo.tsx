@@ -1,14 +1,18 @@
-import { useId } from 'react'
+import { useId } from "react";
 
 interface LyraLogoProps {
-  size?: number
-  dim?: boolean
-  glow?: boolean
+  size?: number;
+  dim?: boolean;
+  glow?: boolean;
 }
 
-export default function LyraLogo({ size = 28, dim = false, glow = true }: LyraLogoProps) {
-  const rawId = useId()
-  const glowFilterId = `lyra-vega-glow-${rawId}`
+export default function LyraLogo({
+  size = 28,
+  dim = false,
+  glow = true,
+}: LyraLogoProps) {
+  const rawId = useId();
+  const glowFilterId = `lyra-vega-glow-${rawId}`;
 
   return (
     <svg
@@ -20,13 +24,25 @@ export default function LyraLogo({ size = 28, dim = false, glow = true }: LyraLo
     >
       <defs>
         {glow && (
-          <filter id={glowFilterId} x="-50%" y="-50%" width="200%" height="200%">
+          <filter
+            id={glowFilterId}
+            x="-50%"
+            y="-50%"
+            width="200%"
+            height="200%"
+          >
             <feGaussianBlur stdDeviation="1.2" />
           </filter>
         )}
       </defs>
       {/* Constellation lines */}
-      <g stroke="#b0864f" strokeWidth="0.35" strokeLinejoin="round" strokeLinecap="round" opacity="0.85">
+      <g
+        stroke="#b0864f"
+        strokeWidth="0.35"
+        strokeLinejoin="round"
+        strokeLinecap="round"
+        opacity="0.85"
+      >
         <path d="M4.3 19.88 L9.82 20.03 L17.46 10.4 L12.23 10.06 L4.3 19.88 Z" />
         <path d="M22.8 9.12 L19.98 5.28 L17.46 10.4 L22.8 9.12 Z" />
       </g>
@@ -40,9 +56,16 @@ export default function LyraLogo({ size = 28, dim = false, glow = true }: LyraLo
       </g>
       {/* Vega — brightest */}
       {glow && (
-        <circle cx="22.83" cy="9.12" r="2.4" fill="#FFBB41" opacity="0.28" filter={`url(#${glowFilterId})`} />
+        <circle
+          cx="22.83"
+          cy="9.12"
+          r="2.4"
+          fill="#FFBB41"
+          opacity="0.28"
+          filter={`url(#${glowFilterId})`}
+        />
       )}
       <circle cx="22.83" cy="9.12" r="1.15" fill="#FCE7C1" />
     </svg>
-  )
+  );
 }

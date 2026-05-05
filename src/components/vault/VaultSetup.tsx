@@ -56,8 +56,8 @@ export default function VaultSetup({ onDone }: VaultSetupProps) {
         </h1>
         <p className="text-sm text-muted leading-relaxed mb-7">
           Before you begin, point Lyra at a folder on your disk. This is your{" "}
-          <span className="text-accent font-medium">vault</span>, where every song
-          you write lives as a plain file.
+          <span className="text-accent font-medium">vault</span>, where every
+          song you write lives as a plain file.
         </p>
 
         {/* Options */}
@@ -138,9 +138,12 @@ export default function VaultSetup({ onDone }: VaultSetupProps) {
               />
               <button
                 className="shrink-0 px-2.5 py-2 text-xs text-secondary hover:text-primary hover:bg-elev transition-colors border-none border-l border-border-soft bg-transparent cursor-pointer"
-                style={{ borderLeft: '1px solid var(--color-border-soft)' }}
+                style={{ borderLeft: "1px solid var(--color-border-soft)" }}
                 onClick={async () => {
-                  const selected = await openDialog({ directory: true, multiple: false });
+                  const selected = await openDialog({
+                    directory: true,
+                    multiple: false,
+                  });
                   if (selected && !Array.isArray(selected)) setPath(selected);
                 }}
               >

@@ -55,7 +55,13 @@ export function NowCard({ onClick }: NowCardProps) {
   );
 }
 
-export default function SnapshotCard({ header, index, isPreview, isShiftSelected, onClick }: SnapshotCardProps) {
+export default function SnapshotCard({
+  header,
+  index,
+  isPreview,
+  isShiftSelected,
+  onClick,
+}: SnapshotCardProps) {
   const label = `#${index + 1}`;
   const [menuPos, setMenuPos] = useState<{ x: number; y: number } | null>(null);
   const { restoreSnapshot } = useSnapshot();
@@ -92,14 +98,16 @@ export default function SnapshotCard({ header, index, isPreview, isShiftSelected
           isPreview
             ? "border border-accent bg-accent-soft"
             : isShiftSelected
-            ? "border border-dashed border-accent"
-            : "border border-border-soft hover:border-accent hover:bg-elev"
+              ? "border border-dashed border-accent"
+              : "border border-border-soft hover:border-accent hover:bg-elev"
         }`}
         onClick={(e) => onClick(header.id, e.shiftKey)}
         onContextMenu={handleContextMenu}
       >
         {isShiftSelected && (
-          <div className="text-2xs text-accent font-semibold uppercase tracking-wide">compare from</div>
+          <div className="text-2xs text-accent font-semibold uppercase tracking-wide">
+            compare from
+          </div>
         )}
         <div className="flex items-start justify-between gap-2">
           <div
@@ -119,7 +127,8 @@ export default function SnapshotCard({ header, index, isPreview, isShiftSelected
         </div>
         <div className="flex items-baseline justify-between">
           <span className="text-2xs text-faint uppercase tracking-wide font-medium">
-            {header.section_count} section{header.section_count !== 1 ? "s" : ""}
+            {header.section_count} section
+            {header.section_count !== 1 ? "s" : ""}
           </span>
           <span className="text-[10.5px] text-faint">{label}</span>
         </div>

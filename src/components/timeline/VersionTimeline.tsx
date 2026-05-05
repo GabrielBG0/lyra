@@ -12,7 +12,8 @@ const NUDGE_MIN_ELAPSED_MS = 5 * 60 * 1000;
 export default function VersionTimeline() {
   const { historyBarExpanded: expanded, toggleHistoryBar } = useUIStore();
   const [shiftSelectedId, setShiftSelectedId] = useState<string | null>(null);
-  const { snapshotHeaders, previewSnapshotId, exitPreview, diffTargetB } = useEditorStore();
+  const { snapshotHeaders, previewSnapshotId, exitPreview, diffTargetB } =
+    useEditorStore();
   const filePath = useEditorStore((s) => s.filePath);
 
   const { createSnapshot } = useSnapshot();
@@ -44,7 +45,8 @@ export default function VersionTimeline() {
       if (
         state.filePath !== null &&
         state.filePath === prevState.filePath &&
-        (state.sections !== prevState.sections || state.metadata !== prevState.metadata)
+        (state.sections !== prevState.sections ||
+          state.metadata !== prevState.metadata)
       ) {
         changeCount.current++;
       }
@@ -139,7 +141,9 @@ export default function VersionTimeline() {
               <button
                 className="shrink-0 flex items-center gap-1 px-2.5 py-1 bg-accent/70 text-bg font-semibold rounded font-ui cursor-pointer border-none hover:bg-accent/90 transition-all"
                 style={{ fontSize: 11 }}
-                onClick={() => openSnapshotModal((note) => createSnapshot(note))}
+                onClick={() =>
+                  openSnapshotModal((note) => createSnapshot(note))
+                }
               >
                 <Icons.Pin size={11} />
                 Save take
@@ -148,8 +152,12 @@ export default function VersionTimeline() {
             <button
               className="shrink-0 flex items-center justify-center w-5 h-5 bg-transparent border-none rounded cursor-pointer transition-colors"
               style={{ color: "oklch(0.52 0.10 20)" }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = "oklch(0.45 0.15 20)")}
-              onMouseLeave={(e) => (e.currentTarget.style.color = "oklch(0.52 0.10 20)")}
+              onMouseEnter={(e) =>
+                (e.currentTarget.style.color = "oklch(0.45 0.15 20)")
+              }
+              onMouseLeave={(e) =>
+                (e.currentTarget.style.color = "oklch(0.52 0.10 20)")
+              }
               onClick={() => setNudgeDismissed(true)}
               aria-label="Dismiss"
             >
@@ -214,7 +222,9 @@ export default function VersionTimeline() {
               key={header.id}
               header={header}
               index={snapshotHeaders.length - 1 - i}
-              isPreview={previewSnapshotId === header.id || diffTargetB === header.id}
+              isPreview={
+                previewSnapshotId === header.id || diffTargetB === header.id
+              }
               isShiftSelected={shiftSelectedId === header.id}
               onClick={handleCardClick}
             />
@@ -222,7 +232,10 @@ export default function VersionTimeline() {
           {snapshotHeaders.length === 0 && (
             <div
               className="shrink-0 w-42.5 p-2.5 rounded-lg flex items-center justify-center cursor-pointer opacity-50 hover:opacity-75 transition-opacity"
-              style={{ border: "1.5px dashed oklch(0.55 0.08 55 / 0.4)", minHeight: 80 }}
+              style={{
+                border: "1.5px dashed oklch(0.55 0.08 55 / 0.4)",
+                minHeight: 80,
+              }}
               onClick={() => openSnapshotModal((note) => createSnapshot(note))}
             >
               <span className="text-xs text-faint">Save your first take</span>

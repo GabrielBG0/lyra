@@ -13,6 +13,7 @@ Lyra is a desktop application (Tauri 2 + React 19 + Rust) for songwriters to man
 ## Data Format
 
 Each song is a ZIP file (`.lyr`) containing:
+
 - `song.toml` — metadata (title, status, key, BPM, tags)
 - `sections/{ulid}.toml` — lyric content per section
 - `snapshots/{ulid}.json` — immutable point-in-time captures (append-only)
@@ -23,6 +24,7 @@ The SQLite index is a **cache** rebuilt from disk on startup — never treat it 
 ## CSS Conventions
 
 Colors use **OKLch** (not hex/hsl). Design tokens are defined in `src/styles/global.css` under `@theme`:
+
 - Surfaces: `bg`, `surface`, `panel`, `elev`
 - Text: `primary`, `secondary`, `muted`, `faint`
 - Accent: amber variants
@@ -54,7 +56,8 @@ In code, use `${mod}${shift}Z` — never `${shift}${mod}Z`.
 ## Writing preferences
 
 When writing text for the UI components, keep these principles in mind:
-- Never use "—" (em dash). Always prefer to use a comma or split into multiple sentences. 
+
+- Never use "—" (em dash). Always prefer to use a comma or split into multiple sentences.
 - Write in a more human way, when appropriate. For example, instead of "This is the song editor, where you can edit your songs", say "Here you can edit your songs".
 
 ## Design Style Guidelines

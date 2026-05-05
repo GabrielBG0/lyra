@@ -1,4 +1,5 @@
 # Test Plan — Lyra TypeScript (Tier 1 + Tier 2)
+
 Generated: 2026-05-04
 
 ## Scope
@@ -17,18 +18,19 @@ Pure logic in `src/lib/` and Zustand store state management in `src/stores/`. No
 
 ## Files Covered
 
-| Source File | Test File | Test Types | # Tests |
-|---|---|---|---|
-| `src/lib/findMatches.ts` | `src/lib/__tests__/findMatches.test.ts` | unit | 18 |
-| `src/lib/sectionClipboard.ts` | `src/lib/__tests__/sectionClipboard.test.ts` | unit | 18 |
-| `src/lib/shortcuts.ts` | `src/lib/__tests__/shortcuts.test.ts` | unit | 14 |
-| `src/lib/ulid.ts` | `src/lib/__tests__/ulid.test.ts` | unit | 7 |
-| `src/stores/songStore.ts` | `src/stores/__tests__/songStore.test.ts` | unit | 14 |
-| `src/stores/editorStore.ts` | `src/stores/__tests__/editorStore.test.ts` | unit | 42 |
+| Source File                   | Test File                                    | Test Types | # Tests |
+| ----------------------------- | -------------------------------------------- | ---------- | ------- |
+| `src/lib/findMatches.ts`      | `src/lib/__tests__/findMatches.test.ts`      | unit       | 18      |
+| `src/lib/sectionClipboard.ts` | `src/lib/__tests__/sectionClipboard.test.ts` | unit       | 18      |
+| `src/lib/shortcuts.ts`        | `src/lib/__tests__/shortcuts.test.ts`        | unit       | 14      |
+| `src/lib/ulid.ts`             | `src/lib/__tests__/ulid.test.ts`             | unit       | 7       |
+| `src/stores/songStore.ts`     | `src/stores/__tests__/songStore.test.ts`     | unit       | 14      |
+| `src/stores/editorStore.ts`   | `src/stores/__tests__/editorStore.test.ts`   | unit       | 42      |
 
 ## Test Cases Summary
 
 ### `src/lib/findMatches.ts`
+
 - `computeMatches`: empty query, empty sections, single match, multiple matches in one section
 - `matchIndex` per-section reset
 - Cross-section matching with correct `sectionIndex`
@@ -37,26 +39,31 @@ Pure logic in `src/lib/` and Zustand store state management in `src/stores/`. No
 - `end` offset = `start + query.length`
 
 ### `src/lib/sectionClipboard.ts`
+
 - `serializeSection`: correct header format, all field types, empty content
 - `parseSection`: round-trip, null for empty/bad input, unknown type → `'verse'`, all valid types, lowercase normalization, CRLF handling, content trimming, internal newlines preserved
 - `looksLikeSection`: true for `---` prefix, false for plain text, leading-whitespace handling, empty string
 
 ### `src/lib/shortcuts.ts`
+
 - `matchesShortcut`: ctrlKey, metaKey, no-mod, wrong key, unexpected shift, mod+shift combos, key case insensitivity, non-alpha keys (comma), def with no main key
 - `SHORTCUT_CATEGORIES`: non-empty, all shortcuts have keys, all shortcuts have a main key, no duplicate combos
 
 ### `src/lib/ulid.ts`
+
 - Format: 26 chars, Crockford base32 regex, 50-call fuzzing
 - Uniqueness: 100 consecutive calls, same timestamp
 - Sortability: later timestamp → lexicographically greater; time prefix monotonic across 10 sequential timestamps
 
 ### `src/stores/songStore.ts`
+
 - `setSongs`: full replace, clear to empty
 - `upsertSong`: insert new, update existing by `file_path`, two different paths
 - `removeSong`: removes by path, clears `selectedSongPath` when active song removed, preserves selection for other song, no-op for unknown path
 - `selectSong`: set, deselect with null, switch between paths
 
 ### `src/stores/editorStore.ts`
+
 - `loadSong`: populates state, resets dirty+history, closes find panel via uiStore
 - `closeSong`: nullifies all fields
 - `execute/undo/redo`: apply called, clears future, undo → future, undo no-op on empty stack, redo → past, redo no-op, MAX_HISTORY=100 cap
@@ -82,15 +89,15 @@ Pure logic in `src/lib/` and Zustand store state management in `src/stores/`. No
 
 ## Results
 
-| Test File | Passed | Failed | Skipped |
-|---|---|---|---|
-| `findMatches.test.ts` | 18 | 0 | 0 |
-| `sectionClipboard.test.ts` | 18 | 0 | 0 |
-| `shortcuts.test.ts` | 14 | 0 | 0 |
-| `ulid.test.ts` | 7 | 0 | 0 |
-| `songStore.test.ts` | 14 | 0 | 0 |
-| `editorStore.test.ts` | 42 | 0 | 0 |
-| **Total** | **113** | **0** | **0** |
+| Test File                  | Passed  | Failed | Skipped |
+| -------------------------- | ------- | ------ | ------- |
+| `findMatches.test.ts`      | 18      | 0      | 0       |
+| `sectionClipboard.test.ts` | 18      | 0      | 0       |
+| `shortcuts.test.ts`        | 14      | 0      | 0       |
+| `ulid.test.ts`             | 7       | 0      | 0       |
+| `songStore.test.ts`        | 14      | 0      | 0       |
+| `editorStore.test.ts`      | 42      | 0      | 0       |
+| **Total**                  | **113** | **0**  | **0**   |
 
 ## Coverage
 

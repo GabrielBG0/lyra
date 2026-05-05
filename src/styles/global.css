@@ -26,7 +26,8 @@
 
 @font-face {
   font-family: "Noto Serif";
-  src: url("/fonts/NotoSerif-Italic-VariableFont_wdth,wght.ttf") format("truetype");
+  src: url("/fonts/NotoSerif-Italic-VariableFont_wdth,wght.ttf")
+    format("truetype");
   font-weight: 100 900;
   font-style: italic;
   font-display: swap;
@@ -88,12 +89,15 @@
   --color-diff-remove-text: #e68478;
 
   /* ── Find highlights */
-  --color-find-match: oklch(0.72 0.10 55 / 0.25);
-  --color-find-match-active: oklch(0.72 0.10 55 / 0.55);
+  --color-find-match: oklch(0.72 0.1 55 / 0.25);
+  --color-find-match-active: oklch(0.72 0.1 55 / 0.55);
 
   /* ── Typography */
-  --font-ui: "Satoshi", -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
-  --font-lyrics: "Noto Serif", "Noto Serif JP", "Noto Serif KR", Georgia, "Times New Roman", serif;
+  --font-ui:
+    "Satoshi", -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+  --font-lyrics:
+    "Noto Serif", "Noto Serif JP", "Noto Serif KR", Georgia, "Times New Roman",
+    serif;
 
   /* ── Extra text sizes not in Tailwind's default scale */
   --text-2xs: 10px;
@@ -149,8 +153,14 @@
 }
 
 @keyframes menu-in {
-  from { opacity: 0; transform: translateY(-4px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @layer components {
@@ -159,7 +169,9 @@
     background: oklch(0.205 0.012 60);
     border: 1px solid oklch(0.32 0.012 60 / 0.5);
     border-radius: 0.5rem;
-    box-shadow: 0 12px 32px oklch(0.06 0.005 60 / 0.65), 0 0 0 1px oklch(0.32 0.012 60 / 0.35);
+    box-shadow:
+      0 12px 32px oklch(0.06 0.005 60 / 0.65),
+      0 0 0 1px oklch(0.32 0.012 60 / 0.35);
     padding: 0.25rem;
     position: relative;
     animation: menu-in 90ms ease-out both;
@@ -172,7 +184,12 @@
     left: 0;
     right: 0;
     height: 1px;
-    background: linear-gradient(90deg, transparent, oklch(0.72 0.10 55 / 0.45), transparent);
+    background: linear-gradient(
+      90deg,
+      transparent,
+      oklch(0.72 0.1 55 / 0.45),
+      transparent
+    );
     pointer-events: none;
   }
 
@@ -180,7 +197,9 @@
   .menu-item,
   .menu-item-danger {
     position: relative;
-    transition: background-color 100ms, color 100ms;
+    transition:
+      background-color 100ms,
+      color 100ms;
   }
   .menu-item::before,
   .menu-item-danger::before {
@@ -194,10 +213,16 @@
     opacity: 0;
     transition: opacity 100ms;
   }
-  .menu-item::before { background: oklch(0.72 0.1 55); }
-  .menu-item-danger::before { background: oklch(0.66 0.1 22); }
+  .menu-item::before {
+    background: oklch(0.72 0.1 55);
+  }
+  .menu-item-danger::before {
+    background: oklch(0.66 0.1 22);
+  }
   .menu-item:hover::before,
-  .menu-item-danger:hover::before { opacity: 1; }
+  .menu-item-danger:hover::before {
+    opacity: 1;
+  }
 
   /* Auto-resizing textarea — no visible chrome */
   .lyric-textarea {

@@ -1,29 +1,30 @@
 // Intercepts the native window close event and saves any dirty song first.
 
-import { useEffect } from 'react'
-import { getCurrentWindow } from '@tauri-apps/api/window'
-import { tauriApi } from '../lib/tauri'
-import { useEditorStore } from '../stores/editorStore'
+import { useEffect } from "react";
+import { getCurrentWindow } from "@tauri-apps/api/window";
+import { tauriApi } from "../lib/tauri";
+import { useEditorStore } from "../stores/editorStore";
 
 export function useCloseGuard() {
   useEffect(() => {
-    const win = getCurrentWindow()
+    const win = getCurrentWindow();
 
     const unlisten = win.onCloseRequested(async (event) => {
-      event.preventDefault()
+      event.preventDefault();
 
-      const { isDirty, filePath, metadata, sections, markClean } = useEditorStore.getState()
+      const { isDirty, filePath, metadata, sections, markClean } =
+        useEditorStore.getState();
 
       if (isDirty && filePath && metadata) {
-        await tauriApi.song.save(filePath, metadata, sections)
-        markClean()
+        await tauriApi.song.save(filePath, metadata, sections);
+        markClean();
       }
 
-      await win.destroy()
-    })
+      await win.destroy();
+    });
 
     return () => {
-      unlisten.then((fn) => fn())
-    }
-  }, [])
+      unlisten.then((fn) => fn());
+    };
+  }, []);
 }

@@ -11,12 +11,13 @@ Lyra is a desktop app for writing lyrics. Writing is the protagonist — the int
 ### Five guiding principles
 
 1. **The page is sacred.** The lyric area is the only region that uses a serif, the only region with generous leading, and the only region that runs at 85% width for measure. Chrome surrounds it, but never invades it.
-2. **Ink over glass.** No glassmorphism, no gradients on content surfaces, no shine. Elevations are expressed by subtle shifts in lightness on a warm-dark substrate, not by shadows or blurs. Shadows exist only under modals and popovers, where they signal *detachment* from the surface — not decoration.
+2. **Ink over glass.** No glassmorphism, no gradients on content surfaces, no shine. Elevations are expressed by subtle shifts in lightness on a warm-dark substrate, not by shadows or blurs. Shadows exist only under modals and popovers, where they signal _detachment_ from the surface — not decoration.
 3. **Warm restraint.** A single amber accent (`--color-accent`) and a rose secondary (`--color-brand-rose`) do all the emotional work. Status colors exist but are muted and used sparingly. No blues, no vibrant greens, no saturated UI chrome.
 4. **Progressive disclosure.** Section tools, delete affordances, rename hints, insert-between handles — all hidden until hover. The editing surface looks finished at rest; controls appear when you reach for them.
 5. **Typographic hierarchy before visual hierarchy.** Borders are soft (`border-soft` at 22% opacity). Dividers are nearly invisible. The eye is led by size, weight, and color — not by boxes and lines.
 
 ### Tone
+
 - **Editorial, not productive.** Lyra is closer to a leather-bound journal than a project manager. Copy is plain, slightly literary. Empty states invite ("Pick a song from the sidebar, or start a new one.") rather than instruct.
 - **Craftsman-grade, not corporate.** Rounded-lg corners, hairline separators, tabular numerals in metadata, italic placeholders in snapshots.
 
@@ -25,6 +26,7 @@ Lyra is a desktop app for writing lyrics. Writing is the protagonist — the int
 ## 2. Brand & Identity
 
 ### The Lyra mark (`components/ui/LyraLogo.tsx`)
+
 A five-star constellation in **parchment cream `#FCE7C1`** connected by **bronze-amber `#b0864f`** hairlines, with **Vega** (`#FFBB41`) as the brightest point — optionally haloed by a Gaussian glow.
 
 - **Use `glow={true}`** in hero contexts (vault setup, timeline "Now" card, empty editor state).
@@ -33,9 +35,11 @@ A five-star constellation in **parchment cream `#FCE7C1`** connected by **bronze
 - **Sizing ladder**: `14px` (chrome), `16–36px` (inline badges / empty rows), `48–72px` (empty editor / sidebar empty state), `56–160px` (onboarding).
 
 ### Wordmark
+
 "Lyra" is set in Satoshi 600, `text-xs` (`12px`), `tracking-wide`. Always paired with the mark on a `1.5` spacing gap in `text-primary`. Never rendered alone below 12px; never stretched, italicized, or colored.
 
 ### The treble clef glyph `𝄞`
+
 A decorative fallback used only in the collapsed sidebar (AppShell.tsx:66). It's a typographic hug to the subject matter — never replace the Lyra mark with it in a primary surface.
 
 ---
@@ -108,8 +112,9 @@ Four diagnostic hues, each a calm mid-chroma color — never loud.
 | `finished` | `status-finished` | `0.8 0.1 115`   | Pale green |
 
 Render as: **text in status color + 10% bg tint + 20% border tint**. See `STATUS_PILL` in `SongEntry.tsx:13` for the canonical pattern:
+
 ```tsx
-"text-status-draft bg-status-draft/10 border-status-draft/20"
+"text-status-draft bg-status-draft/10 border-status-draft/20";
 ```
 
 ### 3.6 Diff palette
@@ -129,7 +134,7 @@ Removed text gets an additional `line-through`; added text does not. This is an 
 
 ```css
 ::selection {
-  background-color: oklch(0.72 0.10 55 / 0.35);
+  background-color: oklch(0.72 0.1 55 / 0.35);
   color: oklch(0.95 0.013 85);
 }
 ```
@@ -137,6 +142,7 @@ Removed text gets an additional `line-through`; added text does not. This is an 
 Text selection is amber-tinted — consistent with the accent identity — at 35% opacity so it doesn't obliterate the word underneath.
 
 **Focus rings** are never the browser default. Two canonical patterns:
+
 - **Inline field focus** (MetaField, AddSection inputs): a single `border-b border-accent`, no glow.
 - **Modal input focus** (NewSongModal, SnapshotModal): `border: oklch(0.72 0.10 55 / 0.6)` with `box-shadow: 0 0 0 3px oklch(0.72 0.10 55 / 0.1)` — a soft halo. Applied via `onFocus`/`onBlur` handlers.
 
@@ -147,16 +153,21 @@ Text selection is amber-tinted — consistent with the accent identity — at 35
 Two families. No third family is ever permitted.
 
 ### 4.1 UI — **Satoshi** (`--font-ui`, `font-ui`)
+
 ```
 "Satoshi", -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif
 ```
+
 Neo-grotesque. Weights 400/500/600/700 loaded from Fontshare. Handles everything that is not a lyric: titles, buttons, menus, metadata, labels, status pills, modals.
 
 ### 4.2 Lyrics — **Noto Serif** (`--font-lyrics`, `font-lyrics`)
+
 ```
 "Noto Serif", "Noto Serif JP", "Noto Serif KR", Georgia, "Times New Roman", serif
 ```
+
 A pan-Unicode serif with broad language support. Loaded in weights 400/500 plus italic 400 (Latin). Noto Serif JP and Noto Serif KR are listed as fallbacks and activate automatically for Japanese/Korean text without any per-song configuration. **Used only in**:
+
 - The lyric textarea (`.lyric-textarea` in `global.css:98`)
 - Diff content (`DiffSection.tsx` — `font-lyrics text-primary leading-[1.85]`)
 - Snapshot preview section bodies
@@ -201,7 +212,7 @@ A quiet, deliberate tracking ladder:
 - default (0): body, buttons, inputs.
 - `tracking-wide` (`0.025em`): chrome brand lockup, kbd tokens, minor UI chips.
 - `tracking-[0.08em]`: uppercase field labels (KEY, BPM, CAPO). Always paired with `uppercase` + `font-semibold` + `9.5px`.
-- `tracking-[0.14em]`: section-type labels (VERSE, CHORUS, BRIDGE) and "Add section" CTA. The widest tracking in the app — it signals *category*, not content.
+- `tracking-[0.14em]`: section-type labels (VERSE, CHORUS, BRIDGE) and "Add section" CTA. The widest tracking in the app — it signals _category_, not content.
 
 ### 4.6 Leading
 
@@ -211,11 +222,13 @@ A quiet, deliberate tracking ladder:
 - Modal body copy: `leading-relaxed` or `leading-snug`.
 
 ### 4.7 Numerals
+
 Metadata values that the user scans or edits (BPM, Capo, timestamps, version labels) use `tabular-nums`. Never let proportional digits wobble under a changing value.
 
 ### 4.8 Case
 
 Uppercase is a design device, not a shouting mechanism. Reserved for:
+
 - Field labels in the MetadataBar
 - Section type tabs (VERSE, CHORUS)
 - Status pill labels (IDEA, DRAFT)
@@ -246,13 +259,14 @@ When using uppercase, always pair with `font-semibold` (600) or `font-medium` (5
 - **Menu bar**: `h-8` (32px), `data-tauri-drag-region` enabled, `z-50`. Left-padding is `76px` on macOS (traffic-lights) and `10px` elsewhere. No subpixel compromises.
 - **Sidebar expanded**: `w-65` (260px). Never resizable; the constraint is intentional.
 - **Sidebar collapsed**: `w-12` (48px) — a narrow strip with the treble clef glyph, new-song button, and expand button stacked.
-- **Editor inner column**: `w-[85%] mx-auto px-14` (224px padding inside 85% column). This is the *measure* — never put editable lyric text outside this container. Timeline uses full width by design.
+- **Editor inner column**: `w-[85%] mx-auto px-14` (224px padding inside 85% column). This is the _measure_ — never put editable lyric text outside this container. Timeline uses full width by design.
 
 ### 5.2 Spacing scale
 
 Lyra uses Tailwind's default 0.25rem step but **freely uses arbitrary half-steps** (`w-1.25`, `py-0.5`, `h-1.75`) because at this information density every half-pixel matters. Do not try to round these to the nearest integer — they were tuned.
 
 **Canonical spacing moments**:
+
 - Modal inner padding: `px-6 pt-6 pb-5`
 - Modal header → body gap: `mb-5`
 - Sidebar section padding: `px-3.5 pt-3.5 pb-2.5`
@@ -313,7 +327,12 @@ The second "shadow" is a **1px outline** masquerading as a shadow — it gives t
 **Modal top-edge accent line**: every modal has a `1px` horizontal gradient line at the top:
 
 ```css
-background: linear-gradient(90deg, transparent, oklch(0.72 0.10 55 / 0.6), transparent);
+background: linear-gradient(
+  90deg,
+  transparent,
+  oklch(0.72 0.1 55 / 0.6),
+  transparent
+);
 ```
 
 For the delete modal this line uses the danger hue (`oklch(0.55 0.18 25 / 0.6)`) — the only place in the app where the mere top edge of a surface communicates intent.
@@ -323,6 +342,7 @@ For the delete modal this line uses the danger hue (`oklch(0.55 0.18 25 / 0.6)`)
 ## 7. Iconography
 
 ### 7.1 Library
+
 **Lucide React** only, re-exported as a flat namespace in `components/ui/Icon.tsx`. Never import from `lucide-react` directly; always `import { Icons } from '.../ui/Icon'`.
 
 ### 7.2 Sizing ladder
@@ -344,41 +364,49 @@ Lucide uses `1.5px` stroke by default. Increase to `strokeWidth={2.5}` only for 
 Two Lucide icons are re-exported under shorter names for linguistic clarity: `GripVertical → Grip` and `Trash2 → Trash`. Follow this convention if adding new aliases — internal names should read naturally in a sentence.
 
 ### 7.4 Color
+
 Icons inherit from `color`. Default resting state is `text-faint` or `text-secondary`; `text-accent` for active/pinned; `text-brand-rose` for destructive hover. An icon should never use an arbitrary color outside the token palette.
 
 ---
 
 ## 8. Components
 
-Every component should live in one of nine folders: `comments/`, `diff/`, `editor/`, `layout/`, `shell/`, `sidebar/`, `timeline/`, `ui/`, `vault/`. `ui/` is reserved for *app-wide primitives* (modals, icons, logo, context menu); feature folders own their own subcomponents.
+Every component should live in one of nine folders: `comments/`, `diff/`, `editor/`, `layout/`, `shell/`, `sidebar/`, `timeline/`, `ui/`, `vault/`. `ui/` is reserved for _app-wide primitives_ (modals, icons, logo, context menu); feature folders own their own subcomponents.
 
 ### 8.1 Buttons
 
 Lyra does not have a `<Button />` component. Buttons are composed inline with Tailwind. Three canonical shapes:
 
 **Primary (filled amber)**
+
 ```tsx
 className="px-4 py-2 rounded-lg font-semibold border-none"
 style={{ background: 'oklch(0.72 0.10 55)', color: 'oklch(0.145 0.008 60)' }}
 ```
+
 Use for: "Create Song", "Save Version", vault-setup continue. Only **one** primary button per modal / screen region. Disabled state: `background` at 35% alpha + foreground at 50% alpha.
 
 **Secondary (bordered, transparent)**
+
 ```tsx
 className="px-4 py-2 rounded-lg text-secondary hover:text-primary hover:bg-elev
            transition-colors border border-border-soft bg-transparent"
 ```
+
 Use for: Cancel, exit-diff, Close Song in menus.
 
 **Chrome / icon button**
+
 ```tsx
 className="w-7 h-7 flex items-center justify-center rounded text-secondary
            hover:bg-elev hover:text-primary transition-colors
            border-none bg-transparent cursor-pointer"
 ```
+
 Use for: sidebar toggle, save icon, snapshot icon, modal close. Always square, always `rounded`, always transparent at rest. Sizes in common use: `w-5.5 h-5.5`, `w-6 h-6`, `w-7 h-7`, `w-7.5 h-7.5`, `w-8 h-8`.
 
 **Pill / tag**
+
 ```tsx
 className="px-1.5 py-px rounded-full text-2xs font-semibold uppercase
            tracking-wide border [status color classes]"
@@ -410,6 +438,7 @@ The canonical modal (`NewSongModal`, `SnapshotModal`, `DeleteSongModal`, `Keyboa
 ### 8.4 Menus & dropdowns
 
 Menu bar dropdowns and metadata dropdowns follow the same pattern:
+
 - Surface: `bg-elev border border-border rounded-lg p-1 shadow-2xl`
 - Item: `px-2.5 py-1.5 rounded text-[12px|12.5px]`
 - Item hover: **`hover:bg-accent-soft hover:text-accent`** — this is the single canonical menu-hover combination. Do not override.
@@ -420,8 +449,9 @@ Menu bar dropdowns and metadata dropdowns follow the same pattern:
 ### 8.5 Status pills & chips
 
 Two sizes:
+
 - **Status pill** (song lifecycle): rounded-full, border in status color at 20%, bg at 10%, text in status color. Uppercase, `text-2xs`, `font-semibold`, `tracking-wide`. Always `px-1.5 py-px`.
-- **Tag chip** (genre, mood, language): rounded-full, `bg-elev border border-border-soft`, `text-faint`, `font-medium`, `text-2xs`. A *quieter* variant of the same shape.
+- **Tag chip** (genre, mood, language): rounded-full, `bg-elev border border-border-soft`, `text-faint`, `font-medium`, `text-2xs`. A _quieter_ variant of the same shape.
 
 **Dashed "add-a-tag" button**: same dimensions but `bg-transparent border-dashed border-border-soft text-muted`, hover `text-accent border-accent`. This is the canonical "add an item to a group" affordance.
 
@@ -451,6 +481,7 @@ This is the most important component in the app. **No chrome should ever live on
 ### 8.8 Diff view
 
 When a diff is active:
+
 - The `DiffBanner` replaces/overlays the Metadata → Sections area, `bg-accent-soft border-b border-accent`.
 - The lyric area becomes read-only: same 85% column, same font, but text is wrapped in `<mark>` / `<del>` with the diff palette.
 - Inline "Use this section" appears only when the right-hand target is a snapshot (not "now") and the section is changed/added.
@@ -472,12 +503,13 @@ The diff and the editor share the exact same typography. This is critical: a dif
 
 - `transition-colors` — the default for all chrome hovers.
 - `transition-opacity` — for hover-reveal controls (section tools).
-- `transition-all` — only on surfaces that change *both* color and border (snapshot cards, vault-setup option cards). Avoid elsewhere because it's lazy.
+- `transition-all` — only on surfaces that change _both_ color and border (snapshot cards, vault-setup option cards). Avoid elsewhere because it's lazy.
 - `animate-spin` — for the `Loader` icon and only that.
 
 ### 9.3 Hover reveals
 
 A defining interaction pattern. Examples:
+
 - SectionHeader controls: `opacity-0 group-hover:opacity-100`
 - SongEntry delete button: mounted only when `hovered === true`
 - Song title "click to rename" hint: `opacity-0 group-hover/title:opacity-100`
@@ -521,16 +553,19 @@ Canonical bindings:
 `mod` resolves to `⌘` on macOS and `Ctrl` on Windows/Linux via `navigator.platform` + UA sniff (`MenuBar.tsx:11`, `KeyboardShortcutsModal.tsx:10`). Render the platform-appropriate glyph — never "Ctrl" on macOS or "⌘" on Windows.
 
 ### 10.2 Keyboard affordances
+
 - Every clickable `<div role="button">` must set `tabIndex={0}` and handle Enter + Space (`SongEntry.tsx:41`).
 - Inline-edit fields commit on `Enter`, cancel on `Escape`, and commit on blur unless Escape was pressed (the `cancelledRef` pattern in MetaField / ChipGroup).
 - Modal inputs autofocus **after a 30ms delay** — a small but deliberate buffer to let the dialog's own focus trap settle.
 
 ### 10.3 Semantic & ARIA
+
 - Icon-only buttons **must** have both `title=` and `aria-label=` when the icon is not textual (see SongEntry's delete button).
 - Form fields use real `<label>` elements where possible; otherwise, pair with an uppercase "label" text and place the input directly below.
 - Modal surfaces do not yet implement a focus trap; future modals should add one. Escape + click-outside + Cancel all close — don't remove any of those exits.
 
 ### 10.4 Contrast
+
 All text tokens meet WCAG AA against their intended background. Do not place `text-faint` on `bg`; it is designed for `surface` or `panel`. Do not place `text-muted` on `elev` without testing.
 
 ---
@@ -538,19 +573,23 @@ All text tokens meet WCAG AA against their intended background. Do not place `te
 ## 11. Editor Conventions
 
 ### 11.1 The 85% column
+
 Every piece of lyric content — sections, diffs, snapshot previews — renders inside `w-[85%] mx-auto px-14 py-3.5 pb-16`. Never deviate. The 15% margin is the "page's breath."
 
 ### 11.2 Metadata hierarchy
+
 MetadataBar uses a **gradient fade-out** from `surface` to `transparent`:
 
 ```css
-background: linear-gradient(180deg, oklch(0.175 0.010 60), transparent);
+background: linear-gradient(180deg, oklch(0.175 0.01 60), transparent);
 ```
 
-This is the only gradient background in the app. It signals: this bar is *above* the lyric page, but it dissolves into the page rather than sitting on it.
+This is the only gradient background in the app. It signals: this bar is _above_ the lyric page, but it dissolves into the page rather than sitting on it.
 
 ### 11.3 Tiny dots are a system
+
 A cluster of 1–2px colored circles carry state across the app:
+
 - `w-1 h-1` — section type dot (dim amber / rose / faint)
 - `w-1.25 h-1.25` — unsaved glow on save icon
 - `w-1.5 h-1.5` — dirty indicator, song-list dirty dot, title-row glow
@@ -559,6 +598,7 @@ A cluster of 1–2px colored circles carry state across the app:
 **Use the smallest dot that will be read.** Dots are ambient, not announcements.
 
 ### 11.4 Tabs, not spaces, for layout
+
 When a menu item needs a keyboard hint beside it, the label and kbd are separated by a literal `\t` in the label string, split on parse (`MenuBar.tsx:177`). This is a small pragma — do not redesign it.
 
 ---
@@ -566,23 +606,27 @@ When a menu item needs a keyboard hint beside it, the label and kbd are separate
 ## 12. Content & Copy
 
 ### 12.1 Voice
+
 - **Calm imperatives**: "Pick a song from the sidebar, or start a new one." Never "Select a song to continue."
 - **Concrete nouns**: "vault," "snapshot," "section" — not "workspace," "save point," "block."
 - **Don't apologize for absence**: empty states say "No songs yet. Create one to begin." — not "You don't have any songs."
 - **Punctuation**: prefer `—` (em-dash) and `·` (middle dot) as separators over `,` and `|`. The app is full of both, and it reads as a considered typographic choice.
 
 ### 12.2 Placeholders
+
 - `Write verse…`, `Write chorus…` — auto-generated from section name lowercased.
 - `Untitled Song` — new-song modal placeholder.
 - `e.g. Added bridge, tweaked chorus…` — snapshot note placeholder. Use this exact cadence for any new freeform field.
 - `Search songs…` — always ends in an ellipsis (`…`, not `...`).
 
 ### 12.3 Unit formatting
+
 - Time-ago: `just now` / `Nm ago` / `Nh ago` / `yesterday` / `Nd ago` (`SnapshotCard.tsx:20`).
 - Date: `toLocaleDateString(undefined, { dateStyle: 'medium' })` — e.g. "Apr 20, 2026."
 - Counts: `1 song` / `2 songs` — always pluralize, never "song(s)".
 
 ### 12.4 TODO-honesty
+
 Unimplemented menu items are shown grayed with an explicit `TODO` badge (`MenuBar.tsx:192`). This is part of the voice: the app does not pretend to have what it doesn't. Preserve this pattern rather than removing stubs.
 
 ---
@@ -606,6 +650,7 @@ Unimplemented menu items are shown grayed with an explicit `TODO` badge (`MenuBa
 ## 14. Do & Don't
 
 **Do**
+
 - Use OKLCH tokens via Tailwind classes.
 - Follow the 85%-column rule for anything resembling a lyric.
 - Prefer `text-[12.5px]` inline over inventing a new scale step.
@@ -614,6 +659,7 @@ Unimplemented menu items are shown grayed with an explicit `TODO` badge (`MenuBa
 - Treat amber as a finite resource — spend it on the thing that matters on the screen.
 
 **Don't**
+
 - Use shadows on content surfaces.
 - Add a third font family.
 - Introduce a new accent hue; extend the muted amber / rose vocabulary instead.
@@ -629,7 +675,7 @@ Unimplemented menu items are shown grayed with an explicit `TODO` badge (`MenuBa
 
 - **One component per file**, PascalCase filename matching default export.
 - **Styles live inline** via Tailwind utilities or a handful of `@layer components` classes in `global.css`. CSS Modules and styled-components are not used.
-- **Colors are token references.** Do not hard-code OKLCH values in components *except* inside `style={{}}` objects when a dynamic computation is required (modals use inline styles for dynamic borders/shadows — this is the established exception).
+- **Colors are token references.** Do not hard-code OKLCH values in components _except_ inside `style={{}}` objects when a dynamic computation is required (modals use inline styles for dynamic borders/shadows — this is the established exception).
 - **Icons always come from the `Icons` namespace** (`components/ui/Icon.tsx`).
 - **Modals live in `components/ui/`**; feature-specific sub-panels live in their feature folder.
 - **Global design tokens**: authoritatively in `src/styles/global.css` under `@theme`. Supplemental raw vars (for inline-style gradients) go in `src/styles/tokens.css`.

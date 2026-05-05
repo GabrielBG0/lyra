@@ -1,10 +1,11 @@
-import { useEffect, useRef } from 'react'
-import { useUIStore } from '../../stores/uiStore'
-import { useEditorStore } from '../../stores/editorStore'
-import { Icons } from '../ui/Icon'
+import { useEffect, useRef } from "react";
+import { useUIStore } from "../../stores/uiStore";
+import { useEditorStore } from "../../stores/editorStore";
+import { Icons } from "../ui/Icon";
 
 export default function FindPanel() {
-  const { findPanelOpen, findReplaceMode, closeFindPanel, toggleFindReplace } = useUIStore()
+  const { findPanelOpen, findReplaceMode, closeFindPanel, toggleFindReplace } =
+    useUIStore();
   const {
     findQuery,
     findCaseSensitive,
@@ -19,60 +20,60 @@ export default function FindPanel() {
     clearFind,
     replaceCurrent,
     replaceAll,
-  } = useEditorStore()
+  } = useEditorStore();
 
-  const findInputRef = useRef<HTMLInputElement>(null)
-  const replaceInputRef = useRef<HTMLInputElement>(null)
+  const findInputRef = useRef<HTMLInputElement>(null);
+  const replaceInputRef = useRef<HTMLInputElement>(null);
 
   // Focus input when panel opens
   useEffect(() => {
     if (findPanelOpen) {
-      setTimeout(() => findInputRef.current?.focus(), 20)
+      setTimeout(() => findInputRef.current?.focus(), 20);
     }
-  }, [findPanelOpen])
+  }, [findPanelOpen]);
 
   // Listen for focus event from keyboard shortcut handler
   useEffect(() => {
     const handler = () => {
-      findInputRef.current?.focus()
-      findInputRef.current?.select()
-    }
-    window.addEventListener('find-panel:focus-input', handler)
-    return () => window.removeEventListener('find-panel:focus-input', handler)
-  }, [])
+      findInputRef.current?.focus();
+      findInputRef.current?.select();
+    };
+    window.addEventListener("find-panel:focus-input", handler);
+    return () => window.removeEventListener("find-panel:focus-input", handler);
+  }, []);
 
   const handleClose = () => {
-    clearFind()
-    closeFindPanel()
-  }
+    clearFind();
+    closeFindPanel();
+  };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Escape') {
-      handleClose()
-    } else if (e.key === 'Enter') {
-      e.preventDefault()
+    if (e.key === "Escape") {
+      handleClose();
+    } else if (e.key === "Enter") {
+      e.preventDefault();
       if (e.shiftKey) {
-        findPrev()
+        findPrev();
       } else {
-        findNext()
+        findNext();
       }
-    } else if (e.key === 'Tab' && findReplaceMode && !e.shiftKey) {
-      e.preventDefault()
-      replaceInputRef.current?.focus()
+    } else if (e.key === "Tab" && findReplaceMode && !e.shiftKey) {
+      e.preventDefault();
+      replaceInputRef.current?.focus();
     }
-  }
+  };
 
-  const matchCount = findMatches.length
-  const hasQuery = findQuery.length > 0
+  const matchCount = findMatches.length;
+  const hasQuery = findQuery.length > 0;
 
   return (
     <div
       className="absolute top-0 right-3 w-[420px] z-40"
       style={{
-        transform: findPanelOpen ? 'translateY(0)' : 'translateY(-100%)',
+        transform: findPanelOpen ? "translateY(0)" : "translateY(-100%)",
         opacity: findPanelOpen ? 1 : 0,
-        transition: 'transform 180ms ease, opacity 180ms ease',
-        pointerEvents: findPanelOpen ? 'auto' : 'none',
+        transition: "transform 180ms ease, opacity 180ms ease",
+        pointerEvents: findPanelOpen ? "auto" : "none",
       }}
     >
       <div className="bg-panel border border-border rounded-b-xl shadow-lg">
@@ -93,7 +94,9 @@ export default function FindPanel() {
           {/* Match counter */}
           {hasQuery && (
             <span className="text-[11px] text-muted shrink-0 tabular-nums">
-              {matchCount === 0 ? 'No results' : `${findActiveIndex + 1} of ${matchCount}`}
+              {matchCount === 0
+                ? "No results"
+                : `${findActiveIndex + 1} of ${matchCount}`}
             </span>
           )}
 
@@ -103,8 +106,8 @@ export default function FindPanel() {
             title="Match case"
             className={`w-6 h-6 flex items-center justify-center rounded transition-colors ${
               findCaseSensitive
-                ? 'bg-accent-soft text-accent'
-                : 'text-muted hover:text-secondary hover:bg-elev'
+                ? "bg-accent-soft text-accent"
+                : "text-muted hover:text-secondary hover:bg-elev"
             }`}
           >
             <Icons.CaseSensitive size={13} />
@@ -116,8 +119,8 @@ export default function FindPanel() {
             title="Match whole word"
             className={`w-6 h-6 flex items-center justify-center rounded transition-colors ${
               findWholeWord
-                ? 'bg-accent-soft text-accent'
-                : 'text-muted hover:text-secondary hover:bg-elev'
+                ? "bg-accent-soft text-accent"
+                : "text-muted hover:text-secondary hover:bg-elev"
             }`}
           >
             <Icons.WholeWord size={13} />
@@ -149,8 +152,8 @@ export default function FindPanel() {
             title="Toggle Replace"
             className={`w-6 h-6 flex items-center justify-center rounded transition-colors ${
               findReplaceMode
-                ? 'bg-accent-soft text-accent'
-                : 'text-muted hover:text-secondary hover:bg-elev'
+                ? "bg-accent-soft text-accent"
+                : "text-muted hover:text-secondary hover:bg-elev"
             }`}
           >
             <Icons.Replace size={13} />
@@ -169,12 +172,12 @@ export default function FindPanel() {
         {/* Replace row — animated with grid rows */}
         <div
           style={{
-            display: 'grid',
-            gridTemplateRows: findReplaceMode ? '1fr' : '0fr',
-            transition: 'grid-template-rows 160ms ease',
+            display: "grid",
+            gridTemplateRows: findReplaceMode ? "1fr" : "0fr",
+            transition: "grid-template-rows 160ms ease",
           }}
         >
-          <div style={{ overflow: 'hidden' }}>
+          <div style={{ overflow: "hidden" }}>
             <div className="flex items-center gap-1 px-2 py-1.5 border-t border-border-soft">
               <Icons.Replace size={13} className="text-muted shrink-0" />
 
@@ -183,18 +186,21 @@ export default function FindPanel() {
                 type="text"
                 placeholder="Replace with…"
                 onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault()
-                    replaceCurrent(e.currentTarget.value)
-                  } else if (e.key === 'Escape') {
-                    handleClose()
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    replaceCurrent(e.currentTarget.value);
+                  } else if (e.key === "Escape") {
+                    handleClose();
                   }
                 }}
                 className="flex-1 bg-transparent text-[12.5px] text-primary placeholder:text-muted outline-none min-w-0"
               />
 
               <button
-                onClick={() => replaceInputRef.current && replaceCurrent(replaceInputRef.current.value)}
+                onClick={() =>
+                  replaceInputRef.current &&
+                  replaceCurrent(replaceInputRef.current.value)
+                }
                 disabled={matchCount === 0}
                 className="px-2 py-0.5 text-[11px] text-secondary hover:text-primary hover:bg-elev rounded transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
               >
@@ -202,7 +208,10 @@ export default function FindPanel() {
               </button>
 
               <button
-                onClick={() => replaceInputRef.current && replaceAll(replaceInputRef.current.value)}
+                onClick={() =>
+                  replaceInputRef.current &&
+                  replaceAll(replaceInputRef.current.value)
+                }
                 disabled={matchCount === 0}
                 className="px-2 py-0.5 text-[11px] text-secondary hover:text-primary hover:bg-elev rounded transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
               >
@@ -213,5 +222,5 @@ export default function FindPanel() {
         </div>
       </div>
     </div>
-  )
+  );
 }

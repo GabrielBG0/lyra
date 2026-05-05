@@ -15,7 +15,15 @@ const STATUS_DOT: Record<SongStatus, string> = {
 const STATUS_LABELS: SongStatus[] = ["idea", "draft", "demo", "finished"];
 
 export default function MetadataBar() {
-  const { metadata, snapshotHeaders, updateMetadata, past, future, undo, redo } = useEditorStore();
+  const {
+    metadata,
+    snapshotHeaders,
+    updateMetadata,
+    past,
+    future,
+    undo,
+    redo,
+  } = useEditorStore();
   const { createSnapshot } = useSnapshot();
   const { openSnapshotModal } = useUIStore();
   const [editingTitle, setEditingTitle] = useState(false);
@@ -69,7 +77,11 @@ export default function MetadataBar() {
           <div className="flex items-center gap-0.5 shrink-0">
             <button
               className="w-6.5 h-6.5 flex items-center justify-center rounded text-faint hover:bg-elev hover:text-secondary transition-colors border-none bg-transparent cursor-pointer disabled:opacity-30 disabled:cursor-default disabled:hover:bg-transparent disabled:hover:text-faint"
-              title={past.length > 0 ? `Undo: ${past[past.length - 1].description}` : 'Undo'}
+              title={
+                past.length > 0
+                  ? `Undo: ${past[past.length - 1].description}`
+                  : "Undo"
+              }
               disabled={past.length === 0}
               onClick={undo}
             >
@@ -77,7 +89,11 @@ export default function MetadataBar() {
             </button>
             <button
               className="w-6.5 h-6.5 flex items-center justify-center rounded text-faint hover:bg-elev hover:text-secondary transition-colors border-none bg-transparent cursor-pointer disabled:opacity-30 disabled:cursor-default disabled:hover:bg-transparent disabled:hover:text-faint"
-              title={future.length > 0 ? `Redo: ${future[future.length - 1].description}` : 'Redo'}
+              title={
+                future.length > 0
+                  ? `Redo: ${future[future.length - 1].description}`
+                  : "Redo"
+              }
               disabled={future.length === 0}
               onClick={redo}
             >
