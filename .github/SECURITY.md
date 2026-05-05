@@ -8,10 +8,10 @@ Lyra is a local-first desktop app built with Tauri, React, Rust, and SQLite. It 
 
 Security fixes are provided for the latest public release and the current default branch.
 
-| Version | Supported |
-| --- | --- |
-| Latest release | Yes |
-| Default branch | Yes |
+| Version        | Supported   |
+| -------------- | ----------- |
+| Latest release | Yes         |
+| Default branch | Yes         |
 | Older releases | Best effort |
 
 Lyra is still early software, so supported versions may change as release channels mature. If you are unsure whether an issue affects a supported version, please report it anyway.
