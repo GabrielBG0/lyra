@@ -141,6 +141,169 @@ pub async fn cherry_pick_section(
     Ok(section)
 }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::{
+        core::song::{create_lyr_file, read_lyr_file, write_lyr_file},
+        error::AppError,
+        test_utils::make_section,
+    };
+    use tempfile::TempDir;
+
+    async fn setup_song(dir: &TempDir) -> (std::path::PathBuf, crate::models::song::SongPayload) {
+        create_lyr_file(dir.path(), "Test Song").await.unwrap()
+    }
+
+    // ── create_snapshot ───────────────────────────────────────────────
+
+    #[tokio::test]
+    async fn create_snapshot_appears_in_song_header_list() {
+        let dir = TempDir::new().unwrap();
+        let (path, payload) = setup_song(&dir).await;
+
+        create_snapshot(&path, &payload.sections, Some("first draft".to_owned()))
+            .await
+            .unwrap();
+
+        let read_back = read_lyr_file(&path).await.unwrap();
+        assert_eq!(read_back.snapshot_headers.len(), 1);
+        assert_eq!(read_back.snapshot_headers[0].note.as_deref(), Some("first draft"));
+        assert_eq!(read_back.snapshot_headers[0].section_count, 1);
+    }
+
+    #[tokio::test]
+    async fn create_snapshot_multiple_snapshots_sorted_chronologically() {
+        let dir = TempDir::new().unwrap();
+        let (path, payload) = setup_song(&dir).await;
+
+        create_snapshot(&path, &payload.sections, Some("snap-1".to_owned()))
+            .await
+            .unwrap();
+        create_snapshot(&path, &payload.sections, Some("snap-2".to_owned()))
+            .await
+            .unwrap();
+
+        let read_back = read_lyr_file(&path).await.unwrap();
+        assert_eq!(read_back.snapshot_headers.len(), 2);
+        // ULIDs are lexicographically chronological
+        assert!(read_back.snapshot_headers[0].id < read_back.snapshot_headers[1].id);
+    }
+
+    // ── load_snapshot ─────────────────────────────────────────────────
+
+    #[tokio::test]
+    async fn load_snapshot_returns_full_section_content() {
+        let dir = TempDir::new().unwrap();
+        let (path, payload) = setup_song(&dir).await;
+
+        let mut sections = payload.sections.clone();
+        sections[0].content = "Snapshot content".to_owned();
+        write_lyr_file(&path, &payload.metadata, &sections).await.unwrap();
+
+        let header = create_snapshot(&path, &sections, None).await.unwrap();
+        let snapshot = load_snapshot(&path, &header.id).await.unwrap();
+
+        assert_eq!(snapshot.sections.len(), 1);
+        assert_eq!(snapshot.sections[0].content, "Snapshot content");
+    }
+
+    #[tokio::test]
+    async fn load_snapshot_not_found_returns_error() {
+        let dir = TempDir::new().unwrap();
+        let (path, _) = setup_song(&dir).await;
+
+        let result = load_snapshot(&path, "nonexistent-id").await;
+
+        assert!(matches!(result, Err(AppError::SnapshotNotFound(_))));
+    }
+
+    // ── restore_snapshot ──────────────────────────────────────────────
+
+    #[tokio::test]
+    async fn restore_snapshot_replaces_live_sections_with_snapshot_content() {
+        let dir = TempDir::new().unwrap();
+        let (path, payload) = setup_song(&dir).await;
+
+        // Take a snapshot of the original state
+        let header = create_snapshot(&path, &payload.sections, None).await.unwrap();
+
+        // Modify the live section
+        let mut modified = payload.sections.clone();
+        modified[0].content = "Modified after snapshot".to_owned();
+        write_lyr_file(&path, &payload.metadata, &modified).await.unwrap();
+
+        // Restore
+        let restored = restore_snapshot(&path, &header.id).await.unwrap();
+
+        assert_eq!(restored[0].content, payload.sections[0].content);
+
+        let read_back = read_lyr_file(&path).await.unwrap();
+        assert_eq!(read_back.sections[0].content, payload.sections[0].content);
+    }
+
+    #[tokio::test]
+    async fn restore_snapshot_preserves_existing_snapshots() {
+        let dir = TempDir::new().unwrap();
+        let (path, payload) = setup_song(&dir).await;
+
+        let header = create_snapshot(&path, &payload.sections, Some("snap".to_owned()))
+            .await
+            .unwrap();
+        restore_snapshot(&path, &header.id).await.unwrap();
+
+        let read_back = read_lyr_file(&path).await.unwrap();
+        assert_eq!(read_back.snapshot_headers.len(), 1);
+    }
+
+    // ── cherry_pick_section ───────────────────────────────────────────
+
+    #[tokio::test]
+    async fn cherry_pick_restores_only_the_target_section() {
+        let dir = TempDir::new().unwrap();
+        let (path, payload) = setup_song(&dir).await;
+
+        let chorus = make_section("chorus-id", "Chorus", 2, "original chorus");
+        let all_sections = vec![payload.sections[0].clone(), chorus.clone()];
+        write_lyr_file(&path, &payload.metadata, &all_sections).await.unwrap();
+
+        let header = create_snapshot(&path, &all_sections, None).await.unwrap();
+
+        // Modify both sections after snapshot
+        let mut modified_verse = payload.sections[0].clone();
+        modified_verse.content = "changed verse".to_owned();
+        let mut modified_chorus = chorus.clone();
+        modified_chorus.content = "changed chorus".to_owned();
+        write_lyr_file(&path, &payload.metadata, &[modified_verse, modified_chorus])
+            .await
+            .unwrap();
+
+        // Cherry-pick only the chorus back
+        let restored_chorus = cherry_pick_section(&path, &header.id, "chorus-id").await.unwrap();
+
+        assert_eq!(restored_chorus.content, "original chorus");
+
+        let read_back = read_lyr_file(&path).await.unwrap();
+        let chorus_back = read_back.sections.iter().find(|s| s.id == "chorus-id").unwrap();
+        let verse_back = read_back.sections.iter().find(|s| s.id != "chorus-id").unwrap();
+
+        assert_eq!(chorus_back.content, "original chorus");
+        assert_eq!(verse_back.content, "changed verse"); // not touched
+    }
+
+    #[tokio::test]
+    async fn cherry_pick_section_not_in_snapshot_returns_error() {
+        let dir = TempDir::new().unwrap();
+        let (path, payload) = setup_song(&dir).await;
+
+        let header = create_snapshot(&path, &payload.sections, None).await.unwrap();
+
+        let result = cherry_pick_section(&path, &header.id, "does-not-exist").await;
+
+        assert!(matches!(result, Err(AppError::SectionNotFound(_))));
+    }
+}
+
 // ══════════════════════════════════════════════════════════════════════
 //  Internal helpers
 // ══════════════════════════════════════════════════════════════════════

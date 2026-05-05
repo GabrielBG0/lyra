@@ -3,6 +3,8 @@ pub mod commands;
 pub mod core;
 pub mod error;
 pub mod models;
+#[cfg(test)]
+pub mod test_utils;
 
 use std::path::Path;
 use std::sync::Mutex;

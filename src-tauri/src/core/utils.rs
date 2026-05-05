@@ -83,6 +83,114 @@ pub fn sanitize_title(title: &str) -> String {
     }
 }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::test_utils::make_section;
+
+    // ── sanitize_title ────────────────────────────────────────────────
+
+    #[test]
+    fn sanitize_title_simple_words() {
+        assert_eq!(sanitize_title("Blue Hour"), "blue-hour");
+    }
+
+    #[test]
+    fn sanitize_title_special_chars_become_hyphens() {
+        // Apostrophe between letters becomes its own hyphen: "don't" → "don-t"
+        assert_eq!(sanitize_title("Don't Stop (Demo)"), "don-t-stop-demo");
+    }
+
+    #[test]
+    fn sanitize_title_numbers_are_preserved() {
+        assert_eq!(sanitize_title("Song 2024"), "song-2024");
+    }
+
+    #[test]
+    fn sanitize_title_consecutive_separators_collapsed_to_one() {
+        assert_eq!(sanitize_title("Hello  World"), "hello-world");
+    }
+
+    #[test]
+    fn sanitize_title_leading_and_trailing_separators_stripped() {
+        assert_eq!(sanitize_title("---hello---"), "hello");
+    }
+
+    #[test]
+    fn sanitize_title_all_non_alphanumeric_returns_untitled() {
+        assert_eq!(sanitize_title("---"), "untitled");
+    }
+
+    #[test]
+    fn sanitize_title_empty_string_returns_untitled() {
+        assert_eq!(sanitize_title(""), "untitled");
+    }
+
+    #[test]
+    fn sanitize_title_unicode_letters_preserved() {
+        // Rust's char::is_alphanumeric() accepts Unicode letters like 'é'
+        assert_eq!(sanitize_title("Café"), "café");
+    }
+
+    #[test]
+    fn sanitize_title_mixed_case_lowercased() {
+        assert_eq!(sanitize_title("MY SONG"), "my-song");
+    }
+
+    // ── find_available_path ───────────────────────────────────────────
+
+    #[test]
+    fn find_available_path_returns_stem_when_no_collision() {
+        let dir = tempfile::TempDir::new().unwrap();
+        let path = find_available_path(dir.path(), "blue-hour").unwrap();
+        assert_eq!(path, dir.path().join("blue-hour.lyr"));
+    }
+
+    #[test]
+    fn find_available_path_increments_on_single_collision() {
+        let dir = tempfile::TempDir::new().unwrap();
+        std::fs::write(dir.path().join("blue-hour.lyr"), b"").unwrap();
+
+        let path = find_available_path(dir.path(), "blue-hour").unwrap();
+        assert_eq!(path, dir.path().join("blue-hour-2.lyr"));
+    }
+
+    #[test]
+    fn find_available_path_keeps_incrementing_past_multiple_collisions() {
+        let dir = tempfile::TempDir::new().unwrap();
+        std::fs::write(dir.path().join("song.lyr"), b"").unwrap();
+        std::fs::write(dir.path().join("song-2.lyr"), b"").unwrap();
+        std::fs::write(dir.path().join("song-3.lyr"), b"").unwrap();
+
+        let path = find_available_path(dir.path(), "song").unwrap();
+        assert_eq!(path, dir.path().join("song-4.lyr"));
+    }
+
+    // ── serialize_section ─────────────────────────────────────────────
+
+    #[test]
+    fn serialize_section_roundtrip() {
+        let section = make_section("abc123", "Chorus", 2, "First line\nSecond line");
+        let toml_str = serialize_section(&section).unwrap();
+        let parsed: crate::models::section::Section = toml::from_str(&toml_str).unwrap();
+
+        assert_eq!(parsed.id, section.id);
+        assert_eq!(parsed.name, section.name);
+        assert_eq!(parsed.content, section.content);
+        assert_eq!(parsed.order, section.order);
+    }
+
+    #[test]
+    fn serialize_section_multiline_content_is_human_readable() {
+        let section = make_section("id1", "Verse", 0, "Line one\nLine two\nLine three");
+        let toml_str = serialize_section(&section).unwrap();
+
+        // The toml crate uses a literal multiline string for values with newlines.
+        assert!(toml_str.contains("'''") || toml_str.contains("\"\"\""),
+            "expected multiline TOML string, got:\n{toml_str}");
+    }
+}
+
 /// Copy every entry from `src` into `dst` **except** those whose names
 /// appear in `skip`.
 pub fn copy_entries_except(

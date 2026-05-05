@@ -183,6 +183,152 @@ pub async fn export_html(path: &Path, include_history: bool) -> AppResult<String
 
 // ── Internal helpers ────────────────────────────────────────────────────────
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::{core::song::create_lyr_file, test_utils::build_test_lyr};
+    use tempfile::TempDir;
+
+    // ── escape_html ───────────────────────────────────────────────────
+
+    #[test]
+    fn escape_html_plain_text_unchanged() {
+        assert_eq!(escape_html("Hello world"), "Hello world");
+    }
+
+    #[test]
+    fn escape_html_ampersand() {
+        assert_eq!(escape_html("a & b"), "a &amp; b");
+    }
+
+    #[test]
+    fn escape_html_angle_brackets() {
+        assert_eq!(escape_html("<em>hi</em>"), "&lt;em&gt;hi&lt;/em&gt;");
+    }
+
+    #[test]
+    fn escape_html_double_quote() {
+        assert_eq!(escape_html(r#"say "hi""#), "say &quot;hi&quot;");
+    }
+
+    #[test]
+    fn escape_html_all_special_chars_in_one_string() {
+        assert_eq!(
+            escape_html(r#"<a href="x&y">z</a>"#),
+            "&lt;a href=&quot;x&amp;y&quot;&gt;z&lt;/a&gt;"
+        );
+    }
+
+    // ── format_date ───────────────────────────────────────────────────
+
+    #[test]
+    fn format_date_truncates_to_yyyy_mm_dd() {
+        assert_eq!(format_date("2025-03-15T14:22:00Z"), "2025-03-15");
+    }
+
+    #[test]
+    fn format_date_already_short_returns_unchanged() {
+        assert_eq!(format_date("2025-03"), "2025-03");
+    }
+
+    #[test]
+    fn format_date_empty_string_returns_empty() {
+        assert_eq!(format_date(""), "");
+    }
+
+    // ── format_musical_info ───────────────────────────────────────────
+
+    #[test]
+    fn format_musical_info_all_fields_joined_with_dot() {
+        let info = MusicalInfo {
+            key: Some("C Major".to_owned()),
+            bpm: Some(120),
+            capo: None,
+            tuning: Some("DADGAD".to_owned()),
+        };
+        assert_eq!(format_musical_info(&info), "C Major · 120 BPM · DADGAD");
+    }
+
+    #[test]
+    fn format_musical_info_only_bpm() {
+        let info = MusicalInfo { key: None, bpm: Some(90), capo: None, tuning: None };
+        assert_eq!(format_musical_info(&info), "90 BPM");
+    }
+
+    #[test]
+    fn format_musical_info_all_none_returns_empty_string() {
+        let info = MusicalInfo { key: None, bpm: None, capo: None, tuning: None };
+        assert_eq!(format_musical_info(&info), "");
+    }
+
+    // ── build_html_document ───────────────────────────────────────────
+
+    #[test]
+    fn build_html_document_contains_doctype_and_title() {
+        let html = build_html_document("My Song", "<p>body</p>");
+        assert!(html.contains("<!DOCTYPE html>"));
+        assert!(html.contains("My Song"));
+        assert!(html.contains("<p>body</p>"));
+    }
+
+    #[test]
+    fn build_html_document_escapes_title() {
+        let html = build_html_document("<script>alert(1)</script>", "");
+        assert!(!html.contains("<script>"));
+        assert!(html.contains("&lt;script&gt;"));
+    }
+
+    // ── export_plain_text ─────────────────────────────────────────────
+
+    #[tokio::test]
+    async fn export_plain_text_contains_title_and_section() {
+        let dir = TempDir::new().unwrap();
+        let (path, _) = create_lyr_file(dir.path(), "Midnight Blues").await.unwrap();
+
+        let text = export_plain_text(&path, false).await.unwrap();
+
+        assert!(text.contains("Midnight Blues"));
+        assert!(text.contains("[Verse 1]"));
+    }
+
+    #[tokio::test]
+    async fn export_plain_text_without_history_has_no_history_section() {
+        let dir = TempDir::new().unwrap();
+        let (path, _) = create_lyr_file(dir.path(), "Song").await.unwrap();
+
+        let text = export_plain_text(&path, false).await.unwrap();
+
+        assert!(!text.contains("HISTORY"));
+    }
+
+    // ── export_html ───────────────────────────────────────────────────
+
+    #[tokio::test]
+    async fn export_html_produces_valid_structure() {
+        let dir = TempDir::new().unwrap();
+        let lyr_path = dir.path().join("test.lyr");
+        build_test_lyr(&lyr_path, "Ocean Drive", "sec-001");
+
+        let html = export_html(&lyr_path, false).await.unwrap();
+
+        assert!(html.contains("<!DOCTYPE html>"));
+        assert!(html.contains("Ocean Drive"));
+        assert!(html.contains("Verse 1"));
+        assert!(html.contains("Hello world"));
+    }
+
+    #[tokio::test]
+    async fn export_html_escapes_special_characters_in_title() {
+        let dir = TempDir::new().unwrap();
+        let (path, _) = create_lyr_file(dir.path(), "A & B").await.unwrap();
+
+        let html = export_html(&path, false).await.unwrap();
+
+        assert!(!html.contains("<title>A & B</title>"));
+        assert!(html.contains("A &amp; B"));
+    }
+}
+
 /// Build the info line from optional musical fields.
 /// Returns an empty string when all fields are `None`.
 fn format_musical_info(musical: &MusicalInfo) -> String {
