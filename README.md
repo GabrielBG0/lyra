@@ -8,8 +8,6 @@
 
 Lyra keeps every draft of your lyrics as immutable snapshots, lets you diff any two versions at the character level, and stores everything in plain files you own. No cloud, no accounts, no lock-in.
 
-> ![Version](https://img.shields.io/github/v/release/GabrielBG0/lyra?label=version) — macOS, Windows, and Linux.
-
 ---
 
 ## Features
