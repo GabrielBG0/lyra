@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Section {
-    pub id: String,           // ULID, stable identity
+    pub id: String, // ULID, stable identity
     pub name: String,
     pub section_type: SectionType,
     pub order: u32,
@@ -26,5 +26,11 @@ pub struct SnapshotSection {
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "kebab-case")]
 pub enum SectionType {
-    Intro, Verse, PreChorus, Chorus, Bridge, Outro, Custom
+    Intro,
+    Verse,
+    PreChorus,
+    Chorus,
+    Bridge,
+    Outro,
+    Custom,
 }

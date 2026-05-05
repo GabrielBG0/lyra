@@ -7,7 +7,7 @@ use crate::models::section::SnapshotSection;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Snapshot {
-    pub id: String,           // ULID
+    pub id: String, // ULID
     pub created_at: String,
     pub created_by: Option<String>,
     pub note: Option<String>,

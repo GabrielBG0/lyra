@@ -16,7 +16,10 @@ pub async fn nuke_vault(state: tauri::State<'_, AppState>) -> AppResult<()> {
         if !config.debug_mode {
             return Err(AppError::Other("debug mode is not enabled".to_string()));
         }
-        config.vault_path.clone().ok_or(AppError::VaultNotConfigured)?
+        config
+            .vault_path
+            .clone()
+            .ok_or(AppError::VaultNotConfigured)?
     };
 
     let vault_path = PathBuf::from(&vault_path_str);

@@ -43,8 +43,8 @@ pub async fn read_comments(path: &Path) -> AppResult<Vec<Comment>> {
 
     match raw {
         Some(buf) => {
-            let cf: CommentsFile = toml::from_str(&buf)
-                .map_err(|e| AppError::Other(format!("comments.toml: {e}")))?;
+            let cf: CommentsFile =
+                toml::from_str(&buf).map_err(|e| AppError::Other(format!("comments.toml: {e}")))?;
             Ok(cf.comments)
         }
         None => Ok(Vec::new()),
@@ -94,7 +94,10 @@ pub async fn resolve_comment(path: &Path, comment_id: &str) -> AppResult<()> {
 /// Return all comments belonging to `section_id`.
 pub async fn list_comments(path: &Path, section_id: &str) -> AppResult<Vec<Comment>> {
     let all = read_comments(path).await?;
-    Ok(all.into_iter().filter(|c| c.section_id == section_id).collect())
+    Ok(all
+        .into_iter()
+        .filter(|c| c.section_id == section_id)
+        .collect())
 }
 
 #[cfg(test)]
@@ -294,7 +297,9 @@ async fn do_write_comments(
     copy_entries_except(&mut src_archive, &mut writer, skip, opts)?;
 
     // Write the updated comments.toml
-    let cf = CommentsFile { comments: comments.to_vec() };
+    let cf = CommentsFile {
+        comments: comments.to_vec(),
+    };
     let toml_str = toml::to_string_pretty(&cf)
         .map_err(|e| AppError::Other(format!("comments.toml serialization: {e}")))?;
     writer.start_file(COMMENTS_ENTRY, opts)?;

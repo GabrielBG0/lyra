@@ -300,10 +300,7 @@ pub async fn create_lyr_file(vault_path: &Path, title: &str) -> AppResult<(PathB
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{
-        core::snapshot::create_snapshot,
-        test_utils::build_test_lyr,
-    };
+    use crate::{core::snapshot::create_snapshot, test_utils::build_test_lyr};
     use tempfile::TempDir;
 
     // ── create_lyr_file ───────────────────────────────────────────────
@@ -367,7 +364,9 @@ mod tests {
             updated_at: payload.sections[0].updated_at.clone(),
         });
 
-        write_lyr_file(&path, &payload.metadata, &sections).await.unwrap();
+        write_lyr_file(&path, &payload.metadata, &sections)
+            .await
+            .unwrap();
         let read_back = read_lyr_file(&path).await.unwrap();
 
         assert_eq!(read_back.sections[0].name, "Intro");

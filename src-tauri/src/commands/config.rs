@@ -1,7 +1,11 @@
 //! Commands for config
 #![allow(dead_code)]
 
-use crate::{commands::AppState, core::config::{load_config, save_config, AppConfig}, error::AppResult};
+use crate::{
+    commands::AppState,
+    core::config::{load_config, save_config, AppConfig},
+    error::AppResult,
+};
 
 #[tauri::command]
 pub async fn get_config() -> AppResult<AppConfig> {

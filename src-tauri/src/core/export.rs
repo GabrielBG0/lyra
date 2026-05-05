@@ -251,13 +251,23 @@ mod tests {
 
     #[test]
     fn format_musical_info_only_bpm() {
-        let info = MusicalInfo { key: None, bpm: Some(90), capo: None, tuning: None };
+        let info = MusicalInfo {
+            key: None,
+            bpm: Some(90),
+            capo: None,
+            tuning: None,
+        };
         assert_eq!(format_musical_info(&info), "90 BPM");
     }
 
     #[test]
     fn format_musical_info_all_none_returns_empty_string() {
-        let info = MusicalInfo { key: None, bpm: None, capo: None, tuning: None };
+        let info = MusicalInfo {
+            key: None,
+            bpm: None,
+            capo: None,
+            tuning: None,
+        };
         assert_eq!(format_musical_info(&info), "");
     }
 

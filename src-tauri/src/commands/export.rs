@@ -6,7 +6,10 @@ use std::path::PathBuf;
 use tauri_plugin_dialog::DialogExt;
 use tauri_plugin_opener::OpenerExt;
 
-use crate::{core, error::{AppError, AppResult}};
+use crate::{
+    core,
+    error::{AppError, AppResult},
+};
 
 /// Show a native save dialog and write the song as plain text to the chosen path.
 #[tauri::command]

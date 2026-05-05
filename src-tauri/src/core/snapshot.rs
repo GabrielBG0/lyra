@@ -168,7 +168,10 @@ mod tests {
 
         let read_back = read_lyr_file(&path).await.unwrap();
         assert_eq!(read_back.snapshot_headers.len(), 1);
-        assert_eq!(read_back.snapshot_headers[0].note.as_deref(), Some("first draft"));
+        assert_eq!(
+            read_back.snapshot_headers[0].note.as_deref(),
+            Some("first draft")
+        );
         assert_eq!(read_back.snapshot_headers[0].section_count, 1);
     }
 
@@ -199,7 +202,9 @@ mod tests {
 
         let mut sections = payload.sections.clone();
         sections[0].content = "Snapshot content".to_owned();
-        write_lyr_file(&path, &payload.metadata, &sections).await.unwrap();
+        write_lyr_file(&path, &payload.metadata, &sections)
+            .await
+            .unwrap();
 
         let header = create_snapshot(&path, &sections, None).await.unwrap();
         let snapshot = load_snapshot(&path, &header.id).await.unwrap();
@@ -226,12 +231,16 @@ mod tests {
         let (path, payload) = setup_song(&dir).await;
 
         // Take a snapshot of the original state
-        let header = create_snapshot(&path, &payload.sections, None).await.unwrap();
+        let header = create_snapshot(&path, &payload.sections, None)
+            .await
+            .unwrap();
 
         // Modify the live section
         let mut modified = payload.sections.clone();
         modified[0].content = "Modified after snapshot".to_owned();
-        write_lyr_file(&path, &payload.metadata, &modified).await.unwrap();
+        write_lyr_file(&path, &payload.metadata, &modified)
+            .await
+            .unwrap();
 
         // Restore
         let restored = restore_snapshot(&path, &header.id).await.unwrap();
@@ -265,7 +274,9 @@ mod tests {
 
         let chorus = make_section("chorus-id", "Chorus", 2, "original chorus");
         let all_sections = vec![payload.sections[0].clone(), chorus.clone()];
-        write_lyr_file(&path, &payload.metadata, &all_sections).await.unwrap();
+        write_lyr_file(&path, &payload.metadata, &all_sections)
+            .await
+            .unwrap();
 
         let header = create_snapshot(&path, &all_sections, None).await.unwrap();
 
@@ -279,13 +290,23 @@ mod tests {
             .unwrap();
 
         // Cherry-pick only the chorus back
-        let restored_chorus = cherry_pick_section(&path, &header.id, "chorus-id").await.unwrap();
+        let restored_chorus = cherry_pick_section(&path, &header.id, "chorus-id")
+            .await
+            .unwrap();
 
         assert_eq!(restored_chorus.content, "original chorus");
 
         let read_back = read_lyr_file(&path).await.unwrap();
-        let chorus_back = read_back.sections.iter().find(|s| s.id == "chorus-id").unwrap();
-        let verse_back = read_back.sections.iter().find(|s| s.id != "chorus-id").unwrap();
+        let chorus_back = read_back
+            .sections
+            .iter()
+            .find(|s| s.id == "chorus-id")
+            .unwrap();
+        let verse_back = read_back
+            .sections
+            .iter()
+            .find(|s| s.id != "chorus-id")
+            .unwrap();
 
         assert_eq!(chorus_back.content, "original chorus");
         assert_eq!(verse_back.content, "changed verse"); // not touched
@@ -296,7 +317,9 @@ mod tests {
         let dir = TempDir::new().unwrap();
         let (path, payload) = setup_song(&dir).await;
 
-        let header = create_snapshot(&path, &payload.sections, None).await.unwrap();
+        let header = create_snapshot(&path, &payload.sections, None)
+            .await
+            .unwrap();
 
         let result = cherry_pick_section(&path, &header.id, "does-not-exist").await;
 

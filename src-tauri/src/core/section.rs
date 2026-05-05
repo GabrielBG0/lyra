@@ -139,7 +139,11 @@ mod tests {
 
         let read_back = read_lyr_file(&path).await.unwrap();
         assert_eq!(read_back.sections.len(), 2);
-        let bridge = read_back.sections.iter().find(|s| s.id == "sec-two").unwrap();
+        let bridge = read_back
+            .sections
+            .iter()
+            .find(|s| s.id == "sec-two")
+            .unwrap();
         assert_eq!(bridge.content, "bridge content");
     }
 
@@ -172,7 +176,9 @@ mod tests {
             .await
             .unwrap();
 
-        delete_section(&path, &payload.sections[0].id).await.unwrap();
+        delete_section(&path, &payload.sections[0].id)
+            .await
+            .unwrap();
 
         let read_back = read_lyr_file(&path).await.unwrap();
         assert_eq!(read_back.sections.len(), 1);
@@ -195,11 +201,14 @@ mod tests {
             .unwrap();
 
         // Put them in reverse order
-        reorder_sections(&path, vec![
-            "sec-c".to_owned(),
-            "sec-b".to_owned(),
-            payload.sections[0].id.clone(),
-        ])
+        reorder_sections(
+            &path,
+            vec![
+                "sec-c".to_owned(),
+                "sec-b".to_owned(),
+                payload.sections[0].id.clone(),
+            ],
+        )
         .await
         .unwrap();
 

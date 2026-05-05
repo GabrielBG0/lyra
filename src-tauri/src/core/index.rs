@@ -212,7 +212,12 @@ mod tests {
     #[tokio::test]
     async fn upsert_song_and_list_songs_roundtrip() {
         let pool = test_pool().await;
-        let entry = make_entry("id-1", "Blue Hour", "/vault/blue-hour.lyr", "2025-01-01T00:00:00Z");
+        let entry = make_entry(
+            "id-1",
+            "Blue Hour",
+            "/vault/blue-hour.lyr",
+            "2025-01-01T00:00:00Z",
+        );
 
         upsert_song(&pool, &entry).await.unwrap();
 
@@ -225,7 +230,12 @@ mod tests {
     #[tokio::test]
     async fn upsert_song_on_conflict_updates_existing_row() {
         let pool = test_pool().await;
-        let entry = make_entry("id-1", "Original", "/vault/song.lyr", "2025-01-01T00:00:00Z");
+        let entry = make_entry(
+            "id-1",
+            "Original",
+            "/vault/song.lyr",
+            "2025-01-01T00:00:00Z",
+        );
         upsert_song(&pool, &entry).await.unwrap();
 
         let updated = make_entry("id-1", "Updated", "/vault/song.lyr", "2025-01-02T00:00:00Z");
@@ -240,15 +250,24 @@ mod tests {
     async fn list_songs_ordered_newest_updated_at_first() {
         let pool = test_pool().await;
 
-        upsert_song(&pool, &make_entry("a", "A", "/v/a.lyr", "2025-01-01T00:00:00Z"))
-            .await
-            .unwrap();
-        upsert_song(&pool, &make_entry("b", "B", "/v/b.lyr", "2025-01-03T00:00:00Z"))
-            .await
-            .unwrap();
-        upsert_song(&pool, &make_entry("c", "C", "/v/c.lyr", "2025-01-02T00:00:00Z"))
-            .await
-            .unwrap();
+        upsert_song(
+            &pool,
+            &make_entry("a", "A", "/v/a.lyr", "2025-01-01T00:00:00Z"),
+        )
+        .await
+        .unwrap();
+        upsert_song(
+            &pool,
+            &make_entry("b", "B", "/v/b.lyr", "2025-01-03T00:00:00Z"),
+        )
+        .await
+        .unwrap();
+        upsert_song(
+            &pool,
+            &make_entry("c", "C", "/v/c.lyr", "2025-01-02T00:00:00Z"),
+        )
+        .await
+        .unwrap();
 
         let songs = list_songs(&pool).await.unwrap();
 
@@ -263,12 +282,18 @@ mod tests {
     async fn remove_song_deletes_the_correct_row() {
         let pool = test_pool().await;
 
-        upsert_song(&pool, &make_entry("id-1", "Keep", "/v/keep.lyr", "2025-01-01T00:00:00Z"))
-            .await
-            .unwrap();
-        upsert_song(&pool, &make_entry("id-2", "Delete", "/v/del.lyr", "2025-01-01T00:00:00Z"))
-            .await
-            .unwrap();
+        upsert_song(
+            &pool,
+            &make_entry("id-1", "Keep", "/v/keep.lyr", "2025-01-01T00:00:00Z"),
+        )
+        .await
+        .unwrap();
+        upsert_song(
+            &pool,
+            &make_entry("id-2", "Delete", "/v/del.lyr", "2025-01-01T00:00:00Z"),
+        )
+        .await
+        .unwrap();
 
         remove_song(&pool, "/v/del.lyr").await.unwrap();
 
@@ -315,12 +340,18 @@ mod tests {
     async fn clear_index_removes_all_rows() {
         let pool = test_pool().await;
 
-        upsert_song(&pool, &make_entry("a", "A", "/v/a.lyr", "2025-01-01T00:00:00Z"))
-            .await
-            .unwrap();
-        upsert_song(&pool, &make_entry("b", "B", "/v/b.lyr", "2025-01-01T00:00:00Z"))
-            .await
-            .unwrap();
+        upsert_song(
+            &pool,
+            &make_entry("a", "A", "/v/a.lyr", "2025-01-01T00:00:00Z"),
+        )
+        .await
+        .unwrap();
+        upsert_song(
+            &pool,
+            &make_entry("b", "B", "/v/b.lyr", "2025-01-01T00:00:00Z"),
+        )
+        .await
+        .unwrap();
 
         clear_index(&pool).await.unwrap();
 

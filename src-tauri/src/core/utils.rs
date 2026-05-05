@@ -186,8 +186,10 @@ mod tests {
         let toml_str = serialize_section(&section).unwrap();
 
         // The toml crate uses a literal multiline string for values with newlines.
-        assert!(toml_str.contains("'''") || toml_str.contains("\"\"\""),
-            "expected multiline TOML string, got:\n{toml_str}");
+        assert!(
+            toml_str.contains("'''") || toml_str.contains("\"\"\""),
+            "expected multiline TOML string, got:\n{toml_str}"
+        );
     }
 }
 

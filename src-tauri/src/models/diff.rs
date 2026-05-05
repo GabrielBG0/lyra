@@ -1,8 +1,8 @@
 //! Data models for diff
 #![allow(dead_code)]
 
-use serde::{Deserialize, Serialize};
 use serde;
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SectionDiff {
@@ -14,7 +14,12 @@ pub struct SectionDiff {
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "lowercase")]
-pub enum DiffStatus { Equal, Changed, Added, Removed }
+pub enum DiffStatus {
+    Equal,
+    Changed,
+    Added,
+    Removed,
+}
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DiffHunk {
@@ -24,4 +29,8 @@ pub struct DiffHunk {
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "lowercase")]
-pub enum HunkKind { Equal, Insert, Delete }
+pub enum HunkKind {
+    Equal,
+    Insert,
+    Delete,
+}

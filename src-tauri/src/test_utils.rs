@@ -81,7 +81,9 @@ pub fn build_test_lyr(path: &Path, title: &str, section_id: &str) {
     let opts = SimpleFileOptions::default();
 
     writer.start_file("meta.json", opts).unwrap();
-    writer.write_all(br#"{"lyr_format_version":"1.0"}"#).unwrap();
+    writer
+        .write_all(br#"{"lyr_format_version":"1.0"}"#)
+        .unwrap();
 
     let song_toml = toml::to_string_pretty(&metadata).unwrap();
     writer.start_file("song.toml", opts).unwrap();
