@@ -69,3 +69,12 @@ For design-related decisions, consult the style_guidelines.md file in the root o
 The `project_overview.md` file in the root of the repository contains a high-level summary of the project, its goals, and its architecture. If you make significant changes to the project structure, data format, or design principles, please update this file accordingly to keep it accurate and helpful for new contributors.
 
 Before updating the `project_overview.md`, ask of the user input if they want to update it, and if so, what specific changes they would like to make. This ensures that the overview remains relevant and up-to-date with the current state of the project. When in doubt if you should update the overview, ask for clarification instead of making assumptions. It's better to ask than to guess wrong.
+
+## Writing Text outside of the code/program
+
+When writing text that is not part of the code or program (such as documentation, comments, or commit messages), follow these guidelines:
+
+- Never use "—" (em dash). Always prefer to use a comma or split into multiple sentences.
+- Write in a direct and clear way, avoiding unnecessary jargon or complexity. For example, instead of "This function is responsible for handling the user input and processing it accordingly", say "This function handles user input and processes it."
+- Use active voice instead of passive voice whenever possible. For example, instead of "The data was processed by the function", say "The function processed the data."
+- Be concise and to the point. Avoid unnecessary words or phrases that do not add value to the message. For example, instead of "In order to achieve the desired outcome, we need to implement this feature", say "To achieve the desired outcome, we need to implement this feature."

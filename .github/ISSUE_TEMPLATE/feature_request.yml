@@ -1,0 +1,61 @@
+name: Feature request
+description: Propose a new feature or an improvement to an existing one.
+labels: ["enhancement", "needs-triage"]
+body:
+  - type: checkboxes
+    attributes:
+      label: Before you file
+      options:
+        - label: I searched existing issues and this hasn't been requested yet.
+          required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve?
+      description: >
+        Describe the workflow pain, limitation, or gap this addresses.
+        The best feature requests start here, not with a solution.
+      placeholder: |
+        When I'm working on multiple songs with the same chord progression, I have no
+        way to reuse a section without copying it by hand every time.
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: What would you like to see? Sketches, mockups, and examples are welcome.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives you've considered
+      description: Are there other approaches or workarounds? Why don't they fully solve the problem?
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Feature area
+      options:
+        - Editor (sections, content, formatting)
+        - Version history (snapshots, diffs, restore)
+        - Vault and file management
+        - Metadata (title, status, key, BPM, tags)
+        - Comments and annotations
+        - Export
+        - Keyboard shortcuts
+        - UI / design
+        - Performance
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Anything else, such as how often you'd use this or how many songs it would affect.

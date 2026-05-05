@@ -1,0 +1,84 @@
+name: Performance issue
+description: The app is slow, sluggish, or unresponsive in a specific situation.
+labels: ["performance", "needs-triage"]
+body:
+  - type: checkboxes
+    attributes:
+      label: Before you file
+      options:
+        - label: I searched existing issues and this hasn't been reported yet.
+          required: true
+
+  - type: dropdown
+    id: operation
+    attributes:
+      label: Which operation is slow?
+      options:
+        - App startup / vault loading
+        - Opening a song
+        - Typing in the editor
+        - Saving (autosave or manual)
+        - Creating or restoring a snapshot
+        - Viewing a diff
+        - Scrolling
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Describe the slowness
+      description: What is slow, and how slow? A rough time estimate helps ("takes ~5 seconds instead of being instant").
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open a vault with ~200 songs
+        2. Click any song
+        3. The editor takes 4–5 seconds to appear
+    validations:
+      required: true
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      options:
+        - macOS
+        - Windows
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Lyra version
+      placeholder: "e.g. 0.1.0-beta"
+    validations:
+      required: true
+
+  - type: input
+    id: vault-size
+    attributes:
+      label: Vault size
+      description: Approximate number of songs and average snapshot count per song.
+      placeholder: "e.g. 150 songs, ~10 snapshots each"
+
+  - type: input
+    id: hardware
+    attributes:
+      label: Hardware (optional)
+      description: CPU model and RAM. Helps diagnose whether this is hardware-bound.
+      placeholder: "e.g. Apple M2, 16 GB RAM"
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional context
+      description: Does it happen every time or only sometimes? Does it improve after a restart? Any screenshots or recordings?

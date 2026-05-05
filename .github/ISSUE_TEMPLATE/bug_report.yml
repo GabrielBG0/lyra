@@ -1,0 +1,79 @@
+name: Bug report
+description: Something isn't working as expected.
+labels: ["bug", "needs-triage"]
+body:
+  - type: checkboxes
+    attributes:
+      label: Before you file
+      options:
+        - label: I searched existing issues and this hasn't been reported yet.
+          required: true
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: A clear description of the bug. What did you see vs. what did you expect?
+      placeholder: |
+        When I do X, Y happens. I expected Z instead.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: The minimal steps needed to trigger the bug every time.
+      placeholder: |
+        1. Open a song
+        2. Click "Save take"
+        3. ...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      options:
+        - macOS
+        - Windows
+        - Other (please specify in additional context)
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Lyra version
+      description: Found in the About dialog (Help > About Lyra).
+      placeholder: "e.g. 0.1.0-beta"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: regression
+    attributes:
+      label: Is this a regression?
+      description: Did this work in a previous version?
+      options:
+        - "Yes, it worked before"
+        - "No, it has never worked"
+        - Not sure
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs or errors
+      description: >
+        Enable debug mode in Preferences and paste any errors from the console here.
+        You can also attach a `.lyr` file if the bug is file-specific (remove personal content first).
+      render: text
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional context
+      description: Screenshots, screen recordings, vault size, or anything else that might help.

@@ -1,0 +1,96 @@
+name: Data or file issue
+description: >
+  Lost content, a corrupted .lyr file, snapshots missing, or the index out of sync.
+  Use this template for anything that affects your songs on disk.
+labels: ["data", "high-priority", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: >
+        **Stop writing to the affected vault until this is resolved.**
+        If your song file may be corrupted, make a backup copy of the `.lyr` file now
+        before doing anything else.
+
+  - type: checkboxes
+    attributes:
+      label: Before you file
+      options:
+        - label: I have backed up the affected `.lyr` file(s).
+          required: true
+
+  - type: dropdown
+    id: issue-type
+    attributes:
+      label: What kind of data issue is this?
+      options:
+        - Content I wrote has disappeared
+        - A snapshot is missing or shows wrong content
+        - The song list is out of sync with files on disk
+        - A .lyr file appears corrupted (won't open)
+        - Undo/redo produced unexpected content
+        - Content was overwritten unexpectedly
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Describe what you saw before, during, and after the data was affected.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps that led to this
+      description: What were you doing when the issue occurred? Include autosave timing, app crashes, or force-quits if relevant.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      options:
+        - macOS
+        - Windows
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Lyra version
+      placeholder: "e.g. 0.1.0-beta"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: recoverable
+    attributes:
+      label: Was the content recovered?
+      options:
+        - "Yes, fully"
+        - "Yes, partially"
+        - "No"
+        - Not sure yet
+    validations:
+      required: true
+
+  - type: textarea
+    id: attachment
+    attributes:
+      label: Attach the affected file
+      description: >
+        If you can share the `.lyr` file, attach it here (rename to `.lyr.zip` so GitHub accepts it).
+        Remove any personal or sensitive lyrics first. If the file is too large, describe its
+        approximate size and number of snapshots.
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional context
+      description: Vault size, whether the app crashed, any error messages shown, etc.
