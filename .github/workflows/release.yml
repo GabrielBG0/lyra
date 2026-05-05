@@ -2,7 +2,7 @@ name: Release
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
     paths-ignore:
       - "**.md"
       - ".gitignore"
@@ -61,7 +61,7 @@ jobs:
 
   build:
     name: Build (${{ matrix.platform }})
-    needs: [ check, create-release ]
+    needs: [check, create-release]
     if: needs.check.outputs.should_release == 'true'
     permissions:
       contents: write
@@ -122,7 +122,7 @@ jobs:
 
   publish-release:
     name: Publish release
-    needs: [ check, create-release, build ]
+    needs: [check, create-release, build]
     if: needs.check.outputs.should_release == 'true'
     runs-on: ubuntu-latest
     permissions:
