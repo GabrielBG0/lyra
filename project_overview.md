@@ -44,21 +44,21 @@ The app is currently at `v0.1.0-beta`.
 
 ## 2. Tech Stack
 
-| Layer | Technology |
-|---|---|
-| Desktop shell | **Tauri 2** (Rust runtime, WebView frontend) |
-| Frontend | **React 19**, TypeScript, Vite 7 |
-| Styling | **Tailwind CSS 4** (utility-first), custom design tokens via `@theme` |
-| State management | **Zustand 5** (multiple small stores) |
-| Drag-and-drop | **@dnd-kit** (sortable sections) |
-| Icons | **Lucide React** (re-exported via `Icon.tsx`) |
-| Backend logic | **Rust** (async via Tokio) |
-| Database | **SQLite** via **sqlx 0.7** (index cache only) |
-| File format | ZIP archive (`zip` crate) + TOML/JSON entries |
-| Diffing | **similar** crate (character-level diffs) |
-| IDs | **ULID** (Rust `ulid` crate + hand-rolled TS implementation) |
-| Serialization | **serde** + **toml** + **serde_json** |
-| Error handling | **thiserror** (typed errors), **anyhow** (internal) |
+| Layer            | Technology                                                            |
+| ---------------- | --------------------------------------------------------------------- |
+| Desktop shell    | **Tauri 2** (Rust runtime, WebView frontend)                          |
+| Frontend         | **React 19**, TypeScript, Vite 7                                      |
+| Styling          | **Tailwind CSS 4** (utility-first), custom design tokens via `@theme` |
+| State management | **Zustand 5** (multiple small stores)                                 |
+| Drag-and-drop    | **@dnd-kit** (sortable sections)                                      |
+| Icons            | **Lucide React** (re-exported via `Icon.tsx`)                         |
+| Backend logic    | **Rust** (async via Tokio)                                            |
+| Database         | **SQLite** via **sqlx 0.7** (index cache only)                        |
+| File format      | ZIP archive (`zip` crate) + TOML/JSON entries                         |
+| Diffing          | **similar** crate (character-level diffs)                             |
+| IDs              | **ULID** (Rust `ulid` crate + hand-rolled TS implementation)          |
+| Serialization    | **serde** + **toml** + **serde_json**                                 |
+| Error handling   | **thiserror** (typed errors), **anyhow** (internal)                   |
 
 ---
 
@@ -603,13 +603,13 @@ The history limit is **100 commands** (oldest is dropped when exceeded).
 
 ### Implemented commands
 
-| Mutation | Command created in |
-|---|---|
-| Edit section content | `editorStore.updateSection` |
-| Update metadata (title, status, key…) | `editorStore.updateMetadata` |
-| Reorder sections | `editorStore.reorderSections` |
-| Add section | `editorStore.addSection` |
-| Delete section | `editorStore.removeSection` |
+| Mutation                              | Command created in            |
+| ------------------------------------- | ----------------------------- |
+| Edit section content                  | `editorStore.updateSection`   |
+| Update metadata (title, status, key…) | `editorStore.updateMetadata`  |
+| Reorder sections                      | `editorStore.reorderSections` |
+| Add section                           | `editorStore.addSection`      |
+| Delete section                        | `editorStore.removeSection`   |
 
 ### Command merging (typing deduplication)
 
@@ -812,31 +812,31 @@ All colors use **OKLCH** (perceptually uniform). Defined in `src/styles/global.c
 
 **Surface palette** (dark, warm-biased):
 
-| Token | OKLCH | Role |
-|---|---|---|
-| `bg` | `0.145 0.008 60` | App canvas, lyric area |
-| `surface` | `0.175 0.01 60` | Snapshot cards, modal fields |
-| `panel` | `0.205 0.012 60` | Sidebar, menu bar, timeline |
-| `elev` | `0.245 0.014 60` | Hover/active states, dropdowns |
+| Token     | OKLCH            | Role                           |
+| --------- | ---------------- | ------------------------------ |
+| `bg`      | `0.145 0.008 60` | App canvas, lyric area         |
+| `surface` | `0.175 0.01 60`  | Snapshot cards, modal fields   |
+| `panel`   | `0.205 0.012 60` | Sidebar, menu bar, timeline    |
+| `elev`    | `0.245 0.014 60` | Hover/active states, dropdowns |
 
 **Text scale**:
 
-| Token | OKLCH | Use |
-|---|---|---|
-| `primary` | `0.95 0.013 85` | Titles, active values, lyric body |
-| `secondary` | `0.78 0.013 80` | Labels, menu items at rest |
-| `muted` | `0.55 0.01 75` | Metadata, secondary text |
-| `faint` | `0.4 0.008 70` | Timestamps, hint text, disabled |
+| Token       | OKLCH           | Use                               |
+| ----------- | --------------- | --------------------------------- |
+| `primary`   | `0.95 0.013 85` | Titles, active values, lyric body |
+| `secondary` | `0.78 0.013 80` | Labels, menu items at rest        |
+| `muted`     | `0.55 0.01 75`  | Metadata, secondary text          |
+| `faint`     | `0.4 0.008 70`  | Timestamps, hint text, disabled   |
 
 **Accent** (muted amber): `oklch(0.72 0.1 55)` — used for CTAs, active states, dirty indicator. Treat as a finite resource.
 
 **Status colors**:
 
-| Status | Token | Character |
-|---|---|---|
-| `idea` | `status-idea` = `0.75 0.08 230` | Cool blue |
-| `draft` | `status-draft` = `0.78 0.1 65` | Warm gold |
-| `demo` | `status-demo` = `0.68 0.12 15` | Ember red |
+| Status     | Token                             | Character  |
+| ---------- | --------------------------------- | ---------- |
+| `idea`     | `status-idea` = `0.75 0.08 230`   | Cool blue  |
+| `draft`    | `status-draft` = `0.78 0.1 65`    | Warm gold  |
+| `demo`     | `status-demo` = `0.68 0.12 15`    | Ember red  |
 | `finished` | `status-finished` = `0.8 0.1 115` | Pale green |
 
 Status pill pattern:
@@ -865,10 +865,10 @@ Lyric `line-height` is always **1.85**. Never change it. Diff also uses 1.85 for
 h-8 MenuBar (32px)
 ┌──────────────────────────────────────────────────┐
 │ Sidebar w-65 │ EditorPanel flex-1                │
-│ (or w-12)   │   MetadataBar (shrink-0)           │
-│             │   [DiffBanner | PreviewBanner]      │
-│             │   SectionEditor (flex-1 scroll-y)   │
-│             │   VersionTimeline (42px or 160px)  │
+│ (or w-12)    │   MetadataBar (shrink-0)          │
+│              │   [DiffBanner | PreviewBanner]    │
+│              │   SectionEditor (flex-1 scroll-y) │
+│              │   VersionTimeline (42px or 160px) │
 └──────────────────────────────────────────────────┘
 ```
 
@@ -946,21 +946,21 @@ Always: `${mod}${shift}Key` order. `mod` is `⌘` on macOS, `Ctrl+` on Windows. 
 
 All shortcuts are defined in `src/lib/shortcuts.ts` as `SHORTCUT_CATEGORIES`. The `matchesShortcut(def, e)` helper checks modifier state.
 
-| Shortcut | Action |
-|---|---|
-| `mod+N` | New song |
-| `mod+W` | Close song |
-| `mod+S` | Save |
-| `mod+Shift+S` | Save take (snapshot) |
-| `mod+\` | Toggle sidebar |
-| `mod+H` | Toggle history bar |
-| `mod+,` | Preferences |
-| `mod+Z` | Undo |
-| `mod+Shift+Z` | Redo |
-| `mod+C` | Copy focused section |
-| `mod+X` | Cut focused section |
-| `mod+V` | Paste section |
-| `Esc` | Close modal / exit diff / cancel inline edit |
+| Shortcut      | Action                                       |
+| ------------- | -------------------------------------------- |
+| `mod+N`       | New song                                     |
+| `mod+W`       | Close song                                   |
+| `mod+S`       | Save                                         |
+| `mod+Shift+S` | Save take (snapshot)                         |
+| `mod+b`       | Toggle sidebar                               |
+| `mod+H`       | Toggle history bar                           |
+| `mod+,`       | Preferences                                  |
+| `mod+Z`       | Undo                                         |
+| `mod+Shift+Z` | Redo                                         |
+| `mod+C`       | Copy focused section                         |
+| `mod+X`       | Cut focused section                          |
+| `mod+V`       | Paste section                                |
+| `Esc`         | Close modal / exit diff / cancel inline edit |
 
 Two hook layers:
 - `useKeyboardShortcuts` — handles app-level actions (Save, New, Toggle)

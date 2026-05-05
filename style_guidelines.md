@@ -48,12 +48,12 @@ All colors are authored in **OKLCH** for perceptual consistency and defined in `
 
 A four-step dark palette with a subtle warm bias (chroma `0.008–0.014`, hue `60`). Each step is ~3% lighter than the previous in OKLCH L.
 
-| Token                | OKLCH                    | Role                                                                     |
-| -------------------- | ------------------------ | ------------------------------------------------------------------------ |
-| `bg` / `--color-bg`  | `0.145 0.008 60`         | Application canvas. The editor, empty states, vault setup.               |
-| `surface`            | `0.175 0.01 60`          | Slight-raised surfaces: snapshot cards, modal fields, onboarding cards.  |
-| `panel`              | `0.205 0.012 60`         | Sidebar, menu bar, timeline strip, modal body. The "furniture."          |
-| `elev`               | `0.245 0.014 60`         | Hover/active states, dropdown menus, inline chips, modal input hover.    |
+| Token               | OKLCH            | Role                                                                    |
+| ------------------- | ---------------- | ----------------------------------------------------------------------- |
+| `bg` / `--color-bg` | `0.145 0.008 60` | Application canvas. The editor, empty states, vault setup.              |
+| `surface`           | `0.175 0.01 60`  | Slight-raised surfaces: snapshot cards, modal fields, onboarding cards. |
+| `panel`             | `0.205 0.012 60` | Sidebar, menu bar, timeline strip, modal body. The "furniture."         |
+| `elev`              | `0.245 0.014 60` | Hover/active states, dropdown menus, inline chips, modal input hover.   |
 
 **Rules of use**
 
@@ -64,10 +64,10 @@ A four-step dark palette with a subtle warm bias (chroma `0.008–0.014`, hue `6
 
 ### 3.2 Borders
 
-| Token         | OKLCH                       | Role                                                    |
-| ------------- | --------------------------- | ------------------------------------------------------- |
-| `border`      | `0.32 0.012 60 / 0.5`       | Visible edges: menus, modals, snapshot-card resting.    |
-| `border-soft` | `0.32 0.012 60 / 0.22`      | Hairlines: divider rows, panel edges, input outlines.   |
+| Token         | OKLCH                  | Role                                                  |
+| ------------- | ---------------------- | ----------------------------------------------------- |
+| `border`      | `0.32 0.012 60 / 0.5`  | Visible edges: menus, modals, snapshot-card resting.  |
+| `border-soft` | `0.32 0.012 60 / 0.22` | Hairlines: divider rows, panel edges, input outlines. |
 
 **Rule of thumb**: if the border must read as "this is a container," use `border`. If it must read as "there is a subtle boundary here," use `border-soft`. Most of the app uses `border-soft`.
 
@@ -75,12 +75,12 @@ A four-step dark palette with a subtle warm bias (chroma `0.008–0.014`, hue `6
 
 Four-step typographic gray scale, warm-biased (chroma ~0.01, hue 70–85).
 
-| Token       | OKLCH               | Use for                                                     |
-| ----------- | ------------------- | ----------------------------------------------------------- |
-| `primary`   | `0.95 0.013 85`     | Titles, active values, lyric body.                          |
-| `secondary` | `0.78 0.013 80`     | Labels, menu items at rest, placeholder controls.           |
-| `muted`     | `0.55 0.01 75`      | Metadata, secondary text, inactive menu triggers.           |
-| `faint`     | `0.4 0.008 70`      | Timestamps, hint text, disabled affordances, soft dividers. |
+| Token       | OKLCH           | Use for                                                     |
+| ----------- | --------------- | ----------------------------------------------------------- |
+| `primary`   | `0.95 0.013 85` | Titles, active values, lyric body.                          |
+| `secondary` | `0.78 0.013 80` | Labels, menu items at rest, placeholder controls.           |
+| `muted`     | `0.55 0.01 75`  | Metadata, secondary text, inactive menu triggers.           |
+| `faint`     | `0.4 0.008 70`  | Timestamps, hint text, disabled affordances, soft dividers. |
 
 **Hover convention**: `text-muted` / `text-faint` → `text-primary` or `text-secondary`. Never jump two levels (muted → faint).
 
@@ -88,11 +88,11 @@ Four-step typographic gray scale, warm-biased (chroma ~0.01, hue 70–85).
 
 Only two accent hues exist. **Use them sparingly** — once the eye indexes amber as "this matters," that contract must be protected.
 
-| Token                     | OKLCH                    | Role                                                                                                 |
-| ------------------------- | ------------------------ | ---------------------------------------------------------------------------------------------------- |
-| `accent`                  | `0.72 0.1 55`            | Muted amber. Primary CTAs, active icon state, dirty-dot, selection bar, accent border on focus.      |
-| `accent-soft`             | `0.72 0.1 55 / 0.12`     | Selected song background, "Saved" toast, comments-open hover, active snapshot card.                  |
-| `brand-rose`              | `0.66 0.1 22`            | Bridge section type; destructive chip hover (X on tags). **Never** a primary action color.           |
+| Token         | OKLCH                | Role                                                                                            |
+| ------------- | -------------------- | ----------------------------------------------------------------------------------------------- |
+| `accent`      | `0.72 0.1 55`        | Muted amber. Primary CTAs, active icon state, dirty-dot, selection bar, accent border on focus. |
+| `accent-soft` | `0.72 0.1 55 / 0.12` | Selected song background, "Saved" toast, comments-open hover, active snapshot card.             |
+| `brand-rose`  | `0.66 0.1 22`        | Bridge section type; destructive chip hover (X on tags). **Never** a primary action color.      |
 
 **Danger / destructive red** is distinct from the rose and used only for the "Delete" CTA (`oklch(0.55 0.18 25)`). It never appears in chrome, status, or branding.
 
@@ -100,12 +100,12 @@ Only two accent hues exist. **Use them sparingly** — once the eye indexes ambe
 
 Four diagnostic hues, each a calm mid-chroma color — never loud.
 
-| Status     | Token             | OKLCH              | Character   |
-| ---------- | ----------------- | ------------------ | ----------- |
-| `idea`     | `status-idea`     | `0.75 0.08 230`    | Cool blue   |
-| `draft`    | `status-draft`    | `0.78 0.1 65`      | Warm gold   |
-| `demo`     | `status-demo`     | `0.68 0.12 15`     | Ember red   |
-| `finished` | `status-finished` | `0.8 0.1 115`      | Pale green  |
+| Status     | Token             | OKLCH           | Character  |
+| ---------- | ----------------- | --------------- | ---------- |
+| `idea`     | `status-idea`     | `0.75 0.08 230` | Cool blue  |
+| `draft`    | `status-draft`    | `0.78 0.1 65`   | Warm gold  |
+| `demo`     | `status-demo`     | `0.68 0.12 15`  | Ember red  |
+| `finished` | `status-finished` | `0.8 0.1 115`   | Pale green |
 
 Render as: **text in status color + 10% bg tint + 20% border tint**. See `STATUS_PILL` in `SongEntry.tsx:13` for the canonical pattern:
 ```tsx
@@ -116,12 +116,12 @@ Render as: **text in status color + 10% bg tint + 20% border tint**. See `STATUS
 
 A separate, pre-computed hex palette because diff highlight ink must be **legible against its own background**, not adjusted to ambient tokens.
 
-| Token                | Hex        | Use                     |
-| -------------------- | ---------- | ----------------------- |
-| `diff-add`           | `#14532d`  | Added text background   |
-| `diff-add-text`      | `#86efac`  | Added text foreground   |
-| `diff-remove`        | `#450a0a`  | Removed text background |
-| `diff-remove-text`   | `#fca5a5`  | Removed text foreground |
+| Token              | Hex       | Use                     |
+| ------------------ | --------- | ----------------------- |
+| `diff-add`         | `#14532d` | Added text background   |
+| `diff-add-text`    | `#86efac` | Added text foreground   |
+| `diff-remove`      | `#450a0a` | Removed text background |
+| `diff-remove-text` | `#fca5a5` | Removed text foreground |
 
 Removed text gets an additional `line-through`; added text does not. This is an intentional visual asymmetry — removal is louder because it is rarer and more consequential.
 
@@ -167,29 +167,29 @@ Never in metadata, chrome, or buttons. A serif lyric block against a sans-serif 
 
 Lyra overrides a handful of Tailwind default sizes and introduces two custom ones.
 
-| Token              | px     | Canonical uses                                                                   |
-| ------------------ | ------ | -------------------------------------------------------------------------------- |
-| `text-2xs`         | **10** | Status pill labels, section-type tabs (`TYPE_LABEL`), timestamps, footer counts. |
-| `text-[10.5px]`    | 10.5   | Vault path crumb, footer metadata, "click to rename" hint.                       |
-| `text-[11px]`      | 11     | Fine chips, inline kbd glyphs, tag chips.                                        |
-| `text-xs`          | 12     | Modal description lines, keyboard-hint tokens in menu bar.                       |
-| `text-[12.5px]`    | 12.5   | Menu item labels, search input, comment body.                                    |
-| `text-[13px]`      | 13     | Song titles in list, modal button labels.                                        |
-| `text-sm`          | 14     | Modal primary inputs, empty-state body copy.                                     |
-| `text-base`        | 16     | The lyric textarea (only).                                                       |
-| `text-title`       | **26** | Song title in MetadataBar.                                                       |
-| `text-3xl`         | 30     | Vault setup welcome heading (the largest heading anywhere).                      |
+| Token           | px     | Canonical uses                                                                   |
+| --------------- | ------ | -------------------------------------------------------------------------------- |
+| `text-2xs`      | **10** | Status pill labels, section-type tabs (`TYPE_LABEL`), timestamps, footer counts. |
+| `text-[10.5px]` | 10.5   | Vault path crumb, footer metadata, "click to rename" hint.                       |
+| `text-[11px]`   | 11     | Fine chips, inline kbd glyphs, tag chips.                                        |
+| `text-xs`       | 12     | Modal description lines, keyboard-hint tokens in menu bar.                       |
+| `text-[12.5px]` | 12.5   | Menu item labels, search input, comment body.                                    |
+| `text-[13px]`   | 13     | Song titles in list, modal button labels.                                        |
+| `text-sm`       | 14     | Modal primary inputs, empty-state body copy.                                     |
+| `text-base`     | 16     | The lyric textarea (only).                                                       |
+| `text-title`    | **26** | Song title in MetadataBar.                                                       |
+| `text-3xl`      | 30     | Vault setup welcome heading (the largest heading anywhere).                      |
 
 **Note**: the app freely mixes Tailwind utility classes and inline `style={{ fontSize: 12.5 }}` — the latter is used when a half-pixel or a specifically-tuned value matters. This is a deliberate convention, not an accident. If a designer needs 11.5px, write it inline; don't invent a new token.
 
 ### 4.4 Weight
 
-| Weight | Role                                                                            |
-| ------ | ------------------------------------------------------------------------------- |
-| 400    | Body, menu items, meta values.                                                  |
-| 500 (`font-medium`) | Song title in list, fine tags, in-line "Me" author names, action buttons. |
-| 600 (`font-semibold`) | H1/H2, brand wordmark, primary CTAs, saved toast, snapshot label "v1".   |
-| 700 (`font-bold`) | Snapshot version labels ("Now", "v1"), counter badges on comment icons.     |
+| Weight                | Role                                                                      |
+| --------------------- | ------------------------------------------------------------------------- |
+| 400                   | Body, menu items, meta values.                                            |
+| 500 (`font-medium`)   | Song title in list, fine tags, in-line "Me" author names, action buttons. |
+| 600 (`font-semibold`) | H1/H2, brand wordmark, primary CTAs, saved toast, snapshot label "v1".    |
+| 700 (`font-bold`)     | Snapshot version labels ("Now", "v1"), counter badges on comment icons.   |
 
 Italic is used in exactly one place: the tagline on the vault setup ("Lyra — the lyre constellation…") and for missing-note placeholders in snapshot cards.
 
@@ -231,15 +231,15 @@ When using uppercase, always pair with `font-semibold` (600) or `font-medium` (5
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│ MenuBar                                 h-8, panel       │
+│ MenuBar                                 h-8, panel      │
 ├────────────┬────────────────────────────────────────────┤
-│            │                                             │
-│ Sidebar    │ EditorPanel                                 │
-│ w-65       │   ├── MetadataBar      (shrink-0)           │
-│ (or w-12)  │   ├── [DiffBanner | SnapshotPreviewBanner]  │
-│            │   ├── SectionEditor    (flex-1, scroll-y)   │
-│            │   └── VersionTimeline  (42px | 184px)       │
-│            │                                             │
+│            │                                            │
+│ Sidebar    │ EditorPanel                                │
+│ w-65       │   ├── MetadataBar      (shrink-0)          │
+│ (or w-12)  │   ├── [DiffBanner | SnapshotPreviewBanner] │
+│            │   ├── SectionEditor    (flex-1, scroll-y)  │
+│            │   └── VersionTimeline  (42px | 184px)      │
+│            │                                            │
 └────────────┴────────────────────────────────────────────┘
 ```
 
@@ -264,13 +264,13 @@ Lyra uses Tailwind's default 0.25rem step but **freely uses arbitrary half-steps
 
 A narrow radius vocabulary.
 
-| Token             | Use                                                                 |
-| ----------------- | ------------------------------------------------------------------- |
-| `rounded` (4px)   | Small chrome buttons, menu items, kbd tokens, field chips.          |
-| `rounded-md` (6px)| "New song" CTA in empty state, vault setup primary button.         |
-| `rounded-lg` (8px)| Song entries, modals inputs, panels, context menus, snapshot cards. |
-| `rounded-xl` (12px)| Modal surfaces.                                                    |
-| `rounded-full`    | Status pills, tag chips, counter dots, avatar-like status dots.     |
+| Token               | Use                                                                 |
+| ------------------- | ------------------------------------------------------------------- |
+| `rounded` (4px)     | Small chrome buttons, menu items, kbd tokens, field chips.          |
+| `rounded-md` (6px)  | "New song" CTA in empty state, vault setup primary button.          |
+| `rounded-lg` (8px)  | Song entries, modals inputs, panels, context menus, snapshot cards. |
+| `rounded-xl` (12px) | Modal surfaces.                                                     |
+| `rounded-full`      | Status pills, tag chips, counter dots, avatar-like status dots.     |
 
 Never mix `rounded` and `rounded-lg` on adjacent siblings — the eye reads it as a bug.
 
@@ -509,14 +509,14 @@ Every shortcut the user can reach is cataloged in `SHORTCUT_CATEGORIES` and surf
 
 Canonical bindings:
 
-| Binding         | Action         |
-| --------------- | -------------- |
-| `mod + N`       | New song       |
-| `mod + S`       | Save           |
-| `mod + Shift + S` | Save version |
-| `mod + W`       | Close song     |
-| `mod + \`       | Toggle sidebar |
-| `Esc`           | Close modal / exit diff / exit preview / cancel inline edit |
+| Binding           | Action                                                      |
+| ----------------- | ----------------------------------------------------------- |
+| `mod + N`         | New song                                                    |
+| `mod + S`         | Save                                                        |
+| `mod + Shift + S` | Save version                                                |
+| `mod + W`         | Close song                                                  |
+| `mod + \`         | Toggle sidebar                                              |
+| `Esc`             | Close modal / exit diff / exit preview / cancel inline edit |
 
 `mod` resolves to `⌘` on macOS and `Ctrl` on Windows/Linux via `navigator.platform` + UA sniff (`MenuBar.tsx:11`, `KeyboardShortcutsModal.tsx:10`). Render the platform-appropriate glyph — never "Ctrl" on macOS or "⌘" on Windows.
 
@@ -589,17 +589,17 @@ Unimplemented menu items are shown grayed with an explicit `TODO` badge (`MenuBa
 
 ## 13. States — a quick reference
 
-| State         | Treatment                                                                    |
-| ------------- | ---------------------------------------------------------------------------- |
-| **Rest**      | Surfaces at `panel`, text at `secondary`/`primary`, borders `border-soft`.   |
-| **Hover**     | Background lifts to `elev`; text to `primary`; border may shift to `accent`. |
-| **Active**    | `bg-accent-soft` + `text-accent` (menus, section-comments toggle).            |
-| **Selected**  | `bg-accent-soft` + `song-entry-selected` left bar (2px amber, radius 0 2 2 0). |
-| **Focus**     | Accent border + halo (boxed inputs) or accent bottom-border (inline fields).  |
-| **Disabled** | `opacity-40` or `opacity-50` with `cursor-not-allowed`. No grayscale.         |
-| **Loading**   | `Icons.Loader` with `animate-spin` in `text-muted`.                          |
-| **Dirty**     | `w-1.5 h-1.5 rounded-full bg-accent` with 6–8px amber box-shadow.            |
-| **Danger**    | `brand-rose` text on hover; `oklch(0.55 0.18 25)` fill on confirm CTA.       |
+| State        | Treatment                                                                      |
+| ------------ | ------------------------------------------------------------------------------ |
+| **Rest**     | Surfaces at `panel`, text at `secondary`/`primary`, borders `border-soft`.     |
+| **Hover**    | Background lifts to `elev`; text to `primary`; border may shift to `accent`.   |
+| **Active**   | `bg-accent-soft` + `text-accent` (menus, section-comments toggle).             |
+| **Selected** | `bg-accent-soft` + `song-entry-selected` left bar (2px amber, radius 0 2 2 0). |
+| **Focus**    | Accent border + halo (boxed inputs) or accent bottom-border (inline fields).   |
+| **Disabled** | `opacity-40` or `opacity-50` with `cursor-not-allowed`. No grayscale.          |
+| **Loading**  | `Icons.Loader` with `animate-spin` in `text-muted`.                            |
+| **Dirty**    | `w-1.5 h-1.5 rounded-full bg-accent` with 6–8px amber box-shadow.              |
+| **Danger**   | `brand-rose` text on hover; `oklch(0.55 0.18 25)` fill on confirm CTA.         |
 
 ---
 
