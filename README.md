@@ -40,12 +40,12 @@ The [`docs/user/`](docs/user/) folder contains the full user guide:
 
 ## Prerequisites
 
-| Requirement                                                    | Version | Notes                                            |
-| -------------------------------------------------------------- | ------- | ------------------------------------------------ |
-| [Node.js](https://nodejs.org/)                                 | ≥ 20    | For the frontend build                           |
-| [Rust](https://rustup.rs/)                                     | stable  | For the Tauri backend                            |
-| [Tauri system deps](https://v2.tauri.app/start/prerequisites/) | —       | Platform-specific (see link)                     |
-| WebView2                                                       | —       | Windows only, usually pre-installed on Win 10/11 |
+| Requirement                                                    | Version | Notes                                                                                      |
+| -------------------------------------------------------------- | ------- | ------------------------------------------------------------------------------------------ |
+| [Node.js](https://nodejs.org/)                                 | ≥ 20    | For the frontend build                                                                     |
+| [Rust](https://rustup.rs/)                                     | stable  | For the Tauri backend                                                                      |
+| [Tauri system deps](https://v2.tauri.app/start/prerequisites/) | —       | Platform-specific (see link)                                                               |
+| WebView2                                                       | —       | Windows only, usually pre-installed on Win 10/11                                           |
 | WebKitGTK + other libs                                         | —       | Linux only, install via your distro's package manager (see Tauri prerequisites link above) |
 
 Follow the [Tauri v2 prerequisites guide](https://v2.tauri.app/start/prerequisites/) for your OS before continuing.
