@@ -38,6 +38,22 @@ The [`docs/user/`](docs/user/) folder contains the full user guide:
 
 ---
 
+## Download and Install
+
+You don't need to build from source to use Lyra. Pre-built installers are available for Windows, macOS, and Linux.
+
+1. Go to the [Releases page](https://github.com/GabrielBG0/lyra/releases).
+2. Open the latest release and expand the **Assets** section.
+3. Download the installer for your operating system:
+   - **Windows:** `.msi` (recommended) or `.exe` setup installer
+   - **macOS:** `.dmg` disk image
+   - **Linux:** `.AppImage` (universal), `.deb` (Debian/Ubuntu), or `.rpm` (Fedora/RHEL)
+4. Run the installer and follow the prompts.
+
+Once installed, open Lyra, point it at a folder to use as your vault, and start writing.
+
+---
+
 ## Prerequisites
 
 | Requirement                                                    | Version | Notes                                                                                      |
