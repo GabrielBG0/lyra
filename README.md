@@ -23,6 +23,21 @@ Lyra keeps every draft of your lyrics as immutable snapshots, lets you diff any 
 
 ---
 
+## Documentation
+
+The [`docs/user/`](docs/user/) folder contains the full user guide:
+
+- [Getting Started](docs/user/getting-started.md)
+- [Songs and Sections](docs/user/songs-and-sections.md)
+- [Snapshots](docs/user/snapshots.md)
+- [Comparing Versions](docs/user/comparing-versions.md)
+- [Comments](docs/user/comments.md)
+- [Find and Replace](docs/user/find-and-replace.md)
+- [Exporting](docs/user/exporting.md)
+- [Keyboard Shortcuts](docs/user/keyboard-shortcuts.md)
+
+---
+
 ## Prerequisites
 
 | Requirement                                                    | Version | Notes                                            |
