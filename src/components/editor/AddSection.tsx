@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 import type { SectionType } from "../../lib/types";
 import { Icons } from "../ui/Icon";
+import { useUIStore } from "../../stores/uiStore";
 
 const SECTION_TYPES: { type: SectionType; label: string }[] = [
   { type: "intro", label: "Intro" },
@@ -19,6 +20,7 @@ interface AddSectionProps {
 }
 
 export default function AddSection({ onAdd, inline = false }: AddSectionProps) {
+  const { selectNameOnFocus } = useUIStore();
   const [open, setOpen] = useState(false);
   const [selectedType, setSelectedType] = useState<SectionType>("verse");
   const [name, setName] = useState("");
@@ -34,6 +36,13 @@ export default function AddSection({ onAdd, inline = false }: AddSectionProps) {
       setName(defaultName);
     }
   }, [open, selectedType]);
+
+  useEffect(() => {
+    if (inline) return;
+    const handler = () => setOpen(true);
+    window.addEventListener("add-section:open", handler);
+    return () => window.removeEventListener("add-section:open", handler);
+  }, [inline]);
 
   const handleAdd = () => {
     const finalName =
@@ -85,6 +94,7 @@ export default function AddSection({ onAdd, inline = false }: AddSectionProps) {
                 <TypeAndNamePicker
                   selectedType={selectedType}
                   name={name}
+                  selectNameOnFocus={selectNameOnFocus}
                   onTypeChange={(t) => {
                     setSelectedType(t);
                     setName(
@@ -119,6 +129,7 @@ export default function AddSection({ onAdd, inline = false }: AddSectionProps) {
           <TypeAndNamePicker
             selectedType={selectedType}
             name={name}
+            selectNameOnFocus={selectNameOnFocus}
             onTypeChange={(t) => {
               setSelectedType(t);
               setName(SECTION_TYPES.find((s) => s.type === t)?.label ?? "");
@@ -137,6 +148,7 @@ export default function AddSection({ onAdd, inline = false }: AddSectionProps) {
 function TypeAndNamePicker({
   selectedType,
   name,
+  selectNameOnFocus,
   onTypeChange,
   onNameChange,
   onSubmit,
@@ -145,6 +157,7 @@ function TypeAndNamePicker({
 }: {
   selectedType: SectionType;
   name: string;
+  selectNameOnFocus: boolean;
   onTypeChange: (t: SectionType) => void;
   onNameChange: (n: string) => void;
   onSubmit: () => void;
@@ -174,6 +187,7 @@ function TypeAndNamePicker({
         placeholder="Section name…"
         value={name}
         onChange={(e) => onNameChange(e.target.value)}
+        onFocus={(e) => { if (selectNameOnFocus) e.target.select(); }}
         onKeyDown={(e) => {
           if (e.key === "Enter") onSubmit();
           if (e.key === "Escape") onCancel();

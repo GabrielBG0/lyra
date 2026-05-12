@@ -45,6 +45,7 @@ const IMPLEMENTED = new Set([
   "Find Previous",
   "Show Replace",
   "Hide Replace",
+  "New Section",
 ]);
 
 interface MenuBarProps {
@@ -125,6 +126,8 @@ export default function MenuBar({
     Song: [
       `Save\t${mod}S`,
       `Save Take\t${mod}${shift}S`,
+      "—",
+      `New Section\t${mod}${shift}N`,
       "—",
       // TODO: Diff view between working copy and a snapshot
       `Diff with Take…\t${mod}D`,
@@ -222,7 +225,8 @@ export default function MenuBar({
     if (
       label === "Find…" ||
       label === "Show Replace" ||
-      label === "Hide Replace"
+      label === "Hide Replace" ||
+      label === "New Section"
     )
       return !!filePath;
     if (label === "Find Next" || label === "Find Previous")
@@ -253,6 +257,11 @@ export default function MenuBar({
     await tauriApi.export.pdf(filePath, false);
   };
 
+  const handleNewSection = () => {
+    if (!filePath) return;
+    window.dispatchEvent(new Event("add-section:open"));
+  };
+
   const handleItem = (_menu: string, item: string) => {
     const label = item.split("\t")[0];
     if (!isEnabled(label)) return;
@@ -276,6 +285,7 @@ export default function MenuBar({
       toggleFindReplace();
     else if (label === "Toggle Sidebar") onToggleSidebar();
     else if (label === "Toggle History Bar") onToggleHistoryBar();
+    else if (label === "New Section") handleNewSection();
     else if (label === "Save") saveSong();
     else if (label === "Save Take") {
       openSnapshotModal((note) => createSnapshot(note));

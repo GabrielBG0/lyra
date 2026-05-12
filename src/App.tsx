@@ -47,6 +47,7 @@ export default function App() {
     openSnapshotModal,
     openPreferencesModal,
     setNudgeDismissed,
+    setSelectNameOnFocus,
     openFindPanel,
     toggleFindReplace,
   } = useUIStore();
@@ -97,6 +98,11 @@ export default function App() {
         useEditorStore.getState().findPrev();
     },
     "toggle-find-replace": () => toggleFindReplace(),
+    "new-section": () => {
+      const { filePath } = useEditorStore.getState();
+      if (!filePath) return;
+      window.dispatchEvent(new Event("add-section:open"));
+    },
   });
 
   useEffect(() => {
@@ -111,6 +117,7 @@ export default function App() {
         );
         setVaultPath(cfg.vault_path ?? null);
         setNudgeDismissed(cfg.nudge_dismissed);
+        setSelectNameOnFocus(cfg.select_name_on_focus);
         if (cfg.vault_path) {
           await loadSongs();
           if (!cfg.tutorial_completed) setPendingTour(true);

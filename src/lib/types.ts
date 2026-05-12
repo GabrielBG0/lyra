@@ -124,6 +124,7 @@ export interface AppConfig {
   debug_mode: boolean;
   nudge_dismissed: boolean;
   tutorial_completed: boolean;
+  select_name_on_focus: boolean;
 }
 
 export interface FindMatch {

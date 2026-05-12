@@ -92,7 +92,7 @@ export default function PreferencesModal({
   const [nuking, setNuking] = useState(false);
   const [resetConfirming, setResetConfirming] = useState(false);
   const [resetting, setResetting] = useState(false);
-  const { setNudgeDismissed } = useUIStore();
+  const { setNudgeDismissed, setSelectNameOnFocus } = useUIStore();
 
   useEffect(() => {
     if (!open) return;
@@ -111,13 +111,14 @@ export default function PreferencesModal({
   }, [open, onClose]);
 
   const handleToggle = async (
-    field: keyof Pick<AppConfig, "debug_mode" | "nudge_dismissed">,
+    field: keyof Pick<AppConfig, "debug_mode" | "nudge_dismissed" | "select_name_on_focus">,
     value: boolean,
   ) => {
     if (!config) return;
     const updated = { ...config, [field]: value };
     setConfig(updated);
     if (field === "nudge_dismissed") setNudgeDismissed(value);
+    if (field === "select_name_on_focus") setSelectNameOnFocus(value);
     await tauriApi.config.set(updated);
   };
 
@@ -207,6 +208,13 @@ export default function PreferencesModal({
                     description="Don't show the nudge to save a take while writing"
                     checked={config.nudge_dismissed}
                     onChange={(v) => handleToggle("nudge_dismissed", v)}
+                  />
+                  <div className="h-px bg-border-soft" />
+                  <ToggleRow
+                    label="Select section name on focus"
+                    description="Automatically select the name when opening the new section picker"
+                    checked={config.select_name_on_focus}
+                    onChange={(v) => handleToggle("select_name_on_focus", v)}
                   />
                 </div>
               </div>

@@ -6,6 +6,10 @@ use serde::{Deserialize, Serialize};
 
 use crate::error::{AppError, AppResult};
 
+fn default_true() -> bool {
+    true
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct AppConfig {
     pub vault_path: Option<String>,
@@ -16,6 +20,8 @@ pub struct AppConfig {
     pub nudge_dismissed: bool,
     #[serde(default)]
     pub tutorial_completed: bool,
+    #[serde(default = "default_true")]
+    pub select_name_on_focus: bool,
 }
 
 fn config_path() -> AppResult<PathBuf> {

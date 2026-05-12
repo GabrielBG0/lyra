@@ -101,6 +101,13 @@ export default function SectionHeader({
             <div className="absolute right-0 top-full hidden group-hover/more:block pt-1 z-10">
               <div className="menu-popover min-w-32">
                 <button
+                  className="menu-item w-full text-left px-2.5 py-1.5 text-[12px] text-secondary hover:text-primary hover:bg-panel rounded cursor-pointer border-none bg-transparent"
+                  onClick={() => window.dispatchEvent(new Event("add-section:open"))}
+                >
+                  New section
+                </button>
+                <div className="h-px bg-border-soft my-1 mx-1.5" />
+                <button
                   className="menu-item-danger w-full text-left px-2.5 py-1.5 text-[12px] text-brand-rose hover:bg-panel rounded cursor-pointer border-none bg-transparent"
                   onClick={onDelete}
                 >

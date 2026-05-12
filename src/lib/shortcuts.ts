@@ -28,6 +28,12 @@ export const SHORTCUT_CATEGORIES: ShortcutCategory[] = [
         action: "save-version",
         keys: ["mod", "shift", "S"],
       },
+      {
+        label: "New Section",
+        action: "new-section",
+        keys: ["mod", "shift", "N"],
+        bypassInputFilter: true,
+      },
     ],
   },
   {

@@ -9,6 +9,8 @@ interface UIStore {
   setHistoryBarExpanded: (v: boolean) => void;
   nudgeDismissed: boolean;
   setNudgeDismissed: (v: boolean) => void;
+  selectNameOnFocus: boolean;
+  setSelectNameOnFocus: (v: boolean) => void;
   newSongModalOpen: boolean;
   openNewSongModal: () => void;
   closeNewSongModal: () => void;
@@ -48,6 +50,8 @@ export const useUIStore = create<UIStore>((set) => ({
   setHistoryBarExpanded: (v) => set({ historyBarExpanded: v }),
   nudgeDismissed: false,
   setNudgeDismissed: (v) => set({ nudgeDismissed: v }),
+  selectNameOnFocus: true,
+  setSelectNameOnFocus: (v) => set({ selectNameOnFocus: v }),
   newSongModalOpen: false,
   openNewSongModal: () => set({ newSongModalOpen: true }),
   closeNewSongModal: () => set({ newSongModalOpen: false }),
