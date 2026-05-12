@@ -102,7 +102,9 @@ export default function SectionHeader({
               <div className="menu-popover min-w-32">
                 <button
                   className="menu-item w-full text-left px-2.5 py-1.5 text-[12px] text-secondary hover:text-primary hover:bg-panel rounded cursor-pointer border-none bg-transparent"
-                  onClick={() => window.dispatchEvent(new Event("add-section:open"))}
+                  onClick={() =>
+                    window.dispatchEvent(new Event("add-section:open"))
+                  }
                 >
                   New section
                 </button>

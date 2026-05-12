@@ -12,12 +12,12 @@ To compare your working draft against a snapshot, preview the snapshot first, th
 
 Each section shows a status badge in the diff view:
 
-| Badge | Meaning |
-|-------|---------|
-| **Unchanged** | The section is identical in both versions. |
-| **Changed** | The section exists in both versions but the content differs. |
-| **Added** | The section exists only in the newer version. |
-| **Removed** | The section exists only in the older version. |
+| Badge         | Meaning                                                      |
+| ------------- | ------------------------------------------------------------ |
+| **Unchanged** | The section is identical in both versions.                   |
+| **Changed**   | The section exists in both versions but the content differs. |
+| **Added**     | The section exists only in the newer version.                |
+| **Removed**   | The section exists only in the older version.                |
 
 For sections marked **Changed**, Lyra shows a character-level diff inside the section body. Removed text is highlighted in red, added text in green, and the surrounding context is shown in muted text to give you orientation.
 

@@ -187,7 +187,9 @@ function TypeAndNamePicker({
         placeholder="Section name…"
         value={name}
         onChange={(e) => onNameChange(e.target.value)}
-        onFocus={(e) => { if (selectNameOnFocus) e.target.select(); }}
+        onFocus={(e) => {
+          if (selectNameOnFocus) e.target.select();
+        }}
         onKeyDown={(e) => {
           if (e.key === "Enter") onSubmit();
           if (e.key === "Escape") onCancel();

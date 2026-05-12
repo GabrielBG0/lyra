@@ -8,15 +8,15 @@ Press `Ctrl+N` (`⌘N`) or go to **File → New Song**. Type a title and press E
 
 The metadata bar sits at the top of the editor. Click any field to edit it.
 
-| Field | Description |
-|-------|-------------|
-| **Title** | The song's name. Shown in the sidebar. |
+| Field      | Description                                                        |
+| ---------- | ------------------------------------------------------------------ |
+| **Title**  | The song's name. Shown in the sidebar.                             |
 | **Status** | Where the song is in your process: Idea, Draft, Demo, or Finished. |
-| **Key** | Musical key, e.g. "C Major" or "A Minor". |
-| **BPM** | Tempo in beats per minute. |
-| **Capo** | Guitar capo position. |
-| **Tuning** | Guitar tuning string. |
-| **Tags** | Genre, mood, and language. Each can hold multiple values. |
+| **Key**    | Musical key, e.g. "C Major" or "A Minor".                          |
+| **BPM**    | Tempo in beats per minute.                                         |
+| **Capo**   | Guitar capo position.                                              |
+| **Tuning** | Guitar tuning string.                                              |
+| **Tags**   | Genre, mood, and language. Each can hold multiple values.          |
 
 Changes to metadata are saved along with the rest of the song.
 
