@@ -59,7 +59,11 @@ export default function EditorPanel({
         <ZenToolbar />
         <EditorErrorBoundary>
           <div className="flex-1 overflow-y-auto">
-            <SectionEditor lyricFont={lyricFont} readOnly={false} previewSections={null} />
+            <SectionEditor
+              lyricFont={lyricFont}
+              readOnly={false}
+              previewSections={null}
+            />
           </div>
         </EditorErrorBoundary>
       </div>
