@@ -46,6 +46,8 @@ export default function AppShell({ vaultPath }: AppShellProps) {
     preferencesModalOpen,
     closePreferencesModal,
     toggleHistoryBar,
+    zenMode,
+    exitZenMode,
   } = useUIStore();
   const [lyricFont] = useState<string>(
     '"Noto Serif", "Noto Serif JP", "Noto Serif KR", Georgia, serif',
@@ -55,6 +57,7 @@ export default function AppShell({ vaultPath }: AppShellProps) {
   const { closeSong } = useEditorStore();
 
   const handleCloseSong = () => {
+    if (zenMode) exitZenMode();
     closeSong();
     selectSong(null);
   };
@@ -62,6 +65,33 @@ export default function AppShell({ vaultPath }: AppShellProps) {
   useGlobalShortcuts();
 
   const handleNewSong = () => openNewSongModal();
+
+  if (zenMode) {
+    return (
+      <div className="h-full flex flex-col bg-bg text-primary font-ui overflow-hidden">
+        <EditorPanel lyricFont={lyricFont} onNewSong={handleNewSong} />
+        <NewSongModal
+          open={newSongModalOpen}
+          onClose={closeNewSongModal}
+          onCreate={createSong}
+        />
+        <SnapshotModal
+          open={snapshotModalOpen}
+          onClose={closeSnapshotModal}
+          onSubmit={snapshotModalOnSubmit ?? (() => {})}
+        />
+        <KeyboardShortcutsModal
+          open={shortcutsModalOpen}
+          onClose={closeShortcutsModal}
+        />
+        <AboutModal open={aboutModalOpen} onClose={closeAboutModal} />
+        <PreferencesModal
+          open={preferencesModalOpen}
+          onClose={closePreferencesModal}
+        />
+      </div>
+    );
+  }
 
   return (
     <div

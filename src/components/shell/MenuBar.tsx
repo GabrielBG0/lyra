@@ -38,6 +38,7 @@ const IMPLEMENTED = new Set([
   "Save Take",
   "Toggle Sidebar",
   "Toggle History Bar",
+  "Zen mode",
   "Keyboard Shortcuts…",
   "About Lyra",
   "Find…",
@@ -94,6 +95,7 @@ export default function MenuBar({
     toggleFindReplace,
     findPanelOpen,
     findReplaceMode,
+    enterZenMode,
   } = useUIStore();
   const menuRef = useRef<HTMLDivElement>(null);
   const win = getCurrentWindow();
@@ -135,6 +137,7 @@ export default function MenuBar({
     View: [
       `Toggle Sidebar\t${mod}B`,
       `Toggle History Bar\t${mod}H`,
+      "Zen mode\tF11",
       "—",
       // TODO: Font size zoom
       `Zoom In\t${mod}+`,
@@ -226,7 +229,8 @@ export default function MenuBar({
       label === "Find…" ||
       label === "Show Replace" ||
       label === "Hide Replace" ||
-      label === "New Section"
+      label === "New Section" ||
+      label === "Zen mode"
     )
       return !!filePath;
     if (label === "Find Next" || label === "Find Previous")
@@ -285,6 +289,7 @@ export default function MenuBar({
       toggleFindReplace();
     else if (label === "Toggle Sidebar") onToggleSidebar();
     else if (label === "Toggle History Bar") onToggleHistoryBar();
+    else if (label === "Zen mode") enterZenMode();
     else if (label === "New Section") handleNewSection();
     else if (label === "Save") saveSong();
     else if (label === "Save Take") {

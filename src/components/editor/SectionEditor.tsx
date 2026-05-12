@@ -1,5 +1,6 @@
 import type { SectionType, SnapshotSection } from "../../lib/types";
 import { useEditorStore } from "../../stores/editorStore";
+import { useUIStore } from "../../stores/uiStore";
 import SectionBlock from "./SectionBlock";
 import AddSection from "./AddSection";
 import LyraLogo from "../ui/LyraLogo";
@@ -25,6 +26,7 @@ export default function SectionEditor({
 }: SectionEditorProps) {
   const { sections, filePath, addSection, removeSection, reorderSections } =
     useEditorStore();
+  const { zenMode } = useUIStore();
 
   const handleAdd = async (
     type: SectionType,
@@ -112,6 +114,7 @@ export default function SectionEditor({
   }
 
   if (sections.length === 0) {
+    if (zenMode) return <div className="flex-1 bg-bg" />;
     return (
       <div
         data-tour="section-editor"
@@ -132,7 +135,11 @@ export default function SectionEditor({
       >
         <div
           data-tour="section-editor"
-          className="w-[85%] mx-auto px-14 py-3.5 pb-16"
+          className={
+            zenMode
+              ? "max-w-2xl w-full mx-auto px-8 py-12 pb-24"
+              : "w-[85%] mx-auto px-14 py-3.5 pb-16"
+          }
         >
           {sections.map((section, i) => (
             <SectionBlock
@@ -143,9 +150,12 @@ export default function SectionEditor({
               commentCount={0}
               onInsertBefore={(type, name) => handleAdd(type, name, i - 1)}
               onDelete={handleDelete}
+              zenMode={zenMode}
             />
           ))}
-          <AddSection onAdd={(type, name) => handleAdd(type, name)} />
+          {!zenMode && (
+            <AddSection onAdd={(type, name) => handleAdd(type, name)} />
+          )}
         </div>
       </SortableContext>
     </DndContext>

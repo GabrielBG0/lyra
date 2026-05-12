@@ -50,6 +50,8 @@ export default function App() {
     setSelectNameOnFocus,
     openFindPanel,
     toggleFindReplace,
+    enterZenMode,
+    exitZenMode,
   } = useUIStore();
   const { setSongs } = useSongStore();
 
@@ -76,8 +78,14 @@ export default function App() {
     "toggle-sidebar": () => toggleSidebar(),
     "toggle-history": () => toggleHistoryBar(),
     "close-song": () => {
+      if (useUIStore.getState().zenMode) exitZenMode();
       useEditorStore.getState().closeSong();
       useSongStore.getState().selectSong(null);
+    },
+    "zen-mode": () => {
+      const { zenMode } = useUIStore.getState();
+      if (zenMode) exitZenMode();
+      else enterZenMode();
     },
     preferences: () => openPreferencesModal(),
     find: () => {

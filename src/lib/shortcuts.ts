@@ -45,6 +45,12 @@ export const SHORTCUT_CATEGORIES: ShortcutCategory[] = [
         action: "toggle-history",
         keys: ["mod", "H"],
       },
+      {
+        label: "Zen mode",
+        action: "zen-mode",
+        keys: ["F11"],
+        bypassInputFilter: true,
+      },
     ],
   },
   {

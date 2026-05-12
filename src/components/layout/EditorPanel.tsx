@@ -1,6 +1,8 @@
 import { useEditorStore } from "../../stores/editorStore";
+import { useUIStore } from "../../stores/uiStore";
 import MetadataBar from "../editor/MetadataBar";
 import SectionEditor from "../editor/SectionEditor";
+import ZenToolbar from "../editor/ZenToolbar";
 import VersionTimeline from "../timeline/VersionTimeline";
 import LyraLogo from "../ui/LyraLogo";
 import { Icons } from "../ui/Icon";
@@ -21,8 +23,10 @@ export default function EditorPanel({
 }: EditorPanelProps) {
   const { metadata, previewSnapshotId, loadedSnapshots, diffResult } =
     useEditorStore();
+  const { zenMode } = useUIStore();
 
   if (!metadata) {
+    if (zenMode) return <div className="flex-1 bg-bg" />;
     return (
       <div
         data-tour="editor-panel"
@@ -42,6 +46,22 @@ export default function EditorPanel({
           <Icons.Plus size={13} />
           New song
         </button>
+      </div>
+    );
+  }
+
+  if (zenMode) {
+    return (
+      <div
+        data-tour="editor-panel"
+        className="flex-1 flex flex-col min-h-0 bg-bg"
+      >
+        <ZenToolbar />
+        <EditorErrorBoundary>
+          <div className="flex-1 overflow-y-auto">
+            <SectionEditor lyricFont={lyricFont} readOnly={false} previewSections={null} />
+          </div>
+        </EditorErrorBoundary>
       </div>
     );
   }

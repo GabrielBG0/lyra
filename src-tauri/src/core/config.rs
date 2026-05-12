@@ -122,6 +122,7 @@ mod tests {
             debug_mode: true,
             nudge_dismissed: true,
             tutorial_completed: false,
+            select_name_on_focus: true,
         };
 
         save_config_to(&path, &original).await.unwrap();

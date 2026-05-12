@@ -1,4 +1,6 @@
 import { create } from "zustand";
+import { getCurrentWindow } from "@tauri-apps/api/window";
+import { useEditorStore } from "./editorStore";
 
 interface UIStore {
   sidebarCollapsed: boolean;
@@ -7,6 +9,11 @@ interface UIStore {
   historyBarExpanded: boolean;
   toggleHistoryBar: () => void;
   setHistoryBarExpanded: (v: boolean) => void;
+  zenMode: boolean;
+  preZenSidebarCollapsed: boolean;
+  preZenHistoryBarExpanded: boolean;
+  enterZenMode: () => void;
+  exitZenMode: () => void;
   nudgeDismissed: boolean;
   setNudgeDismissed: (v: boolean) => void;
   selectNameOnFocus: boolean;
@@ -40,7 +47,7 @@ interface UIStore {
   toggleFindReplace: () => void;
 }
 
-export const useUIStore = create<UIStore>((set) => ({
+export const useUIStore = create<UIStore>((set, get) => ({
   sidebarCollapsed: false,
   toggleSidebar: () => set((s) => ({ sidebarCollapsed: !s.sidebarCollapsed })),
   setSidebarCollapsed: (v) => set({ sidebarCollapsed: v }),
@@ -48,6 +55,33 @@ export const useUIStore = create<UIStore>((set) => ({
   toggleHistoryBar: () =>
     set((s) => ({ historyBarExpanded: !s.historyBarExpanded })),
   setHistoryBarExpanded: (v) => set({ historyBarExpanded: v }),
+  zenMode: false,
+  preZenSidebarCollapsed: false,
+  preZenHistoryBarExpanded: false,
+  enterZenMode: () => {
+    const { filePath } = useEditorStore.getState();
+    if (!filePath) return;
+    const { sidebarCollapsed, historyBarExpanded } = get();
+    useEditorStore.getState().clearDiff();
+    useEditorStore.getState().exitPreview();
+    set({
+      zenMode: true,
+      preZenSidebarCollapsed: sidebarCollapsed,
+      preZenHistoryBarExpanded: historyBarExpanded,
+      sidebarCollapsed: true,
+      historyBarExpanded: false,
+    });
+    getCurrentWindow().setFullscreen(true).catch(console.error);
+  },
+  exitZenMode: () => {
+    const { preZenSidebarCollapsed, preZenHistoryBarExpanded } = get();
+    set({
+      zenMode: false,
+      sidebarCollapsed: preZenSidebarCollapsed,
+      historyBarExpanded: preZenHistoryBarExpanded,
+    });
+    getCurrentWindow().setFullscreen(false).catch(console.error);
+  },
   nudgeDismissed: false,
   setNudgeDismissed: (v) => set({ nudgeDismissed: v }),
   selectNameOnFocus: true,

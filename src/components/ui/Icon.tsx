@@ -22,6 +22,7 @@ import {
   CaseSensitive,
   Replace,
   WholeWord,
+  Minimize2,
 } from "lucide-react";
 
 export const Icons = {
@@ -48,4 +49,5 @@ export const Icons = {
   CaseSensitive,
   Replace,
   WholeWord,
+  Minimize2,
 };

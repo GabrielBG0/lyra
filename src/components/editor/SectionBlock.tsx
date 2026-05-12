@@ -16,6 +16,7 @@ interface SectionBlockProps {
   onInsertBefore: (type: SectionType, name: string) => void;
   onDelete: (id: string) => void;
   readOnly?: boolean;
+  zenMode?: boolean;
 }
 
 function renderHighlightedContent(
@@ -61,6 +62,7 @@ export default function SectionBlock({
   onInsertBefore,
   onDelete,
   readOnly,
+  zenMode,
 }: SectionBlockProps) {
   const { updateSection, setFocusedSection, findMatches, findActiveIndex } =
     useEditorStore();
@@ -88,7 +90,7 @@ export default function SectionBlock({
     isDragging,
   } = useSortable({
     id: section.id,
-    disabled: readOnly,
+    disabled: readOnly || !!zenMode,
   });
 
   const style = {
@@ -113,11 +115,11 @@ export default function SectionBlock({
         (rootRef as MutableRefObject<HTMLDivElement | null>).current = el;
       }}
       style={style}
-      className="group relative"
+      className={`group relative${zenMode ? " py-6" : ""}`}
       onFocus={() => setFocusedSection(section.id)}
     >
       {/* Divider with insert affordance */}
-      {!isFirst && !readOnly && (
+      {!isFirst && !readOnly && !zenMode && (
         <div className="group/divider relative h-7 flex items-center cursor-default">
           <div className="absolute inset-x-0 top-1/2 h-px bg-border-soft opacity-55 group-hover/divider:bg-accent group-hover/divider:opacity-35 transition-all" />
           <div className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 opacity-0 group-hover/divider:opacity-100 transition-opacity">
@@ -125,24 +127,26 @@ export default function SectionBlock({
           </div>
         </div>
       )}
-      {!isFirst && readOnly && (
+      {!isFirst && readOnly && !zenMode && (
         <div className="h-7 flex items-center">
           <div className="absolute inset-x-0 top-1/2 h-px bg-border-soft opacity-30" />
         </div>
       )}
 
       {/* Section header */}
-      <SectionHeader
-        sectionType={section.section_type}
-        name={section.name}
-        commentCount={commentCount}
-        commentsOpen={commentsOpen}
-        onToggleComments={() => setCommentsOpen((o) => !o)}
-        onDelete={() => onDelete(section.id)}
-        readOnly={readOnly}
-        dragListeners={listeners}
-        dragAttributes={attributes}
-      />
+      {!zenMode && (
+        <SectionHeader
+          sectionType={section.section_type}
+          name={section.name}
+          commentCount={commentCount}
+          commentsOpen={commentsOpen}
+          onToggleComments={() => setCommentsOpen((o) => !o)}
+          onDelete={() => onDelete(section.id)}
+          readOnly={readOnly}
+          dragListeners={listeners}
+          dragAttributes={attributes}
+        />
+      )}
 
       {/* Lyric textarea */}
       <div className="pb-2">
@@ -193,7 +197,7 @@ export default function SectionBlock({
       </div>
 
       {/* Comments panel */}
-      {commentsOpen && <CommentPanel sectionId={section.id} />}
+      {!zenMode && commentsOpen && <CommentPanel sectionId={section.id} />}
     </div>
   );
 }

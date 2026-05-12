@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { tauriApi } from "../lib/tauri";
 import { useEditorStore } from "../stores/editorStore";
+import { useUIStore } from "../stores/uiStore";
 
 export function useCloseGuard() {
   useEffect(() => {
@@ -18,6 +19,10 @@ export function useCloseGuard() {
       if (isDirty && filePath && metadata) {
         await tauriApi.song.save(filePath, metadata, sections);
         markClean();
+      }
+
+      if (useUIStore.getState().zenMode) {
+        await win.setFullscreen(false);
       }
 
       await win.destroy();

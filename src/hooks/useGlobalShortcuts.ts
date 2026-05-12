@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useEditorStore } from "../stores/editorStore";
+import { useUIStore } from "../stores/uiStore";
 import {
   serializeSection,
   looksLikeSection,
@@ -72,6 +73,32 @@ export function useGlobalShortcuts() {
     }
 
     async function handleKeydown(e: KeyboardEvent) {
+      if (e.key === "Escape") {
+        const {
+          zenMode,
+          exitZenMode,
+          newSongModalOpen,
+          snapshotModalOpen,
+          shortcutsModalOpen,
+          deleteSongModal,
+          aboutModalOpen,
+          vaultOptionsModalOpen,
+          preferencesModalOpen,
+        } = useUIStore.getState();
+        const anyModalOpen =
+          newSongModalOpen ||
+          snapshotModalOpen ||
+          shortcutsModalOpen ||
+          deleteSongModal !== null ||
+          aboutModalOpen ||
+          vaultOptionsModalOpen ||
+          preferencesModalOpen;
+        if (zenMode && !anyModalOpen) {
+          exitZenMode();
+          return;
+        }
+      }
+
       const isMac = navigator.platform.startsWith("Mac");
       const modifier = isMac ? e.metaKey : e.ctrlKey;
       if (!modifier) return;
