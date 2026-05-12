@@ -10,7 +10,7 @@ fn default_true() -> bool {
     true
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AppConfig {
     pub vault_path: Option<String>,
     pub last_opened_song: Option<String>,
@@ -22,6 +22,19 @@ pub struct AppConfig {
     pub tutorial_completed: bool,
     #[serde(default = "default_true")]
     pub select_name_on_focus: bool,
+}
+
+impl Default for AppConfig {
+    fn default() -> Self {
+        Self {
+            vault_path: None,
+            last_opened_song: None,
+            debug_mode: false,
+            nudge_dismissed: false,
+            tutorial_completed: false,
+            select_name_on_focus: true,
+        }
+    }
 }
 
 fn config_path() -> AppResult<PathBuf> {
