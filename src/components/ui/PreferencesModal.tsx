@@ -111,7 +111,10 @@ export default function PreferencesModal({
   }, [open, onClose]);
 
   const handleToggle = async (
-    field: keyof Pick<AppConfig, "debug_mode" | "nudge_dismissed" | "select_name_on_focus">,
+    field: keyof Pick<
+      AppConfig,
+      "debug_mode" | "nudge_dismissed" | "select_name_on_focus"
+    >,
     value: boolean,
   ) => {
     if (!config) return;

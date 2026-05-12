@@ -8,10 +8,10 @@ Type your search query to find matches across all sections in the current song. 
 
 ## Navigating matches
 
-| Action | Windows/Linux | Mac |
-|--------|---------------|-----|
-| Next match | `Ctrl+G` or Enter | `⌘G` or Enter |
-| Previous match | `Ctrl+Shift+G` | `⌘⇧G` |
+| Action         | Windows/Linux     | Mac           |
+| -------------- | ----------------- | ------------- |
+| Next match     | `Ctrl+G` or Enter | `⌘G` or Enter |
+| Previous match | `Ctrl+Shift+G`    | `⌘⇧G`         |
 
 The editor scrolls to keep the active match in view.
 
