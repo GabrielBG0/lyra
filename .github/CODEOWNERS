@@ -1,0 +1,7 @@
+.github/workflows/   @GabrielBG0
+.github/CODEOWNERS   @GabrielBG0
+package.json         @GabrielBG0
+package-lock.json    @GabrielBG0
+.npmrc               @GabrielBG0
+src-tauri/Cargo.toml @GabrielBG0
+src-tauri/Cargo.lock @GabrielBG0

@@ -25,3 +25,18 @@ qa-output/
 *.sw?
 *.db
 *.env
+*.env.*
+
+# Private keys and certificates
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+*.cert
+id_rsa
+id_rsa.*
+id_ed25519
+id_ed25519.*
+id_ecdsa
+id_ecdsa.*
