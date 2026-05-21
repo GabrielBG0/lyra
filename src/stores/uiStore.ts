@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { useEditorStore } from "./editorStore";
+import type { UpdateInfo } from "../lib/types";
 
 interface UIStore {
   sidebarCollapsed: boolean;
@@ -45,6 +46,9 @@ interface UIStore {
   openFindPanel: (withReplace?: boolean) => void;
   closeFindPanel: () => void;
   toggleFindReplace: () => void;
+  pendingUpdate: UpdateInfo | null;
+  setUpdateAvailable: (info: UpdateInfo) => void;
+  dismissUpdate: () => void;
 }
 
 export const useUIStore = create<UIStore>((set, get) => ({
@@ -118,4 +122,7 @@ export const useUIStore = create<UIStore>((set, get) => ({
   closeFindPanel: () => set({ findPanelOpen: false, findReplaceMode: false }),
   toggleFindReplace: () =>
     set((s) => ({ findReplaceMode: !s.findReplaceMode, findPanelOpen: true })),
+  pendingUpdate: null,
+  setUpdateAvailable: (info) => set({ pendingUpdate: info }),
+  dismissUpdate: () => set({ pendingUpdate: null }),
 }));

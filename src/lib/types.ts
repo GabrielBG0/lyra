@@ -1,6 +1,11 @@
 // Domain types that mirror the Rust models exactly.
 // Keep in sync with src-tauri/src/models/.
 
+export interface UpdateInfo {
+  version: string;
+  releaseUrl: string;
+}
+
 export type SongStatus = "idea" | "draft" | "demo" | "finished";
 export type SectionType =
   | "intro"

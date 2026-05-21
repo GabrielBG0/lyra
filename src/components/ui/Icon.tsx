@@ -23,6 +23,7 @@ import {
   Replace,
   WholeWord,
   Minimize2,
+  ArrowUp,
 } from "lucide-react";
 
 export const Icons = {
@@ -50,4 +51,5 @@ export const Icons = {
   Replace,
   WholeWord,
   Minimize2,
+  ArrowUp,
 };
