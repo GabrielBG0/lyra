@@ -136,6 +136,28 @@ jobs:
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:
           script: |
+            const installGuide = [
+              '## Installation',
+              '',
+              'Pick the right file for your system:',
+              '',
+              '**Windows**',
+              '- `.msi` (recommended) — native Windows installer, run it and follow the prompts.',
+              '- `.exe` — alternative installer if the `.msi` does not work on your system.',
+              '',
+              '**macOS**',
+              '- `.dmg` — open it and drag Lyra to your Applications folder.',
+              '- (The `.app.tar.gz` file is used internally for updates. You do not need to download it.)',
+              '',
+              '**Linux**',
+              '- `.AppImage` — works on most distros. Make it executable and run it, no installation needed.',
+              '- `.deb` — for Debian and Ubuntu-based distros.',
+              '- `.rpm` — for Fedora, RHEL, and openSUSE-based distros.',
+              '',
+              '---',
+              ''
+            ].join('\n');
+
             const tagName = 'v${{ needs.check.outputs.version }}';
             const releaseId = Number('${{ needs.create-release.outputs.release_id }}');
             const notes = await github.request('POST /repos/{owner}/{repo}/releases/generate-notes', {
@@ -150,6 +172,6 @@ jobs:
               repo: context.repo.repo,
               release_id: releaseId,
               name: notes.data.name || tagName,
-              body: notes.data.body,
+              body: installGuide + notes.data.body,
               draft: false
             });
