@@ -97,7 +97,9 @@ export default function PreferencesModal({
   const [resetConfirming, setResetConfirming] = useState(false);
   const [resetting, setResetting] = useState(false);
   const [updateChecking, setUpdateChecking] = useState(false);
-  const [updateResult, setUpdateResult] = useState<UpdateInfo | null | "up-to-date" | "error">(null);
+  const [updateResult, setUpdateResult] = useState<
+    UpdateInfo | null | "up-to-date" | "error"
+  >(null);
   const { setNudgeDismissed, setSelectNameOnFocus } = useUIStore();
 
   useEffect(() => {
@@ -220,8 +222,14 @@ export default function PreferencesModal({
 
           {config ? (
             <div
-              className={config.debug_mode ? "grid gap-6 items-start" : "space-y-5"}
-              style={config.debug_mode ? { gridTemplateColumns: "1fr 1fr" } : undefined}
+              className={
+                config.debug_mode ? "grid gap-6 items-start" : "space-y-5"
+              }
+              style={
+                config.debug_mode
+                  ? { gridTemplateColumns: "1fr 1fr" }
+                  : undefined
+              }
             >
               {/* Left column: General, Updates, Developer toggle */}
               <div className="space-y-5">
@@ -257,28 +265,44 @@ export default function PreferencesModal({
                   >
                     <div className="flex items-center justify-between gap-4">
                       <div className="min-w-0">
-                        <div className="text-secondary" style={{ fontSize: 13 }}>
+                        <div
+                          className="text-secondary"
+                          style={{ fontSize: 13 }}
+                        >
                           Check for updates
                         </div>
-                        <div className="text-muted mt-0.5 leading-snug" style={{ fontSize: 11.5 }}>
+                        <div
+                          className="text-muted mt-0.5 leading-snug"
+                          style={{ fontSize: 11.5 }}
+                        >
                           {`Current version: ${pkg.version}`}
-                          {updateResult === "error" && " · Couldn't reach the server."}
-                          {updateResult && updateResult !== "up-to-date" && updateResult !== "error" && (
-                            <>
-                              {" · "}
-                              <button
-                                onClick={() => openUrl((updateResult as UpdateInfo).releaseUrl).catch(console.error)}
-                                className="text-accent hover:underline cursor-pointer bg-transparent border-none p-0"
-                                style={{ fontSize: "inherit" }}
-                              >
-                                Lyra {updateResult.version} available.
-                              </button>
-                            </>
-                          )}
+                          {updateResult === "error" &&
+                            " · Couldn't reach the server."}
+                          {updateResult &&
+                            updateResult !== "up-to-date" &&
+                            updateResult !== "error" && (
+                              <>
+                                {" · "}
+                                <button
+                                  onClick={() =>
+                                    openUrl(
+                                      (updateResult as UpdateInfo).releaseUrl,
+                                    ).catch(console.error)
+                                  }
+                                  className="text-accent hover:underline cursor-pointer bg-transparent border-none p-0"
+                                  style={{ fontSize: "inherit" }}
+                                >
+                                  Lyra {updateResult.version} available.
+                                </button>
+                              </>
+                            )}
                         </div>
                       </div>
                       {updateResult === "up-to-date" ? (
-                        <span className="shrink-0 text-muted" style={{ fontSize: 12.5 }}>
+                        <span
+                          className="shrink-0 text-muted"
+                          style={{ fontSize: 12.5 }}
+                        >
                           You're up to date
                         </span>
                       ) : (
@@ -314,7 +338,10 @@ export default function PreferencesModal({
 
               {/* Right column: debug panels, only visible when debug_mode is on */}
               {config.debug_mode && (
-                <div className="space-y-3" style={{ animation: "fadeIn 0.15s ease" }}>
+                <div
+                  className="space-y-3"
+                  style={{ animation: "fadeIn 0.15s ease" }}
+                >
                   {/* Danger Zone */}
                   <div
                     className="rounded-lg border px-3 py-3"
@@ -333,10 +360,16 @@ export default function PreferencesModal({
                     {!nukeConfirming ? (
                       <div className="flex items-center justify-between gap-3">
                         <div>
-                          <div className="text-secondary" style={{ fontSize: 13 }}>
+                          <div
+                            className="text-secondary"
+                            style={{ fontSize: 13 }}
+                          >
                             Nuke Vault
                           </div>
-                          <div className="text-muted mt-0.5 leading-snug" style={{ fontSize: 11.5 }}>
+                          <div
+                            className="text-muted mt-0.5 leading-snug"
+                            style={{ fontSize: 11.5 }}
+                          >
                             Delete all songs and reset the vault index
                           </div>
                         </div>
@@ -354,8 +387,12 @@ export default function PreferencesModal({
                       </div>
                     ) : (
                       <div>
-                        <p className="text-secondary leading-snug mb-3" style={{ fontSize: 12.5 }}>
-                          This will permanently delete all songs and reset the vault index. This cannot be undone.
+                        <p
+                          className="text-secondary leading-snug mb-3"
+                          style={{ fontSize: 12.5 }}
+                        >
+                          This will permanently delete all songs and reset the
+                          vault index. This cannot be undone.
                         </p>
                         <div className="flex items-center justify-end gap-2">
                           <button
@@ -384,15 +421,23 @@ export default function PreferencesModal({
 
                     <div
                       className="mt-2.5 pt-2.5"
-                      style={{ borderTop: "1px solid oklch(0.55 0.18 25 / 0.2)" }}
+                      style={{
+                        borderTop: "1px solid oklch(0.55 0.18 25 / 0.2)",
+                      }}
                     >
                       {!resetConfirming ? (
                         <div className="flex items-center justify-between gap-3">
                           <div>
-                            <div className="text-secondary" style={{ fontSize: 13 }}>
+                            <div
+                              className="text-secondary"
+                              style={{ fontSize: 13 }}
+                            >
                               Reset App
                             </div>
-                            <div className="text-muted mt-0.5 leading-snug" style={{ fontSize: 11.5 }}>
+                            <div
+                              className="text-muted mt-0.5 leading-snug"
+                              style={{ fontSize: 11.5 }}
+                            >
                               Clear vault path and return to first-launch state
                             </div>
                           </div>
@@ -410,8 +455,13 @@ export default function PreferencesModal({
                         </div>
                       ) : (
                         <div>
-                          <p className="text-secondary leading-snug mb-3" style={{ fontSize: 12.5 }}>
-                            This will clear your vault path and all app settings, returning Lyra to its first-launch state. Your song files will not be deleted.
+                          <p
+                            className="text-secondary leading-snug mb-3"
+                            style={{ fontSize: 12.5 }}
+                          >
+                            This will clear your vault path and all app
+                            settings, returning Lyra to its first-launch state.
+                            Your song files will not be deleted.
                           </p>
                           <div className="flex items-center justify-end gap-2">
                             <button
@@ -457,11 +507,13 @@ export default function PreferencesModal({
                     {[
                       {
                         label: "Update banner",
-                        description: "Show the banner as if a new version was found",
+                        description:
+                          "Show the banner as if a new version was found",
                         action: () => {
                           useUIStore.getState().setUpdateAvailable({
                             version: "99.9.9-1",
-                            releaseUrl: "https://github.com/GabrielBG0/lyra/releases",
+                            releaseUrl:
+                              "https://github.com/GabrielBG0/lyra/releases",
                           });
                           onClose();
                         },
@@ -480,12 +532,21 @@ export default function PreferencesModal({
                         action: () => setUpdateResult("error"),
                       },
                     ].map(({ label, description, action }) => (
-                      <div key={label} className="flex items-center justify-between gap-3">
+                      <div
+                        key={label}
+                        className="flex items-center justify-between gap-3"
+                      >
                         <div>
-                          <div className="text-secondary" style={{ fontSize: 13 }}>
+                          <div
+                            className="text-secondary"
+                            style={{ fontSize: 13 }}
+                          >
                             {label}
                           </div>
-                          <div className="text-muted mt-0.5 leading-snug" style={{ fontSize: 11.5 }}>
+                          <div
+                            className="text-muted mt-0.5 leading-snug"
+                            style={{ fontSize: 11.5 }}
+                          >
                             {description}
                           </div>
                         </div>

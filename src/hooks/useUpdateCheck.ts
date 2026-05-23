@@ -9,7 +9,12 @@ function parseVersion(v: string): [number, number, number, number] {
   const clean = v.replace(/^v/, "");
   const [base, pre] = clean.split("-");
   const parts = base.split(".").map(Number);
-  return [parts[0] ?? 0, parts[1] ?? 0, parts[2] ?? 0, pre ? parseInt(pre, 10) || 0 : 0];
+  return [
+    parts[0] ?? 0,
+    parts[1] ?? 0,
+    parts[2] ?? 0,
+    pre ? parseInt(pre, 10) || 0 : 0,
+  ];
 }
 
 function isNewer(candidate: string, current: string): boolean {
@@ -22,11 +27,16 @@ function isNewer(candidate: string, current: string): boolean {
   return false;
 }
 
-export async function checkForUpdates(signal?: AbortSignal): Promise<UpdateInfo | null> {
-  const r = await fetch("https://api.github.com/repos/GabrielBG0/lyra/releases/latest", {
-    signal,
-    headers: { Accept: "application/vnd.github+json" },
-  });
+export async function checkForUpdates(
+  signal?: AbortSignal,
+): Promise<UpdateInfo | null> {
+  const r = await fetch(
+    "https://api.github.com/repos/GabrielBG0/lyra/releases/latest",
+    {
+      signal,
+      headers: { Accept: "application/vnd.github+json" },
+    },
+  );
   const data = await r.json();
   const tag: string = data.tag_name ?? "";
   const url: string = data.html_url ?? "";

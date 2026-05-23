@@ -109,7 +109,7 @@ export default function AppShell({ vaultPath }: AppShellProps) {
         onToggleHistoryBar={toggleHistoryBar}
         onShowVaultOptions={openVaultOptionsModal}
       />
-<div className="flex flex-1 min-h-0">
+      <div className="flex flex-1 min-h-0">
         {/* Collapsed sidebar strip */}
         {sidebarCollapsed ? (
           <aside className="w-12 shrink-0 bg-panel border-r border-border-soft flex flex-col items-center py-2.5 gap-2">
