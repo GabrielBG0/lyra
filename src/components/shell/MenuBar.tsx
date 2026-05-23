@@ -29,7 +29,6 @@ const IMPLEMENTED = new Set([
   "Preferences…",
   "Vault Options…",
   "Export as Plain Text…",
-  "Export as PDF…",
   "Close Song",
   "Undo",
   "Redo",
@@ -111,7 +110,6 @@ export default function MenuBar({
       `Open Vault…\t${mod}O`,
       "—",
       "Export as Plain Text…",
-      `Export as PDF…\t${mod}P`,
       "—",
       `Close Song\t${mod}W`,
     ],
@@ -260,11 +258,6 @@ export default function MenuBar({
     await tauriApi.export.plainText(filePath, false);
   };
 
-  const handleExportPdf = async () => {
-    if (!filePath) return;
-    await tauriApi.export.pdf(filePath, false);
-  };
-
   const handleNewSection = () => {
     if (!filePath) return;
     window.dispatchEvent(new Event("add-section:open"));
@@ -279,7 +272,6 @@ export default function MenuBar({
     else if (label === "Open Vault…") handleOpenVault();
     else if (label === "Vault Options…") onShowVaultOptions();
     else if (label === "Export as Plain Text…") handleExportText();
-    else if (label === "Export as PDF…") handleExportPdf();
     else if (label === "Close Song") onCloseSong();
     else if (label === "Undo") undo();
     else if (label === "Redo") redo();
