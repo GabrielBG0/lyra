@@ -115,8 +115,8 @@ export const tauriApi = {
     plainText: (path: string, includeHistory: boolean) =>
       invoke<void>("export_plain_text", { path, includeHistory }),
 
-    pdf: (path: string, includeHistory: boolean) =>
-      invoke<void>("export_pdf", { path, includeHistory }),
+    html: (path: string, includeHistory: boolean) =>
+      invoke<void>("export_html", { path, includeHistory }),
   },
 
   debug: {

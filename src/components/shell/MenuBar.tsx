@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { open as openDialog } from "@tauri-apps/plugin-dialog";
+import { openUrl } from "@tauri-apps/plugin-opener";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import LyraLogo from "../ui/LyraLogo";
 import { useEditorStore } from "../../stores/editorStore";
@@ -7,6 +8,7 @@ import { useSong } from "../../hooks/useSong";
 import { useSnapshot } from "../../hooks/useSnapshot";
 import { useUIStore } from "../../stores/uiStore";
 import { tauriApi } from "../../lib/tauri";
+import { Icons } from "../ui/Icon";
 import {
   serializeSection,
   looksLikeSection,
@@ -96,6 +98,8 @@ export default function MenuBar({
     findPanelOpen,
     findReplaceMode,
     enterZenMode,
+    pendingUpdate,
+    dismissUpdate,
   } = useUIStore();
   const menuRef = useRef<HTMLDivElement>(null);
   const win = getCurrentWindow();
@@ -366,6 +370,32 @@ export default function MenuBar({
           )}
         </div>
       ))}
+
+      {pendingUpdate && (
+        <button
+          onClick={() => {
+            openUrl(pendingUpdate.releaseUrl).catch(console.error);
+            dismissUpdate();
+          }}
+          className="flex items-center gap-1.5 my-auto mx-6 px-2.5 h-[21px] rounded cursor-pointer transition-all select-none border"
+          style={{
+            fontSize: 11.5,
+            background: "oklch(0.72 0.10 55 / 0.1)",
+            color: "oklch(0.72 0.10 55)",
+            borderColor: "oklch(0.72 0.10 55 / 0.28)",
+          }}
+          onMouseEnter={(e) =>
+            (e.currentTarget.style.background = "oklch(0.72 0.10 55 / 0.18)")
+          }
+          onMouseLeave={(e) =>
+            (e.currentTarget.style.background = "oklch(0.72 0.10 55 / 0.1)")
+          }
+          title={`Lyra ${pendingUpdate.version} is available`}
+        >
+          <Icons.ArrowUp size={11} />
+          Update
+        </button>
+      )}
 
       <div className="flex-1" />
 

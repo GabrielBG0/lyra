@@ -17,6 +17,7 @@ import VaultOptionsModal from "../ui/VaultOptionsModal";
 import PreferencesModal from "../ui/PreferencesModal";
 import { useCloseGuard } from "../../hooks/useCloseGuard";
 import { useGlobalShortcuts } from "../../hooks/useGlobalShortcuts";
+import { useUpdateCheck } from "../../hooks/useUpdateCheck";
 
 interface AppShellProps {
   vaultPath: string;
@@ -63,6 +64,7 @@ export default function AppShell({ vaultPath }: AppShellProps) {
   };
   useCloseGuard();
   useGlobalShortcuts();
+  useUpdateCheck();
 
   const handleNewSong = () => openNewSongModal();
 

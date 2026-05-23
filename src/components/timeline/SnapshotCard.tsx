@@ -81,14 +81,6 @@ export default function SnapshotCard({
       label: "Compare with current",
       onClick: () => diffWorkingVsSnapshot(header.id),
     },
-    {
-      label: "Delete take",
-      danger: true,
-      onClick: () => {
-        // TODO: implement delete_snapshot Rust command
-        console.warn("Delete snapshot not yet implemented");
-      },
-    },
   ];
 
   return (

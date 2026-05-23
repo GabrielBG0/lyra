@@ -93,7 +93,7 @@ pub fn run() {
             commands::diff::diff_working_vs_snapshot,
             // export
             commands::export::export_plain_text,
-            commands::export::export_pdf,
+            commands::export::export_html,
             // section
             commands::section::add_section,
             commands::section::delete_section,

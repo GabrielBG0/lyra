@@ -39,7 +39,7 @@ pub async fn export_plain_text(
 /// Write the song as printable HTML to a temp file and open it in the
 /// system's default browser so the user can use the browser's print dialog.
 #[tauri::command]
-pub async fn export_pdf(
+pub async fn export_html(
     app: tauri::AppHandle,
     path: String,
     include_history: bool,

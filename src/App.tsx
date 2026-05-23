@@ -128,7 +128,29 @@ export default function App() {
         setSelectNameOnFocus(cfg.select_name_on_focus);
         if (cfg.vault_path) {
           await loadSongs();
-          if (!cfg.tutorial_completed) setPendingTour(true);
+          if (!cfg.tutorial_completed) {
+            setPendingTour(true);
+          } else if (cfg.last_opened_song) {
+            const songs = useSongStore.getState().songs;
+            const lastSong = songs.find(
+              (s) => s.file_path === cfg.last_opened_song,
+            );
+            if (lastSong) {
+              tauriApi.song
+                .open(lastSong.file_path)
+                .then((payload) => {
+                  useEditorStore.getState().loadSong(payload);
+                  useSongStore.getState().selectSong(lastSong.file_path);
+                })
+                .catch((err) =>
+                  console.error("[Init] Failed to reopen last song:", err),
+                );
+            } else {
+              tauriApi.config
+                .set({ ...cfg, last_opened_song: null })
+                .catch(() => {});
+            }
+          }
         }
       } catch {
         setVaultPath(null);
@@ -183,7 +205,7 @@ export default function App() {
       }),
       listen("export-pdf", async () => {
         const { filePath } = useEditorStore.getState();
-        if (filePath) await tauriApi.export.pdf(filePath, false);
+        if (filePath) await tauriApi.export.html(filePath, false);
       }),
       listen("delete-song", async () => {
         const { filePath } = useEditorStore.getState();

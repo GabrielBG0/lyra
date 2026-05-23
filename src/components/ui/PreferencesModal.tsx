@@ -1,10 +1,14 @@
 import { useState, useEffect } from "react";
+import { openUrl } from "@tauri-apps/plugin-opener";
 import { tauriApi } from "../../lib/tauri";
 import type { AppConfig } from "../../lib/types";
 import { useEditorStore } from "../../stores/editorStore";
 import { useSongStore } from "../../stores/songStore";
 import { useUIStore } from "../../stores/uiStore";
 import { Icons } from "./Icon";
+import { checkForUpdates, type UpdateInfo } from "../../hooks/useUpdateCheck";
+import { useTourStore } from "../../stores/tourStore";
+import pkg from "../../../package.json";
 
 interface PreferencesModalProps {
   open: boolean;
@@ -92,12 +96,17 @@ export default function PreferencesModal({
   const [nuking, setNuking] = useState(false);
   const [resetConfirming, setResetConfirming] = useState(false);
   const [resetting, setResetting] = useState(false);
+  const [updateChecking, setUpdateChecking] = useState(false);
+  const [updateResult, setUpdateResult] = useState<
+    UpdateInfo | null | "up-to-date" | "error"
+  >(null);
   const { setNudgeDismissed, setSelectNameOnFocus } = useUIStore();
 
   useEffect(() => {
     if (!open) return;
     setNukeConfirming(false);
     setResetConfirming(false);
+    setUpdateResult(null);
     tauriApi.config.get().then(setConfig);
   }, [open]);
 
@@ -139,6 +148,19 @@ export default function PreferencesModal({
     }
   };
 
+  const handleCheckUpdates = async () => {
+    setUpdateChecking(true);
+    setUpdateResult(null);
+    try {
+      const result = await checkForUpdates();
+      setUpdateResult(result ?? "up-to-date");
+    } catch {
+      setUpdateResult("error");
+    } finally {
+      setUpdateChecking(false);
+    }
+  };
+
   const handleReset = async () => {
     setResetting(true);
     try {
@@ -164,9 +186,10 @@ export default function PreferencesModal({
       }}
     >
       <div
-        className="relative w-full mx-4 rounded-xl border border-border overflow-hidden"
+        className="relative w-full mx-4 rounded-xl border border-border flex flex-col"
         style={{
-          maxWidth: "26rem",
+          maxWidth: config?.debug_mode ? "52rem" : "26rem",
+          maxHeight: "80vh",
           background: "oklch(0.205 0.012 60)",
           boxShadow:
             "0 24px 64px oklch(0.06 0.005 60 / 0.8), 0 0 0 1px oklch(0.32 0.012 60 / 0.4)",
@@ -189,7 +212,7 @@ export default function PreferencesModal({
           <Icons.X size={15} />
         </button>
 
-        <div className="px-6 pt-6 pb-6">
+        <div className="px-6 pt-6 pb-6 overflow-y-auto flex-1">
           <h2
             className="text-primary font-semibold mb-5"
             style={{ fontSize: 15, letterSpacing: "-0.01em" }}
@@ -198,48 +221,130 @@ export default function PreferencesModal({
           </h2>
 
           {config ? (
-            <div className="space-y-5">
-              {/* General */}
-              <div>
-                <SectionLabel>General</SectionLabel>
-                <div
-                  className="rounded-lg border border-border-soft px-3"
-                  style={{ background: "oklch(0.175 0.01 60)" }}
-                >
-                  <ToggleRow
-                    label="Hide save take reminder"
-                    description="Don't show the nudge to save a take while writing"
-                    checked={config.nudge_dismissed}
-                    onChange={(v) => handleToggle("nudge_dismissed", v)}
-                  />
-                  <div className="h-px bg-border-soft" />
-                  <ToggleRow
-                    label="Select section name on focus"
-                    description="Automatically select the name when opening the new section picker"
-                    checked={config.select_name_on_focus}
-                    onChange={(v) => handleToggle("select_name_on_focus", v)}
-                  />
+            <div
+              className={
+                config.debug_mode ? "grid gap-6 items-start" : "space-y-5"
+              }
+              style={
+                config.debug_mode
+                  ? { gridTemplateColumns: "1fr 1fr" }
+                  : undefined
+              }
+            >
+              {/* Left column: General, Updates, Developer toggle */}
+              <div className="space-y-5">
+                {/* General */}
+                <div>
+                  <SectionLabel>General</SectionLabel>
+                  <div
+                    className="rounded-lg border border-border-soft px-3"
+                    style={{ background: "oklch(0.175 0.01 60)" }}
+                  >
+                    <ToggleRow
+                      label="Hide save take reminder"
+                      description="Don't show the nudge to save a take while writing"
+                      checked={config.nudge_dismissed}
+                      onChange={(v) => handleToggle("nudge_dismissed", v)}
+                    />
+                    <div className="h-px bg-border-soft" />
+                    <ToggleRow
+                      label="Select section name on focus"
+                      description="Automatically select the name when opening the new section picker"
+                      checked={config.select_name_on_focus}
+                      onChange={(v) => handleToggle("select_name_on_focus", v)}
+                    />
+                  </div>
+                </div>
+
+                {/* Updates */}
+                <div>
+                  <SectionLabel>Updates</SectionLabel>
+                  <div
+                    className="rounded-lg border border-border-soft px-3 py-2.5"
+                    style={{ background: "oklch(0.175 0.01 60)" }}
+                  >
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="min-w-0">
+                        <div
+                          className="text-secondary"
+                          style={{ fontSize: 13 }}
+                        >
+                          Check for updates
+                        </div>
+                        <div
+                          className="text-muted mt-0.5 leading-snug"
+                          style={{ fontSize: 11.5 }}
+                        >
+                          {`Current version: ${pkg.version}`}
+                          {updateResult === "error" &&
+                            " · Couldn't reach the server."}
+                          {updateResult &&
+                            updateResult !== "up-to-date" &&
+                            updateResult !== "error" && (
+                              <>
+                                {" · "}
+                                <button
+                                  onClick={() =>
+                                    openUrl(
+                                      (updateResult as UpdateInfo).releaseUrl,
+                                    ).catch(console.error)
+                                  }
+                                  className="text-accent hover:underline cursor-pointer bg-transparent border-none p-0"
+                                  style={{ fontSize: "inherit" }}
+                                >
+                                  Lyra {updateResult.version} available.
+                                </button>
+                              </>
+                            )}
+                        </div>
+                      </div>
+                      {updateResult === "up-to-date" ? (
+                        <span
+                          className="shrink-0 text-muted"
+                          style={{ fontSize: 12.5 }}
+                        >
+                          You're up to date
+                        </span>
+                      ) : (
+                        <button
+                          onClick={handleCheckUpdates}
+                          disabled={updateChecking}
+                          className="shrink-0 px-3 py-1.5 rounded-lg border border-border-soft text-secondary hover:text-primary hover:bg-elev transition-colors bg-transparent cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                          style={{ fontSize: 12.5 }}
+                        >
+                          {updateChecking ? "Checking…" : "Check now"}
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Developer toggle */}
+                <div>
+                  <SectionLabel>Developer</SectionLabel>
+                  <div
+                    className="rounded-lg border border-border-soft px-3"
+                    style={{ background: "oklch(0.175 0.01 60)" }}
+                  >
+                    <ToggleRow
+                      label="Debug mode"
+                      description="Show developer tools and commands"
+                      checked={config.debug_mode}
+                      onChange={(v) => handleToggle("debug_mode", v)}
+                    />
+                  </div>
                 </div>
               </div>
 
-              {/* Developer */}
-              <div>
-                <SectionLabel>Developer</SectionLabel>
+              {/* Right column: debug panels, only visible when debug_mode is on */}
+              {config.debug_mode && (
                 <div
-                  className="rounded-lg border border-border-soft px-3"
-                  style={{ background: "oklch(0.175 0.01 60)" }}
+                  className="space-y-3"
+                  style={{ animation: "fadeIn 0.15s ease" }}
                 >
-                  <ToggleRow
-                    label="Debug mode"
-                    description="Show developer tools and commands"
-                    checked={config.debug_mode}
-                    onChange={(v) => handleToggle("debug_mode", v)}
-                  />
-                </div>
-
-                {config.debug_mode && (
+                  {/* Danger Zone */}
                   <div
-                    className="mt-3 rounded-lg border px-3 py-3"
+                    className="rounded-lg border px-3 py-3"
                     style={{
                       background: "oklch(0.55 0.18 25 / 0.06)",
                       borderColor: "oklch(0.55 0.18 25 / 0.25)",
@@ -384,8 +489,79 @@ export default function PreferencesModal({
                       )}
                     </div>
                   </div>
-                )}
-              </div>
+
+                  {/* Debug Triggers */}
+                  <div
+                    className="rounded-lg border px-3 py-3 space-y-2"
+                    style={{
+                      background: "oklch(0.245 0.014 60 / 0.5)",
+                      borderColor: "oklch(0.32 0.012 60 / 0.5)",
+                    }}
+                  >
+                    <div
+                      className="font-semibold uppercase tracking-wide mb-2.5"
+                      style={{ fontSize: 10.5, color: "oklch(0.55 0.008 60)" }}
+                    >
+                      Debug Triggers
+                    </div>
+                    {[
+                      {
+                        label: "Update banner",
+                        description:
+                          "Show the banner as if a new version was found",
+                        action: () => {
+                          useUIStore.getState().setUpdateAvailable({
+                            version: "99.9.9-1",
+                            releaseUrl:
+                              "https://github.com/GabrielBG0/lyra/releases",
+                          });
+                          onClose();
+                        },
+                      },
+                      {
+                        label: "Setup tutorial",
+                        description: "Restart the first-launch tour",
+                        action: () => {
+                          useTourStore.getState().start();
+                          onClose();
+                        },
+                      },
+                      {
+                        label: "Connection error",
+                        description: "Show the update check error state",
+                        action: () => setUpdateResult("error"),
+                      },
+                    ].map(({ label, description, action }) => (
+                      <div
+                        key={label}
+                        className="flex items-center justify-between gap-3"
+                      >
+                        <div>
+                          <div
+                            className="text-secondary"
+                            style={{ fontSize: 13 }}
+                          >
+                            {label}
+                          </div>
+                          <div
+                            className="text-muted mt-0.5 leading-snug"
+                            style={{ fontSize: 11.5 }}
+                          >
+                            {description}
+                          </div>
+                        </div>
+                        <button
+                          onClick={action}
+                          className="shrink-0 px-3 py-1.5 rounded-lg border border-border-soft text-secondary hover:text-primary hover:bg-elev transition-colors bg-transparent cursor-pointer"
+                          style={{ fontSize: 12.5 }}
+                        >
+                          Trigger
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           ) : (
             <div className="text-faint text-sm py-4 text-center">Loading…</div>
