@@ -21,7 +21,7 @@
     "@tauri-apps/plugin-dialog": "^2.7.1",
     "@tauri-apps/plugin-opener": "^2",
     "autoprefixer": "^10.5.0",
-    "lucide-react": "^1.8.0",
+    "lucide-react": "^1.16.0",
     "postcss": "^8.5.14",
     "react": "^19.1.0",
     "react-dom": "^19.2.6",
