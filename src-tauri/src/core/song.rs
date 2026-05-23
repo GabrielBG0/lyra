@@ -44,9 +44,6 @@ struct CommentsFile {
 
 /// Wrapper used to deserialize a snapshot JSON just enough to extract the
 /// header fields and count sections without loading full content.
-///
-/// Snapshot filenames follow the pattern `{ISO-8601}_{slug}.json`,
-/// e.g. `2025-03-01T14:22Z_first-draft.json`.
 #[derive(Debug, Deserialize)]
 struct SnapshotFile {
     created_at: String,
