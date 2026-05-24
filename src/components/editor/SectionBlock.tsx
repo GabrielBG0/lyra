@@ -189,7 +189,9 @@ export default function SectionBlock({
               resize();
             }}
             onInput={resize}
-            spellCheck={false}
+            spellCheck={true}
+            autoCorrect="off"
+            autoCapitalize="off"
             placeholder={readOnly ? "" : `Write ${section.name.toLowerCase()}…`}
             disabled={readOnly}
           />
