@@ -7,6 +7,7 @@ import { useEditorStore } from "../../stores/editorStore";
 import { useSong } from "../../hooks/useSong";
 import { useSnapshot } from "../../hooks/useSnapshot";
 import { useUIStore } from "../../stores/uiStore";
+import { useSongStore } from "../../stores/songStore";
 import { tauriApi } from "../../lib/tauri";
 import { Icons } from "../ui/Icon";
 import {
@@ -48,6 +49,7 @@ const IMPLEMENTED = new Set([
   "Show Replace",
   "Hide Replace",
   "New Section",
+  "Rescan Vault",
 ]);
 
 interface MenuBarProps {
@@ -87,6 +89,7 @@ export default function MenuBar({
     findNext,
     findPrev,
   } = useEditorStore();
+  const { setSongs } = useSongStore();
   const { saveSong } = useSong();
   const { createSnapshot } = useSnapshot();
   const {
@@ -104,7 +107,7 @@ export default function MenuBar({
   const win = getCurrentWindow();
 
   const MENUS = {
-    Lyra: [`Preferences…\t${mod},`, "—", "Vault Options…"],
+    Lyra: [`Preferences…\t${mod},`, "—", "Vault Options…", "Rescan Vault"],
     File: [
       `New Song\t${mod}N`,
       `Open Vault…\t${mod}O`,
@@ -271,6 +274,8 @@ export default function MenuBar({
     else if (label === "New Song") onNewSong();
     else if (label === "Open Vault…") handleOpenVault();
     else if (label === "Vault Options…") onShowVaultOptions();
+    else if (label === "Rescan Vault")
+      tauriApi.vault.rebuildIndex().then(setSongs).catch(console.error);
     else if (label === "Export as Plain Text…") handleExportText();
     else if (label === "Close Song") onCloseSong();
     else if (label === "Undo") undo();

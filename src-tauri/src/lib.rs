@@ -6,7 +6,7 @@ pub mod models;
 #[cfg(test)]
 pub mod test_utils;
 
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::sync::Mutex;
 
 use tauri::{Emitter, Manager, WindowEvent};
@@ -14,6 +14,7 @@ use tauri::{Emitter, Manager, WindowEvent};
 use commands::AppState;
 use core::config::load_config;
 use core::index::init_index;
+use core::vault::{scan_vault, start_watcher};
 
 #[tauri::command]
 fn greet(name: &str) -> String {
@@ -37,7 +38,12 @@ pub fn run() {
                 // first launch when no vault has been configured yet.
                 let pool = if let Some(ref vault_path) = config.vault_path {
                     match init_index(Path::new(vault_path)).await {
-                        Ok(p) => p,
+                        Ok(p) => {
+                            let vp = PathBuf::from(vault_path);
+                            let _ = scan_vault(&vp, &p).await;
+                            let _ = start_watcher(vp, p.clone(), handle.clone());
+                            p
+                        }
                         Err(_) => {
                             let p = sqlx::SqlitePool::connect("sqlite::memory:")
                                 .await
