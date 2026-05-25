@@ -357,7 +357,14 @@ export default function MenuBar({
                         </span>
                       )}
                       {kbd && (
-                        <span className="text-muted text-[11px]">{kbd}</span>
+                        <span
+                          className="text-muted text-[11px]"
+                          style={{
+                            fontFamily: "'Geist Mono', ui-monospace, monospace",
+                          }}
+                        >
+                          {kbd}
+                        </span>
                       )}
                     </span>
                   </button>

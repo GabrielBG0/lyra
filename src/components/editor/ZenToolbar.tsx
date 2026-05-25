@@ -52,6 +52,16 @@ export default function ZenToolbar() {
 
       <button
         className="w-6.5 h-6.5 flex items-center justify-center rounded text-faint hover:bg-elev hover:text-secondary transition-colors border-none bg-transparent cursor-pointer"
+        title="Add section (Ctrl+Shift+N)"
+        onClick={() => window.dispatchEvent(new Event("add-section:open"))}
+      >
+        <Icons.Plus size={13} />
+      </button>
+
+      <div className="w-px h-4 bg-border-soft mx-1" />
+
+      <button
+        className="w-6.5 h-6.5 flex items-center justify-center rounded text-faint hover:bg-elev hover:text-secondary transition-colors border-none bg-transparent cursor-pointer"
         title="Save Take"
         onClick={handleSaveTake}
       >

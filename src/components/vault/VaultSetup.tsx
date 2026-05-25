@@ -124,6 +124,7 @@ export default function VaultSetup({ onDone }: VaultSetupProps) {
               <Icons.Folder size={13} className="text-faint shrink-0 ml-2.5" />
               <input
                 className="flex-1 bg-transparent border-none outline-none text-primary text-xs py-2"
+                style={{ fontFamily: "'Geist Mono', ui-monospace, monospace" }}
                 placeholder={
                   mode === "create"
                     ? "~/Documents/New Lyra Vault"

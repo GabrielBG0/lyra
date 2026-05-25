@@ -114,14 +114,15 @@ export default function SectionEditor({
   }
 
   if (sections.length === 0) {
-    if (zenMode) return <div className="flex-1 bg-bg" />;
     return (
       <div
         data-tour="section-editor"
         className="flex flex-col items-center justify-center flex-1 gap-4"
       >
-        <LyraLogo size={48} dim />
-        <p className="text-muted text-sm">This song has no sections yet.</p>
+        {!zenMode && <LyraLogo size={48} dim />}
+        {!zenMode && (
+          <p className="text-muted text-sm">This song has no sections yet.</p>
+        )}
         <AddSection onAdd={(type, name) => handleAdd(type, name)} />
       </div>
     );
@@ -153,9 +154,7 @@ export default function SectionEditor({
               zenMode={zenMode}
             />
           ))}
-          {!zenMode && (
-            <AddSection onAdd={(type, name) => handleAdd(type, name)} />
-          )}
+          <AddSection onAdd={(type, name) => handleAdd(type, name)} />
         </div>
       </SortableContext>
     </DndContext>
