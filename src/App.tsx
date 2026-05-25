@@ -46,6 +46,7 @@ export default function App() {
     openNewSongModal,
     openSnapshotModal,
     openPreferencesModal,
+    openShortcutsModal,
     setNudgeDismissed,
     setSelectNameOnFocus,
     openFindPanel,
@@ -88,6 +89,7 @@ export default function App() {
       else enterZenMode();
     },
     preferences: () => openPreferencesModal(),
+    "show-shortcuts": () => openShortcutsModal(),
     find: () => {
       const { filePath } = useEditorStore.getState();
       if (!filePath) return;

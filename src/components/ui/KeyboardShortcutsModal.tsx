@@ -23,11 +23,11 @@ function resolveKey(token: string): string {
 function Kbd({ children }: { children: string }) {
   return (
     <kbd
-      className="inline-flex items-center justify-center rounded px-1.5 py-0.5 text-[11px] font-medium text-secondary border border-border-soft"
+      className="inline-flex items-center justify-center rounded px-1.5 pt-0.5 pb-1 text-[12px] font-medium text-secondary border border-border-soft"
       style={{
         background: "oklch(0.18 0.01 60)",
         minWidth: 22,
-        fontFamily: "inherit",
+        fontFamily: "'Geist Mono', ui-monospace, monospace",
       }}
     >
       {children}
@@ -71,8 +71,6 @@ export default function KeyboardShortcutsModal({
   }, [open]);
 
   if (!open) return null;
-
-  const maxHeight = `${MAX_CONTENT_RATIO * 100}vh`;
 
   return (
     <div
@@ -131,8 +129,6 @@ export default function KeyboardShortcutsModal({
             style={{
               columns,
               columnGap: "2.5rem",
-              maxHeight,
-              overflowY: "auto",
             }}
           >
             {SHORTCUT_CATEGORIES.map((category) => (

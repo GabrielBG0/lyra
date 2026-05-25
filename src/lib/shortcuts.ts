@@ -86,6 +86,11 @@ export const SHORTCUT_CATEGORIES: ShortcutCategory[] = [
     title: "General",
     shortcuts: [
       { label: "Preferences", action: "preferences", keys: ["mod", ","] },
+      {
+        label: "Keyboard Shortcuts",
+        action: "show-shortcuts",
+        keys: ["mod", "?"],
+      },
     ],
   },
 ];
@@ -95,9 +100,13 @@ export function matchesShortcut(def: ShortcutDef, e: KeyboardEvent): boolean {
   const needsShift = def.keys.includes("shift");
   const mainKey = def.keys.find((k) => k !== "mod" && k !== "shift");
   if (!mainKey) return false;
+  // Single non-alphanumeric keys (like '?') intrinsically require Shift on most
+  // keyboard layouts. Skip the shift check for those when shift is not explicit.
+  const skipShiftCheck =
+    mainKey.length === 1 && !/^[a-zA-Z0-9]$/.test(mainKey) && !needsShift;
   return (
     (e.metaKey || e.ctrlKey) === needsMod &&
-    e.shiftKey === needsShift &&
+    (skipShiftCheck || e.shiftKey === needsShift) &&
     e.key.toLowerCase() === mainKey.toLowerCase()
   );
 }
