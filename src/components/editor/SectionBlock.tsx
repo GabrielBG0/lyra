@@ -17,6 +17,9 @@ interface SectionBlockProps {
   onDelete: (id: string) => void;
   readOnly?: boolean;
   zenMode?: boolean;
+  textareaRefCallback?: (el: HTMLTextAreaElement | null) => void;
+  onNavigatePrev?: (column?: number) => void;
+  onNavigateNext?: (column?: number) => void;
 }
 
 function renderHighlightedContent(
@@ -63,11 +66,14 @@ export default function SectionBlock({
   onDelete,
   readOnly,
   zenMode,
+  textareaRefCallback,
+  onNavigatePrev,
+  onNavigateNext,
 }: SectionBlockProps) {
   const { updateSection, setFocusedSection, findMatches, findActiveIndex } =
     useEditorStore();
   const [commentsOpen, setCommentsOpen] = useState(false);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const rootRef = useRef<HTMLDivElement>(null);
 
   const sectionMatches = findMatches.filter((m) => m.sectionId === section.id);
@@ -107,6 +113,40 @@ export default function SectionBlock({
   };
 
   useEffect(resize, [section.content]);
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (readOnly || e.shiftKey || e.altKey || e.ctrlKey || e.metaKey) return;
+    const el = e.currentTarget;
+    const { value, selectionStart, selectionEnd } = el;
+    if (e.key === "ArrowUp") {
+      if (value.slice(0, selectionStart ?? 0).indexOf("\n") === -1) {
+        e.preventDefault();
+        // On the first line so column equals selectionStart directly
+        onNavigatePrev?.(selectionStart ?? 0);
+      }
+    } else if (e.key === "ArrowDown") {
+      if (value.slice(selectionStart ?? 0).indexOf("\n") === -1) {
+        e.preventDefault();
+        const textBeforeCursor = value.slice(0, selectionStart ?? 0);
+        const lastNl = textBeforeCursor.lastIndexOf("\n");
+        const column =
+          lastNl === -1
+            ? (selectionStart ?? 0)
+            : (selectionStart ?? 0) - lastNl - 1;
+        onNavigateNext?.(column);
+      }
+    } else if (e.key === "ArrowLeft") {
+      if (selectionStart === selectionEnd && selectionStart === 0) {
+        e.preventDefault();
+        onNavigatePrev?.();
+      }
+    } else if (e.key === "ArrowRight") {
+      if (selectionStart === selectionEnd && selectionStart === value.length) {
+        e.preventDefault();
+        onNavigateNext?.();
+      }
+    }
+  };
 
   return (
     <div
@@ -179,7 +219,10 @@ export default function SectionBlock({
             </div>
           )}
           <textarea
-            ref={textareaRef}
+            ref={(el) => {
+              textareaRef.current = el;
+              textareaRefCallback?.(el);
+            }}
             className="lyric-textarea"
             style={{ fontFamily: lyricFont, position: "relative", zIndex: 1 }}
             value={section.content}
@@ -189,6 +232,7 @@ export default function SectionBlock({
               resize();
             }}
             onInput={resize}
+            onKeyDown={handleKeyDown}
             spellCheck={true}
             autoCorrect="off"
             autoCapitalize="off"

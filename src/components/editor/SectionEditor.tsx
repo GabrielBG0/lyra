@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import type { SectionType, SnapshotSection } from "../../lib/types";
 import { useEditorStore } from "../../stores/editorStore";
 import { useUIStore } from "../../stores/uiStore";
@@ -27,6 +28,35 @@ export default function SectionEditor({
   const { sections, filePath, addSection, removeSection, reorderSections } =
     useEditorStore();
   const { zenMode } = useUIStore();
+  const textareaRefs = useRef<Map<string, HTMLTextAreaElement>>(new Map());
+
+  const focusSectionTextarea = (
+    sectionId: string,
+    atEnd: boolean,
+    column?: number,
+  ) => {
+    const el = textareaRefs.current.get(sectionId);
+    if (!el) return;
+    el.focus();
+    let pos: number;
+    if (column !== undefined) {
+      if (atEnd) {
+        // Land on the last line of the target section at the given column
+        const lastNl = el.value.lastIndexOf("\n");
+        const lastLineStart = lastNl === -1 ? 0 : lastNl + 1;
+        const lastLineLen = el.value.length - lastLineStart;
+        pos = lastLineStart + Math.min(column, lastLineLen);
+      } else {
+        // Land on the first line of the target section at the given column
+        const firstNl = el.value.indexOf("\n");
+        const firstLineLen = firstNl === -1 ? el.value.length : firstNl;
+        pos = Math.min(column, firstLineLen);
+      }
+    } else {
+      pos = atEnd ? el.value.length : 0;
+    }
+    el.setSelectionRange(pos, pos);
+  };
 
   const handleAdd = async (
     type: SectionType,
@@ -152,6 +182,22 @@ export default function SectionEditor({
               onInsertBefore={(type, name) => handleAdd(type, name, i - 1)}
               onDelete={handleDelete}
               zenMode={zenMode}
+              textareaRefCallback={(el) => {
+                if (el) textareaRefs.current.set(section.id, el);
+                else textareaRefs.current.delete(section.id);
+              }}
+              onNavigatePrev={
+                i > 0
+                  ? (column?: number) =>
+                      focusSectionTextarea(sections[i - 1].id, true, column)
+                  : undefined
+              }
+              onNavigateNext={
+                i < sections.length - 1
+                  ? (column?: number) =>
+                      focusSectionTextarea(sections[i + 1].id, false, column)
+                  : undefined
+              }
             />
           ))}
           <AddSection onAdd={(type, name) => handleAdd(type, name)} />
