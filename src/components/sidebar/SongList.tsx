@@ -83,7 +83,10 @@ export default function SongList({ vaultPath, onCreateSong }: SongListProps) {
         </div>
         <div
           className="text-faint leading-tight"
-          style={{ fontSize: 10.5, fontFamily: "'Geist Mono', ui-monospace, monospace" }}
+          style={{
+            fontSize: 10.5,
+            fontFamily: "'Geist Mono', ui-monospace, monospace",
+          }}
         >
           {vaultPath.replace(/\\/g, "/").split("/").slice(-2).join("/")}
         </div>

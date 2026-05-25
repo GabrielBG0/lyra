@@ -143,7 +143,10 @@ export default function VaultOptionsModal({
               <Icons.Folder size={14} className="text-accent shrink-0" />
               <span
                 className="flex-1 text-secondary truncate"
-                style={{ fontSize: 11.5, fontFamily: "'Geist Mono', ui-monospace, monospace" }}
+                style={{
+                  fontSize: 11.5,
+                  fontFamily: "'Geist Mono', ui-monospace, monospace",
+                }}
                 title={displayPath ?? undefined}
               >
                 {displayPath ?? "No vault selected"}
