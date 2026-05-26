@@ -54,6 +54,7 @@ interface EditorStore {
   reorderSections: (orderedIds: string[]) => void;
   addSection: (section: Section, insertAt?: number) => void;
   removeSection: (id: string) => void;
+  splitSection: (originalSection: Section, insertIndex: number, newSections: Section[]) => void;
   markClean: () => void;
   addSnapshotHeader: (header: SnapshotHeader) => void;
   cacheSnapshot: (id: string, snapshot: Snapshot) => void;
@@ -347,6 +348,43 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
           const arr = [...s.sections];
           arr.splice(originalIndex, 0, sectionToRemove);
           return { sections: arr, isDirty: true };
+        });
+        recomputeFind();
+      },
+    };
+    get().execute(cmd);
+  },
+
+  splitSection: (originalSection, insertIndex, newSections) => {
+    const recomputeFind = () => {
+      const { findQuery, findCaseSensitive, findWholeWord, sections } = get();
+      if (findQuery)
+        set({
+          findMatches: computeMatches(findQuery, findCaseSensitive, sections, findWholeWord),
+        });
+    };
+    const newIds = new Set(newSections.map((ns) => ns.id));
+    const cmd: EditorCommand = {
+      description: `Split ${originalSection.name}`,
+      apply() {
+        set((s) => {
+          const filtered = s.sections.filter((sec) => sec.id !== originalSection.id);
+          filtered.splice(insertIndex, 0, ...newSections);
+          return {
+            sections: filtered.map((sec, i) => ({ ...sec, order: i + 1 })),
+            isDirty: true,
+          };
+        });
+        recomputeFind();
+      },
+      undo() {
+        set((s) => {
+          const filtered = s.sections.filter((sec) => !newIds.has(sec.id));
+          filtered.splice(insertIndex, 0, originalSection);
+          return {
+            sections: filtered.map((sec, i) => ({ ...sec, order: i + 1 })),
+            isDirty: true,
+          };
         });
         recomputeFind();
       },

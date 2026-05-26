@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import type { SectionType, SnapshotSection } from "../../lib/types";
+import type { Section, SectionType, SnapshotSection } from "../../lib/types";
 import { useEditorStore } from "../../stores/editorStore";
 import { useUIStore } from "../../stores/uiStore";
 import SectionBlock from "./SectionBlock";
@@ -25,7 +25,7 @@ export default function SectionEditor({
   readOnly,
   previewSections,
 }: SectionEditorProps) {
-  const { sections, filePath, addSection, removeSection, reorderSections } =
+  const { sections, filePath, addSection, removeSection, reorderSections, splitSection } =
     useEditorStore();
   const { zenMode } = useUIStore();
   const textareaRefs = useRef<Map<string, HTMLTextAreaElement>>(new Map());
@@ -80,6 +80,43 @@ export default function SectionEditor({
       removeSection(id);
     } catch (error) {
       console.error("Failed to delete section:", error);
+    }
+  };
+
+  const handleTurnInto = async (
+    sectionId: string,
+    selStart: number,
+    selEnd: number,
+    newType: SectionType,
+    newName: string,
+  ) => {
+    if (!filePath) return;
+    const sectionIndex = sections.findIndex((s) => s.id === sectionId);
+    if (sectionIndex === -1) return;
+    const original = sections[sectionIndex];
+
+    const beforeText = original.content.slice(0, selStart).replace(/\n+$/, "");
+    const selectedText = original.content.slice(selStart, selEnd).replace(/^\n+/, "").replace(/\n+$/, "");
+    const afterText = original.content.slice(selEnd).replace(/^\n+/, "");
+
+    const parts: { type: SectionType; name: string; content: string }[] = [];
+    if (beforeText) parts.push({ type: original.section_type, name: original.name, content: beforeText });
+    parts.push({ type: newType, name: newName, content: selectedText });
+    if (afterText) parts.push({ type: original.section_type, name: original.name, content: afterText });
+
+    try {
+      const newSections: Section[] = [];
+      for (let i = 0; i < parts.length; i++) {
+        const { type, name, content } = parts[i];
+        const s = await tauriApi.section.add(filePath, type, name, sectionIndex + 1 + i);
+        newSections.push({ ...s, content });
+      }
+      await tauriApi.section.delete(filePath, sectionId);
+      splitSection(original, sectionIndex, newSections);
+      const orderedIds = useEditorStore.getState().sections.map((s) => s.id);
+      await tauriApi.section.reorder(filePath, orderedIds);
+    } catch (error) {
+      console.error("Failed to split section:", error);
     }
   };
 
@@ -181,6 +218,7 @@ export default function SectionEditor({
               commentCount={0}
               onInsertBefore={(type, name) => handleAdd(type, name, i - 1)}
               onDelete={handleDelete}
+              onTurnInto={handleTurnInto}
               zenMode={zenMode}
               textareaRefCallback={(el) => {
                 if (el) textareaRefs.current.set(section.id, el);

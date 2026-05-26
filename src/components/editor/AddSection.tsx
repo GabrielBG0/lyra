@@ -4,7 +4,7 @@ import type { SectionType } from "../../lib/types";
 import { Icons } from "../ui/Icon";
 import { useUIStore } from "../../stores/uiStore";
 
-const SECTION_TYPES: { type: SectionType; label: string }[] = [
+export const SECTION_TYPES: { type: SectionType; label: string }[] = [
   { type: "intro", label: "Intro" },
   { type: "verse", label: "Verse" },
   { type: "pre-chorus", label: "Pre-Chorus" },
