@@ -5,6 +5,7 @@ import { useEditorStore } from "../../stores/editorStore";
 import SectionHeader from "./SectionHeader";
 import CommentPanel from "../comments/CommentPanel";
 import AddSection from "./AddSection";
+import TextareaContextMenu from "./TextareaContextMenu";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
@@ -15,11 +16,25 @@ interface SectionBlockProps {
   commentCount: number;
   onInsertBefore: (type: SectionType, name: string) => void;
   onDelete: (id: string) => void;
+  onTurnInto?: (
+    sectionId: string,
+    selStart: number,
+    selEnd: number,
+    type: SectionType,
+    name: string,
+  ) => void;
   readOnly?: boolean;
   zenMode?: boolean;
   textareaRefCallback?: (el: HTMLTextAreaElement | null) => void;
   onNavigatePrev?: (column?: number) => void;
   onNavigateNext?: (column?: number) => void;
+}
+
+interface ContextMenuState {
+  x: number;
+  y: number;
+  selStart: number;
+  selEnd: number;
 }
 
 function renderHighlightedContent(
@@ -64,6 +79,7 @@ export default function SectionBlock({
   commentCount,
   onInsertBefore,
   onDelete,
+  onTurnInto,
   readOnly,
   zenMode,
   textareaRefCallback,
@@ -73,8 +89,10 @@ export default function SectionBlock({
   const { updateSection, setFocusedSection, findMatches, findActiveIndex } =
     useEditorStore();
   const [commentsOpen, setCommentsOpen] = useState(false);
+  const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const rootRef = useRef<HTMLDivElement>(null);
+  const pendingCursorPos = useRef<number | null>(null);
 
   const sectionMatches = findMatches.filter((m) => m.sectionId === section.id);
   const activeMatch = findMatches[findActiveIndex];
@@ -113,6 +131,62 @@ export default function SectionBlock({
   };
 
   useEffect(resize, [section.content]);
+
+  useEffect(() => {
+    if (pendingCursorPos.current !== null) {
+      const pos = pendingCursorPos.current;
+      pendingCursorPos.current = null;
+      requestAnimationFrame(() => {
+        const el = textareaRef.current;
+        if (!el) return;
+        el.focus();
+        el.setSelectionRange(pos, pos);
+      });
+    }
+  }, [section.content]);
+
+  const handleContextMenuCut = async () => {
+    if (!contextMenu) return;
+    const { selStart, selEnd } = contextMenu;
+    await navigator.clipboard.writeText(
+      section.content.slice(selStart, selEnd),
+    );
+    const newContent =
+      section.content.slice(0, selStart) + section.content.slice(selEnd);
+    updateSection(section.id, newContent);
+    pendingCursorPos.current = selStart;
+  };
+
+  const handleContextMenuCopy = async () => {
+    if (!contextMenu) return;
+    const { selStart, selEnd } = contextMenu;
+    await navigator.clipboard.writeText(
+      section.content.slice(selStart, selEnd),
+    );
+  };
+
+  const handleContextMenuPaste = async () => {
+    if (!contextMenu) return;
+    const { selStart, selEnd } = contextMenu;
+    try {
+      const text = await navigator.clipboard.readText();
+      const newContent =
+        section.content.slice(0, selStart) +
+        text +
+        section.content.slice(selEnd);
+      updateSection(section.id, newContent);
+      pendingCursorPos.current = selStart + text.length;
+    } catch {
+      // Clipboard read not permitted
+    }
+  };
+
+  const handleContextMenuSelectAll = () => {
+    const el = textareaRef.current;
+    if (!el) return;
+    el.focus();
+    el.select();
+  };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (readOnly || e.shiftKey || e.altKey || e.ctrlKey || e.metaKey) return;
@@ -233,12 +307,44 @@ export default function SectionBlock({
             }}
             onInput={resize}
             onKeyDown={handleKeyDown}
+            onContextMenu={(e) => {
+              if (readOnly) return;
+              e.preventDefault();
+              const el = e.currentTarget;
+              setContextMenu({
+                x: e.clientX,
+                y: e.clientY,
+                selStart: el.selectionStart ?? 0,
+                selEnd: el.selectionEnd ?? 0,
+              });
+            }}
             spellCheck={true}
             autoCorrect="off"
             autoCapitalize="off"
             placeholder={readOnly ? "" : `Write ${section.name.toLowerCase()}…`}
             disabled={readOnly}
           />
+          {contextMenu && (
+            <TextareaContextMenu
+              x={contextMenu.x}
+              y={contextMenu.y}
+              hasSelection={contextMenu.selStart !== contextMenu.selEnd}
+              onCut={handleContextMenuCut}
+              onCopy={handleContextMenuCopy}
+              onPaste={handleContextMenuPaste}
+              onSelectAll={handleContextMenuSelectAll}
+              onTurnInto={(type, name) => {
+                onTurnInto?.(
+                  section.id,
+                  contextMenu.selStart,
+                  contextMenu.selEnd,
+                  type,
+                  name,
+                );
+              }}
+              onClose={() => setContextMenu(null)}
+            />
+          )}
         </div>
       </div>
 
