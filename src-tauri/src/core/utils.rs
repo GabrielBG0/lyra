@@ -203,7 +203,7 @@ pub fn copy_entries_except(
 ) -> AppResult<()> {
     for i in 0..src.len() {
         let mut entry = src.by_index(i)?;
-        let name = entry.name().to_owned();
+        let name = entry.name()?.into_owned();
 
         if skip.contains(&name) {
             continue;

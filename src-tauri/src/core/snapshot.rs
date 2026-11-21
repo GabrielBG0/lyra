@@ -378,7 +378,7 @@ fn do_append_snapshot(
     // Copy every existing entry
     for i in 0..src_archive.len() {
         let mut entry = src_archive.by_index(i)?;
-        let name = entry.name().to_owned();
+        let name = entry.name()?.into_owned();
 
         let mut buf = Vec::with_capacity(entry.size() as usize);
         entry.read_to_end(&mut buf)?;

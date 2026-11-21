@@ -97,7 +97,7 @@ pub async fn read_lyr_file(path: &Path) -> AppResult<SongPayload> {
     let section_names: Vec<String> = (0..archive.len())
         .filter_map(|i| {
             let entry = archive.by_index(i).ok()?;
-            let name = entry.name().to_owned();
+            let name = entry.name().ok()?.into_owned();
             if name.starts_with("sections/") && name.ends_with(".toml") {
                 Some(name)
             } else {
@@ -119,7 +119,7 @@ pub async fn read_lyr_file(path: &Path) -> AppResult<SongPayload> {
     let snapshot_names: Vec<String> = (0..archive.len())
         .filter_map(|i| {
             let entry = archive.by_index(i).ok()?;
-            let name = entry.name().to_owned();
+            let name = entry.name().ok()?.into_owned();
             if name.starts_with("snapshots/") && name.ends_with(".json") {
                 Some(name)
             } else {
