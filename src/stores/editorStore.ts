@@ -54,7 +54,11 @@ interface EditorStore {
   reorderSections: (orderedIds: string[]) => void;
   addSection: (section: Section, insertAt?: number) => void;
   removeSection: (id: string) => void;
-  splitSection: (originalSection: Section, insertIndex: number, newSections: Section[]) => void;
+  splitSection: (
+    originalSection: Section,
+    insertIndex: number,
+    newSections: Section[],
+  ) => void;
   markClean: () => void;
   addSnapshotHeader: (header: SnapshotHeader) => void;
   cacheSnapshot: (id: string, snapshot: Snapshot) => void;
@@ -360,7 +364,12 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
       const { findQuery, findCaseSensitive, findWholeWord, sections } = get();
       if (findQuery)
         set({
-          findMatches: computeMatches(findQuery, findCaseSensitive, sections, findWholeWord),
+          findMatches: computeMatches(
+            findQuery,
+            findCaseSensitive,
+            sections,
+            findWholeWord,
+          ),
         });
     };
     const newIds = new Set(newSections.map((ns) => ns.id));
@@ -368,7 +377,9 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
       description: `Split ${originalSection.name}`,
       apply() {
         set((s) => {
-          const filtered = s.sections.filter((sec) => sec.id !== originalSection.id);
+          const filtered = s.sections.filter(
+            (sec) => sec.id !== originalSection.id,
+          );
           filtered.splice(insertIndex, 0, ...newSections);
           return {
             sections: filtered.map((sec, i) => ({ ...sec, order: i + 1 })),

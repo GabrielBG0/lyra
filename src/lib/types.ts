@@ -8,13 +8,7 @@ export interface UpdateInfo {
 
 export type SongStatus = "idea" | "draft" | "demo" | "finished";
 export type SectionType =
-  | "intro"
-  | "verse"
-  | "pre-chorus"
-  | "chorus"
-  | "bridge"
-  | "outro"
-  | "custom";
+  "intro" | "verse" | "pre-chorus" | "chorus" | "bridge" | "outro" | "custom";
 export type DiffStatus = "equal" | "changed" | "added" | "removed";
 export type HunkKind = "equal" | "insert" | "delete";
 

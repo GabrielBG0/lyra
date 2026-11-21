@@ -16,7 +16,13 @@ interface SectionBlockProps {
   commentCount: number;
   onInsertBefore: (type: SectionType, name: string) => void;
   onDelete: (id: string) => void;
-  onTurnInto?: (sectionId: string, selStart: number, selEnd: number, type: SectionType, name: string) => void;
+  onTurnInto?: (
+    sectionId: string,
+    selStart: number,
+    selEnd: number,
+    type: SectionType,
+    name: string,
+  ) => void;
   readOnly?: boolean;
   zenMode?: boolean;
   textareaRefCallback?: (el: HTMLTextAreaElement | null) => void;
@@ -142,8 +148,11 @@ export default function SectionBlock({
   const handleContextMenuCut = async () => {
     if (!contextMenu) return;
     const { selStart, selEnd } = contextMenu;
-    await navigator.clipboard.writeText(section.content.slice(selStart, selEnd));
-    const newContent = section.content.slice(0, selStart) + section.content.slice(selEnd);
+    await navigator.clipboard.writeText(
+      section.content.slice(selStart, selEnd),
+    );
+    const newContent =
+      section.content.slice(0, selStart) + section.content.slice(selEnd);
     updateSection(section.id, newContent);
     pendingCursorPos.current = selStart;
   };
@@ -151,7 +160,9 @@ export default function SectionBlock({
   const handleContextMenuCopy = async () => {
     if (!contextMenu) return;
     const { selStart, selEnd } = contextMenu;
-    await navigator.clipboard.writeText(section.content.slice(selStart, selEnd));
+    await navigator.clipboard.writeText(
+      section.content.slice(selStart, selEnd),
+    );
   };
 
   const handleContextMenuPaste = async () => {
@@ -159,7 +170,10 @@ export default function SectionBlock({
     const { selStart, selEnd } = contextMenu;
     try {
       const text = await navigator.clipboard.readText();
-      const newContent = section.content.slice(0, selStart) + text + section.content.slice(selEnd);
+      const newContent =
+        section.content.slice(0, selStart) +
+        text +
+        section.content.slice(selEnd);
       updateSection(section.id, newContent);
       pendingCursorPos.current = selStart + text.length;
     } catch {
@@ -320,7 +334,13 @@ export default function SectionBlock({
               onPaste={handleContextMenuPaste}
               onSelectAll={handleContextMenuSelectAll}
               onTurnInto={(type, name) => {
-                onTurnInto?.(section.id, contextMenu.selStart, contextMenu.selEnd, type, name);
+                onTurnInto?.(
+                  section.id,
+                  contextMenu.selStart,
+                  contextMenu.selEnd,
+                  type,
+                  name,
+                );
               }}
               onClose={() => setContextMenu(null)}
             />

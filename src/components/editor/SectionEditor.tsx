@@ -25,8 +25,14 @@ export default function SectionEditor({
   readOnly,
   previewSections,
 }: SectionEditorProps) {
-  const { sections, filePath, addSection, removeSection, reorderSections, splitSection } =
-    useEditorStore();
+  const {
+    sections,
+    filePath,
+    addSection,
+    removeSection,
+    reorderSections,
+    splitSection,
+  } = useEditorStore();
   const { zenMode } = useUIStore();
   const textareaRefs = useRef<Map<string, HTMLTextAreaElement>>(new Map());
 
@@ -96,19 +102,37 @@ export default function SectionEditor({
     const original = sections[sectionIndex];
 
     const beforeText = original.content.slice(0, selStart).replace(/\n+$/, "");
-    const selectedText = original.content.slice(selStart, selEnd).replace(/^\n+/, "").replace(/\n+$/, "");
+    const selectedText = original.content
+      .slice(selStart, selEnd)
+      .replace(/^\n+/, "")
+      .replace(/\n+$/, "");
     const afterText = original.content.slice(selEnd).replace(/^\n+/, "");
 
     const parts: { type: SectionType; name: string; content: string }[] = [];
-    if (beforeText) parts.push({ type: original.section_type, name: original.name, content: beforeText });
+    if (beforeText)
+      parts.push({
+        type: original.section_type,
+        name: original.name,
+        content: beforeText,
+      });
     parts.push({ type: newType, name: newName, content: selectedText });
-    if (afterText) parts.push({ type: original.section_type, name: original.name, content: afterText });
+    if (afterText)
+      parts.push({
+        type: original.section_type,
+        name: original.name,
+        content: afterText,
+      });
 
     try {
       const newSections: Section[] = [];
       for (let i = 0; i < parts.length; i++) {
         const { type, name, content } = parts[i];
-        const s = await tauriApi.section.add(filePath, type, name, sectionIndex + 1 + i);
+        const s = await tauriApi.section.add(
+          filePath,
+          type,
+          name,
+          sectionIndex + 1 + i,
+        );
         newSections.push({ ...s, content });
       }
       await tauriApi.section.delete(filePath, sectionId);

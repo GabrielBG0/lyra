@@ -38,8 +38,10 @@ export default function TextareaContextMenu({
     const rect = el.getBoundingClientRect();
     const vw = window.innerWidth;
     const vh = window.innerHeight;
-    if (x + rect.width > vw) el.style.left = `${Math.max(0, vw - rect.width - 8)}px`;
-    if (y + rect.height > vh) el.style.top = `${Math.max(0, vh - rect.height - 8)}px`;
+    if (x + rect.width > vw)
+      el.style.left = `${Math.max(0, vw - rect.width - 8)}px`;
+    if (y + rect.height > vh)
+      el.style.top = `${Math.max(0, vh - rect.height - 8)}px`;
   }, [x, y, showPicker]);
 
   useEffect(() => {
@@ -72,7 +74,8 @@ export default function TextareaContextMenu({
 
   const handleSubmit = () => {
     const finalName =
-      name.trim() || (SECTION_TYPES.find((t) => t.type === selectedType)?.label ?? "Section");
+      name.trim() ||
+      (SECTION_TYPES.find((t) => t.type === selectedType)?.label ?? "Section");
     onTurnInto(selectedType, finalName);
     onClose();
   };
@@ -207,7 +210,9 @@ function MenuItem({
       onClick={onClick}
     >
       <span>{label}</span>
-      {hasSubmenu && <span className="text-muted text-base leading-none ml-2">›</span>}
+      {hasSubmenu && (
+        <span className="text-muted text-base leading-none ml-2">›</span>
+      )}
     </button>
   );
 }
